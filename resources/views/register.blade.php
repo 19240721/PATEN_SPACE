@@ -4,36 +4,9 @@
 
 @section('content')
 <div class="app-shell form-page-shell">
-    <aside class="sidebar">
-        <div class="brand-wrap">
-            <div class="brand-mark">P</div>
-            <div class="brand-text">
-                <div class="brand-title">PATEN SPACE</div>
-                <div class="brand-sub">Kecamatan Jatisari</div>
-            </div>
-        </div>
-
-        <button class="hamburger" aria-label="Menu">☰</button>
-
-        <nav class="sidebar-nav">
-            <div class="nav-group-label">Dashboard</div>
-            <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
-
-            <div class="nav-group-label">Layanan PATEN</div>
-            <a href="{{ route('register') }}" class="nav-item active">Registrasi / Pendaftaran</a>
-            <a href="#" class="nav-item">Data Penduduk</a>
-
-            <div class="nav-group-label">Pengelolaan</div>
-            <a href="#" class="nav-item">Data Pengguna</a>
-            <a href="#" class="nav-item">Laporan</a>
-            <a href="#" class="nav-item">Pengaturan</a>
-        </nav>
-
-        <button class="logout-btn">Keluar</button>
-    </aside>
-
     <main class="main-panel form-page-main">
         <header class="topbar form-topbar">
+            <button type="button" class="back-button" aria-label="Kembali" title="Kembali" onclick="if (document.referrer.startsWith(window.location.origin)) { window.history.back(); } else { window.location.href = '{{ route('dashboard') }}'; }">←</button>
             <div>
                 <h1>Registrasi</h1>
                 <p>Input data pendaftaran layanan PATEN Kecamatan Jatisari.</p>
@@ -44,8 +17,10 @@
         @php
             $pendaftaran = $pendaftaran ?? new \App\Models\Pendaftaran();
             $isEdit = isset($pendaftaran->id);
-            $actionUrl = $isEdit ? route('pendaftaran.update', $pendaftaran) : route('register.store');
-            $selectedService = old('jenis_layanan', $pendaftaran->jenis_layanan ?? 'KTP');
+            $actionUrl = $isEdit ? route('pendaftaran.update', $pendaftaran) : route('pendaftaran.store');
+            $fixedService = $isEdit ? $pendaftaran->jenis_layanan : request('jenis_layanan');
+            $hasFixedService = in_array($fixedService, ['PRR', 'KTP', 'KK', 'Akta Kematian', 'Akta Lahir', 'Kedatangan', 'Pindah'], true);
+            $selectedService = old('jenis_layanan', $fixedService ?? 'KTP');
         @endphp
 
         <form action="{{ $actionUrl }}" method="POST" class="form-shell">
@@ -60,19 +35,23 @@
                 </div>
 
                 <div class="form-grid">
-                    <div class="field-group">
-                        <label for="jenis_layanan">Jenis Layanan</label>
-                        <select id="jenis_layanan" name="jenis_layanan" required>
-                            <option value="">Pilih layanan</option>
-                            <option value="PRR" {{ $selectedService == 'PRR' ? 'selected' : '' }}>PRR / Pembuatan KTP Baru</option>
-                            <option value="KTP" {{ $selectedService == 'KTP' ? 'selected' : '' }}>KTP / Pembaharuan (Hilang/Rusak)</option>
-                            <option value="KK" {{ $selectedService == 'KK' ? 'selected' : '' }}>KK</option>
-                            <option value="Akta Kematian" {{ $selectedService == 'Akta Kematian' ? 'selected' : '' }}>Akta Kematian</option>
-                            <option value="Akta Lahir" {{ $selectedService == 'Akta Lahir' ? 'selected' : '' }}>Akta Lahir</option>
-                            <option value="Kedatangan" {{ $selectedService == 'Kedatangan' ? 'selected' : '' }}>Kedatangan</option>
-                            <option value="Pindah" {{ $selectedService == 'Pindah' ? 'selected' : '' }}>Pindah</option>
-                        </select>
-                    </div>
+                    @if ($hasFixedService)
+                        <input type="hidden" name="jenis_layanan" value="{{ $selectedService }}">
+                    @else
+                        <div class="field-group">
+                            <label for="jenis_layanan">Jenis Layanan</label>
+                            <select id="jenis_layanan" name="jenis_layanan" required>
+                                <option value="">Pilih layanan</option>
+                                <option value="PRR" {{ $selectedService == 'PRR' ? 'selected' : '' }}>PRR / Pembuatan KTP Baru</option>
+                                <option value="KTP" {{ $selectedService == 'KTP' ? 'selected' : '' }}>KTP / Pembaharuan (Hilang/Rusak)</option>
+                                <option value="KK" {{ $selectedService == 'KK' ? 'selected' : '' }}>KK</option>
+                                <option value="Akta Kematian" {{ $selectedService == 'Akta Kematian' ? 'selected' : '' }}>Akta Kematian</option>
+                                <option value="Akta Lahir" {{ $selectedService == 'Akta Lahir' ? 'selected' : '' }}>Akta Lahir</option>
+                                <option value="Kedatangan" {{ $selectedService == 'Kedatangan' ? 'selected' : '' }}>Kedatangan</option>
+                                <option value="Pindah" {{ $selectedService == 'Pindah' ? 'selected' : '' }}>Pindah</option>
+                            </select>
+                        </div>
+                    @endif
                     <div class="field-group">
                         <label for="nama_lengkap">Nama Lengkap</label>
                         <input id="nama_lengkap" name="nama_lengkap" type="text" placeholder="Masukkan nama lengkap" value="{{ old('nama_lengkap', $pendaftaran->nama_lengkap ?? '') }}" required>
@@ -198,7 +177,6 @@
                                 <option value="Pacing" {{ old('desa', $pendaftaran->desa ?? '') == 'Pacing' ? 'selected' : '' }}>Pacing</option>
                             </select>
                         </div>
-                        <div class="field-group"><label>Alasan Permohonan</label><input type="text" name="alasan_permohonan" value="{{ old('alasan_permohonan', $pendaftaran->alasan_permohonan ?? '') }}" placeholder="Alasan permohonan"></div>
                         <div class="field-group"><label>Status</label>
                             <select name="status">
                                 <option value="Baru" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Baru' ? 'selected' : '' }}>Baru</option>
@@ -226,7 +204,14 @@
                         <div class="field-group"><label>RT</label><input type="text" name="rt" value="{{ old('rt', $pendaftaran->rt ?? '') }}" placeholder="RT"></div>
                         <div class="field-group"><label>RW</label><input type="text" name="rw" value="{{ old('rw', $pendaftaran->rw ?? '') }}" placeholder="RW"></div>
                         <div class="field-group"><label>Desa</label><input type="text" name="desa" value="{{ old('desa', $pendaftaran->desa ?? '') }}" placeholder="Desa"></div>
-                        <div class="field-group"><label>Alasan Pembaruan</label><input type="text" name="alasan_pembaruan" value="{{ old('alasan_pembaruan', $pendaftaran->alasan_pembaruan ?? '') }}" placeholder="Alasan pembaruan"></div>
+                        <div class="field-group"><label>Alasan Pembaruan</label>
+                            <select name="alasan_pembaruan">
+                                <option value="">Pilih alasan</option>
+                                @foreach (['Hilang', 'Rusak', 'Update Data'] as $reason)
+                                    <option value="{{ $reason }}" {{ old('alasan_pembaruan', $pendaftaran->alasan_pembaruan ?? '') === $reason ? 'selected' : '' }}>{{ $reason }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="field-group"><label>No HP</label><input type="text" name="no_telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}" placeholder="Nomor HP"></div>
                     </div>
                 </div>
@@ -282,7 +267,6 @@
                         <div class="field-group"><label>NIK</label><input type="text" name="nik_kedatangan" value="{{ old('nik_kedatangan', $pendaftaran->nik_kedatangan ?? '') }}" placeholder="NIK"></div>
                         <div class="field-group"><label>Alamat Asal</label><input type="text" name="alamat_asal_kedatangan" value="{{ old('alamat_asal_kedatangan', $pendaftaran->alamat_asal_kedatangan ?? '') }}" placeholder="Alamat asal"></div>
                         <div class="field-group"><label>Alamat Tujuan</label><input type="text" name="alamat_tujuan_kedatangan" value="{{ old('alamat_tujuan_kedatangan', $pendaftaran->alamat_tujuan_kedatangan ?? '') }}" placeholder="Alamat tujuan"></div>
-                        <div class="field-group"><label>Keterangan</label><input type="text" name="keterangan_kedatangan" value="{{ old('keterangan_kedatangan', $pendaftaran->keterangan_kedatangan ?? '') }}" placeholder="Keterangan"></div>
                     </div>
                 </div>
 

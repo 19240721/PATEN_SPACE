@@ -6,6 +6,7 @@ use App\Models\Pendaftaran;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class PendaftaranController extends Controller
 {
@@ -28,29 +29,202 @@ class PendaftaranController extends Controller
         return $value;
     }
 
-    public function index()
-    {
-        return view('register');
-    }
-
     public function create()
     {
         return view('register');
     }
 
-    public function laporan()
+    public function layanan(string $jenisLayanan)
     {
-        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $services = $this->serviceCatalog();
 
-        $total = $pendaftarans->count();
-        $prr = $pendaftarans->where('jenis_layanan', 'PRR')->count();
-        $ktp = $pendaftarans->where('jenis_layanan', 'KTP')->count();
-        $kk = $pendaftarans->where('jenis_layanan', 'KK')->count();
-        $kartuKuning = $pendaftarans->where('jenis_layanan', 'Kartu Kuning')->count();
-        $proses = $pendaftarans->where('status', 'Proses')->count();
-        $selesai = $pendaftarans->where('status', 'Selesai')->count();
+        abort_unless(isset($services[$jenisLayanan]), 404);
 
-        return view('laporan', compact('pendaftarans', 'total', 'prr', 'ktp', 'kk', 'kartuKuning', 'proses', 'selesai'));
+        $service = $services[$jenisLayanan];
+        $pendaftarans = Pendaftaran::where('jenis_layanan', $service['type'])
+            ->latest('tanggal_daftar')
+            ->get();
+
+        return view('layanan', [
+            'pendaftarans' => $pendaftarans,
+            'serviceSlug' => $jenisLayanan,
+            'serviceTitle' => $service['title'],
+            'serviceType' => $service['type'],
+            'columns' => $service['columns'],
+            'services' => $services,
+        ]);
+    }
+
+    public function laporan(Request $request)
+    {
+        $services = $this->serviceCatalog();
+        $allPendaftarans = Pendaftaran::all();
+
+        foreach ($services as &$service) {
+            $service['count'] = $allPendaftarans->where('jenis_layanan', $service['type'])->count();
+        }
+        unset($service);
+
+        $query = Pendaftaran::query();
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $query->where(fn ($builder) => $builder
+                ->where('nama_lengkap', 'like', '%' . $search . '%')
+                ->orWhere('nik', 'like', '%' . $search . '%'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $pendaftarans = $query->latest('tanggal_daftar')->get();
+
+        return view('laporan', [
+            'pendaftarans' => $pendaftarans,
+            'services' => $services,
+            'total' => $allPendaftarans->count(),
+        ]);
+    }
+
+    public function semuaData(Request $request)
+    {
+        $services = $this->serviceCatalog();
+        $query = Pendaftaran::query();
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $query->where(fn ($builder) => $builder
+                ->where('nama_lengkap', 'like', '%' . $search . '%')
+                ->orWhere('nik', 'like', '%' . $search . '%'));
+        }
+
+        if ($request->filled('jenis_layanan') && isset($services[$request->input('jenis_layanan')])) {
+            $query->where('jenis_layanan', $services[$request->input('jenis_layanan')]['type']);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        return view('semua-data', [
+            'pendaftarans' => $query->latest('tanggal_daftar')->get(),
+            'services' => $services,
+            'total' => Pendaftaran::count(),
+        ]);
+    }
+
+    private function serviceCatalog(): array
+    {
+        return [
+            'prr' => [
+                'type' => 'PRR',
+                'title' => 'PRR / KTP Baru',
+                'columns' => [
+                    ['label' => 'Bulan', 'field' => 'bulan'],
+                    ['label' => 'Minggu Ke', 'field' => 'minggu_ke'],
+                    ['label' => 'Tanggal Kedatangan', 'field' => 'tanggal_kedatangan', 'date' => true],
+                    ['label' => 'Nama', 'field' => 'nama_lengkap'],
+                    ['label' => 'NIK', 'field' => 'nik'],
+                    ['label' => 'Tempat Lahir', 'field' => 'tempat_lahir'],
+                    ['label' => 'Tanggal Lahir', 'field' => 'tanggal_lahir', 'date' => true],
+                    ['label' => 'Jalan', 'field' => 'jalan'],
+                    ['label' => 'RT', 'field' => 'rt'],
+                    ['label' => 'RW', 'field' => 'rw'],
+                    ['label' => 'Desa', 'field' => 'desa'],
+                    ['label' => 'No HP', 'field' => 'no_telepon'],
+                ],
+            ],
+            'kartu-keluarga' => [
+                'type' => 'KK',
+                'title' => 'Kartu Keluarga',
+                'columns' => [
+                    ['label' => 'Bulan', 'field' => 'bulan'],
+                    ['label' => 'Minggu Ke', 'field' => 'minggu_ke'],
+                    ['label' => 'Nama', 'field' => 'nama_lengkap'],
+                    ['label' => 'NIK', 'field' => 'nik'],
+                    ['label' => 'Jalan', 'field' => 'jalan'],
+                    ['label' => 'RT', 'field' => 'rt'],
+                    ['label' => 'RW', 'field' => 'rw'],
+                    ['label' => 'Desa', 'field' => 'desa'],
+                    ['label' => 'Keterangan', 'field' => 'keterangan_kk'],
+                ],
+            ],
+            'ktp' => [
+                'type' => 'KTP',
+                'title' => 'KTP',
+                'columns' => [
+                    ['label' => 'Nama', 'field' => 'nama_lengkap'],
+                    ['label' => 'NIK', 'field' => 'nik'],
+                    ['label' => 'Nomor KK', 'field' => 'nomor_kk'],
+                    ['label' => 'Jenis Kelamin', 'field' => 'jenis_kelamin'],
+                    ['label' => 'Tempat Lahir', 'field' => 'tempat_lahir'],
+                    ['label' => 'Tanggal Lahir', 'field' => 'tanggal_lahir', 'date' => true],
+                    ['label' => 'Jalan', 'field' => 'jalan'],
+                    ['label' => 'RT', 'field' => 'rt'],
+                    ['label' => 'RW', 'field' => 'rw'],
+                    ['label' => 'Desa', 'field' => 'desa'],
+                    ['label' => 'Alasan Pembaruan', 'field' => 'alasan_pembaruan'],
+                    ['label' => 'No HP', 'field' => 'no_telepon'],
+                ],
+            ],
+            'akta-kematian' => [
+                'type' => 'Akta Kematian',
+                'title' => 'Akta Kematian',
+                'columns' => [
+                    ['label' => 'Bulan', 'field' => 'bulan'],
+                    ['label' => 'Minggu Ke', 'field' => 'minggu_ke'],
+                    ['label' => 'Nama Almarhum', 'field' => 'nama_alm'],
+                    ['label' => 'Nama Ayah', 'field' => 'nama_ayah'],
+                    ['label' => 'Nama Ibu', 'field' => 'nama_ibu'],
+                    ['label' => 'Tempat Meninggal', 'field' => 'tempat_meninggal'],
+                    ['label' => 'Tanggal Meninggal', 'field' => 'tanggal_meninggal', 'date' => true],
+                    ['label' => 'Alamat', 'field' => 'alamat'],
+                    ['label' => 'Keterangan', 'field' => 'keterangan_kematian'],
+                ],
+            ],
+            'akta-kelahiran' => [
+                'type' => 'Akta Lahir',
+                'title' => 'Akta Kelahiran',
+                'columns' => [
+                    ['label' => 'Bulan', 'field' => 'bulan'],
+                    ['label' => 'Minggu Ke', 'field' => 'minggu_ke'],
+                    ['label' => 'Nama Anak', 'field' => 'nama_anak_lahir'],
+                    ['label' => 'Nama Ayah', 'field' => 'nama_ayah_lahir'],
+                    ['label' => 'Nama Ibu', 'field' => 'nama_ibu_lahir'],
+                    ['label' => 'Berat Badan', 'field' => 'berat_badan'],
+                    ['label' => 'Panjang Badan', 'field' => 'panjang_badan'],
+                    ['label' => 'Tempat Lahir', 'field' => 'tempat_lahir_detail'],
+                    ['label' => 'Alamat', 'field' => 'alamat'],
+                ],
+            ],
+            'kedatangan' => [
+                'type' => 'Kedatangan',
+                'title' => 'Kedatangan',
+                'columns' => [
+                    ['label' => 'Bulan', 'field' => 'bulan'],
+                    ['label' => 'Minggu Ke', 'field' => 'minggu_ke'],
+                    ['label' => 'Tanggal Kedatangan', 'field' => 'tanggal_kedatangan', 'date' => true],
+                    ['label' => 'Nama', 'field' => 'nama_kedatangan'],
+                    ['label' => 'NIK', 'field' => 'nik_kedatangan'],
+                    ['label' => 'Alamat Asal', 'field' => 'alamat_asal_kedatangan'],
+                    ['label' => 'Alamat Tujuan', 'field' => 'alamat_tujuan_kedatangan'],
+                ],
+            ],
+            'pindah' => [
+                'type' => 'Pindah',
+                'title' => 'Pindah',
+                'columns' => [
+                    ['label' => 'Bulan', 'field' => 'bulan'],
+                    ['label' => 'Minggu Ke', 'field' => 'minggu_ke'],
+                    ['label' => 'Nama', 'field' => 'nama_pindah'],
+                    ['label' => 'NIK', 'field' => 'nik_pindah'],
+                    ['label' => 'Alamat Asal', 'field' => 'alamat_asal_pindah'],
+                    ['label' => 'Alamat Tujuan', 'field' => 'alamat_tujuan_pindah'],
+                    ['label' => 'Alasan Pindah', 'field' => 'alasan_pindah'],
+                ],
+            ],
+        ];
     }
 
     public function store(Request $request)
@@ -62,7 +236,12 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'nama_kepala_keluarga' => ['nullable', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:20', 'unique:pendaftarans,nik'],
+            'nik' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('pendaftarans', 'nik')->where(fn ($query) => $query->where('jenis_layanan', $request->input('jenis_layanan'))),
+            ],
             'jenis_kelamin' => ['nullable', 'string', 'max:20'],
             'tempat_lahir' => ['nullable', 'string', 'max:255'],
             'tanggal_lahir' => ['nullable', 'date'],
@@ -119,7 +298,7 @@ class PendaftaranController extends Controller
 
         $pendaftaran = Pendaftaran::create($validated);
 
-        return redirect()->route('register.success')->with('success', 'Pendaftaran berhasil disimpan.')->with('pendaftaran_id', $pendaftaran->id);
+        return redirect()->route('pendaftaran.success')->with('success', 'Pendaftaran berhasil disimpan.')->with('pendaftaran_id', $pendaftaran->id);
     }
 
     public function success()
@@ -143,7 +322,14 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'nama_kepala_keluarga' => ['nullable', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:20', 'unique:pendaftarans,nik,' . $pendaftaran->id],
+            'nik' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('pendaftarans', 'nik')
+                    ->where(fn ($query) => $query->where('jenis_layanan', $request->input('jenis_layanan')))
+                    ->ignore($pendaftaran->id),
+            ],
             'jenis_kelamin' => ['nullable', 'string', 'max:20'],
             'tempat_lahir' => ['nullable', 'string', 'max:255'],
             'tanggal_lahir' => ['nullable', 'date'],
@@ -205,10 +391,4 @@ class PendaftaranController extends Controller
         return Redirect::route('dashboard')->with('success', 'Data pendaftaran berhasil diperbarui.');
     }
 
-    public function destroy(Pendaftaran $pendaftaran)
-    {
-        $pendaftaran->delete();
-
-        return Redirect::route('dashboard')->with('success', 'Data pendaftaran berhasil dihapus.');
-    }
 }

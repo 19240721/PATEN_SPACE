@@ -3,228 +3,120 @@
 @section('title', 'Dashboard PATEN_SPACE')
 
 @section('content')
-<div class="app-shell">
+@php
+    $pendaftarans = \App\Models\Pendaftaran::latest('tanggal_daftar')->get();
+    $total = $pendaftarans->count();
+    $services = [
+    ['label' => 'PRR', 'slug' => 'prr', 'title' => 'PRR / KTP Baru', 'icon' => '▤', 'tone' => 'blue'],
+        ['label' => 'KTP', 'slug' => 'ktp', 'title' => 'KTP', 'icon' => '▣', 'tone' => 'blue'],
+        ['label' => 'KK', 'slug' => 'kartu-keluarga', 'title' => 'Kartu Keluarga', 'icon' => '♧', 'tone' => 'green'],
+        ['label' => 'Akta Lahir', 'slug' => 'akta-kelahiran', 'title' => 'Akta Kelahiran', 'icon' => '✳', 'tone' => 'gold'],
+        ['label' => 'Akta Kematian', 'slug' => 'akta-kematian', 'title' => 'Akta Kematian', 'icon' => '▧', 'tone' => 'blue'],
+        ['label' => 'Kedatangan', 'slug' => 'kedatangan', 'title' => 'Kedatangan', 'icon' => '⌂', 'tone' => 'green'],
+        ['label' => 'Pindah', 'slug' => 'pindah', 'title' => 'Pindah', 'icon' => '→', 'tone' => 'blue'],
+    ];
+    foreach ($services as &$service) {
+        $service['count'] = $pendaftarans->where('jenis_layanan', $service['label'])->count();
+    }
+    unset($service);
+    $chartMax = max(1, max(array_column($services, 'count')));
+    $year = now()->year;
+    $monthlyCounts = collect(range(1, 12))->map(fn ($month) => $pendaftarans
+        ->filter(fn ($item) => $item->tanggal_daftar && \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->year === $year && \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->month === $month)
+        ->count());
+    $monthlyMax = max(1, $monthlyCounts->max());
+    $chartPoints = $monthlyCounts->map(fn ($count, $index) => (24 + ($index * 432 / 11)) . ',' . (128 - ($count / $monthlyMax * 100)))->implode(' ');
+    $monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+@endphp
+
+<div class="app-shell dashboard-page">
     <aside class="sidebar dark-sidebar">
-        <div class="brand-wrap">
-            <div class="brand-mark">P</div>
-            <div class="brand-text">
-                <div class="brand-title">PATEN SPACE</div>
-                <div class="brand-sub">Kecamatan Jatisari</div>
-            </div>
-        </div>
-
-        <div class="sidebar-nav">
-            <div class="nav-group-label">Dashboard</div>
-            <a href="{{ route('dashboard') }}" class="nav-item active">Dashboard</a>
-
-            <div class="nav-group-label">Layanan PATEN</div>
-            <a href="{{ route('pendaftaran.create') }}" class="sidebar-button active">Registrasi / Pendaftaran</a>
-            <a href="#" class="nav-item">Data Penduduk</a>
-
-            <div class="nav-group-label">Pengelolaan</div>
-            <a href="#" class="nav-item">Data Pengguna</a>
-            <a href="#" class="nav-item">Laporan</a>
-            <a href="#" class="nav-item">Pengaturan</a>
-        </div>
-
-        <div class="filter-bar">
-            <button type="button" class="filter-tab">PRR / KTP Baru</button>
-            <button type="button" class="filter-tab active">KK</button>
-            <button type="button" class="filter-tab">KTP / Pembaharuan</button>
-            <button type="button" class="filter-tab">AKTA KEMATIAN</button>
-            <button type="button" class="filter-tab">AKTA LAHIR</button>
-            <button type="button" class="filter-tab">KEDATANGAN</button>
-            <button type="button" class="filter-tab">PINDAH</button>
-        </div>
+        <a href="{{ route('dashboard') }}" class="brand-wrap">
+            <img src="{{ asset('image/logo-kecamatan.png') }}" alt="Logo Kecamatan Jatisari" class="brand-mark">
+            <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
+        </a>
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Menu Utama</div>
+            <a href="{{ route('dashboard') }}" class="nav-item active"><span>◫</span> Dashboard</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Laporan</a>
+            <details class="service-menu" open>
+                <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
+                <div class="service-submenu">
+                    @foreach ($services as $service)
+                        <a href="{{ route('pelayanan.index', $service['slug']) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
+                    @endforeach
+                </div>
+            </details>
+        </nav>
+        <div class="sidebar-profile"><span class="profile-avatar">OP</span><span><strong>Operator Kecamatan</strong><small>Administrator</small></span></div>
     </aside>
 
     <main class="main-panel">
-        <header class="topbar">
-            <div>
-                <h1>Dashboard</h1>
-                <p>Selamat datang, Petugas. Berikut informasi layanan PATEN Kecamatan Jatisari.</p>
-            </div>
-            <div class="date-pill">Senin, 8 September 2025</div>
+        <header class="dashboard-topbar">
+            <div><strong>Kecamatan Jatisari</strong><span>Kabupaten Karawang</span></div>
+            <div class="operator-chip"><span>Petugas PATEN</span><b>OP</b></div>
         </header>
 
-        @php
-            $pendaftarans = \App\Models\Pendaftaran::latest('tanggal_daftar')->get();
-            $total = $pendaftarans->count();
-            $prr = $pendaftarans->where('jenis_layanan', 'PRR')->count();
-            $ktp = $pendaftarans->where('jenis_layanan', 'KTP')->count();
-            $kk = $pendaftarans->where('jenis_layanan', 'KK')->count();
-            $kartuKuning = $pendaftarans->where('jenis_layanan', 'Kartu Kuning')->count();
-        @endphp
+        <div class="dashboard-content">
+            <section class="dashboard-heading">
+                <div><h1>Dashboard Pelayanan</h1><p>Ringkasan pelayanan administrasi Kecamatan Jatisari</p></div>
+                <a href="{{ route('pendaftaran.create') }}" class="dashboard-primary-link"><span>+</span> Pendaftaran Baru</a>
+            </section>
 
-        <section class="stats-grid">
-            <article class="stat-card">
-                <div class="stat-icon green">🧾</div>
-                <div class="stat-content">
-                    <div class="stat-label">Total Pendaftar</div>
-                    <div class="stat-value">{{ $total }}</div>
-                    <div class="stat-trend up">↑ Data real-time</div>
-                </div>
-            </article>
+            <section class="dashboard-stats" aria-label="Ringkasan layanan">
+                <a href="{{ route('pendaftaran.index') }}" class="dashboard-stat dashboard-stat-link total-stat"><span class="stat-symbol">▤</span><div><span>Total Pelayanan</span><strong>{{ number_format($total, 0, ',', '.') }}</strong></div></a>
+                @foreach ($services as $service)
+                    <a href="{{ route('pelayanan.index', $service['slug']) }}" class="dashboard-stat dashboard-stat-link"><span class="stat-symbol {{ $service['tone'] }}">{{ $service['icon'] }}</span><div><span>{{ $service['title'] }}</span><strong>{{ number_format($service['count'], 0, ',', '.') }}</strong></div></a>
+                @endforeach
+            </section>
 
-            <article class="stat-card">
-                <div class="stat-icon mint">👥</div>
-                <div class="stat-content">
-                    <div class="stat-label">PRR / KTP Baru</div>
-                    <div class="stat-value">{{ $prr }}</div>
-                    <div class="stat-trend up">↑ Data real-time</div>
-                </div>
-            </article>
+            <section class="dashboard-charts">
+                <article class="dashboard-panel chart-panel">
+                    <div class="panel-heading"><div><h2>Pelayanan Berdasarkan Jenis</h2><p>Rekap jumlah layanan yang tercatat</p></div><span class="chart-year">{{ $year }}</span></div>
+                    <div class="service-chart" role="img" aria-label="Grafik jumlah pendaftar menurut jenis pelayanan">
+                        @foreach ($services as $service)
+                            <div class="service-bar-column"><span class="bar-value">{{ $service['count'] }}</span><div class="service-bar" style="height: {{ max(4, $service['count'] / $chartMax * 100) }}%"></div><span class="bar-label">{{ $service['label'] === 'Akta Kematian' ? 'Akta Mati' : ($service['label'] === 'Akta Lahir' ? 'Akta Lahir' : $service['label']) }}</span></div>
+                        @endforeach
+                    </div>
+                </article>
 
-            <article class="stat-card">
-                <div class="stat-icon violet">🪪</div>
-                <div class="stat-content">
-                    <div class="stat-label">KTP / Pembaharuan</div>
-                    <div class="stat-value">{{ $ktp }}</div>
-                    <div class="stat-trend up">↑ Data real-time</div>
-                </div>
-            </article>
+                <article class="dashboard-panel chart-panel">
+                    <div class="panel-heading"><div><h2>Tren Pelayanan Bulanan</h2><p>Jumlah pendaftaran per bulan</p></div><span class="chart-year">{{ $year }}</span></div>
+                    <div class="trend-chart" role="img" aria-label="Grafik tren pelayanan bulanan">
+                        <svg viewBox="0 0 480 160" preserveAspectRatio="none" aria-hidden="true">
+                            <line x1="24" y1="28" x2="456" y2="28" /><line x1="24" y1="78" x2="456" y2="78" /><line x1="24" y1="128" x2="456" y2="128" />
+                            <polyline points="{{ $chartPoints }}" />
+                            @foreach ($monthlyCounts as $index => $count)
+                                <circle cx="{{ 24 + ($index * 432 / 11) }}" cy="{{ 128 - ($count / $monthlyMax * 100) }}" r="3.5" />
+                            @endforeach
+                        </svg>
+                        <div class="month-labels">@foreach ($monthLabels as $label)<span>{{ $label }}</span>@endforeach</div>
+                    </div>
+                </article>
+            </section>
 
-            <article class="stat-card">
-                <div class="stat-icon violet">👨‍👩‍👧‍👦</div>
-                <div class="stat-content">
-                    <div class="stat-label">KK</div>
-                    <div class="stat-value">{{ $kk }}</div>
-                    <div class="stat-trend up">↑ Data real-time</div>
-                </div>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-icon orange">📘</div>
-                <div class="stat-content">
-                    <div class="stat-label">Kartu Kuning</div>
-                    <div class="stat-value">{{ $kartuKuning }}</div>
-                    <div class="stat-trend up">↑ Data real-time</div>
-                </div>
-            </article>
-        </section>
-
-        <section class="content-grid">
-            <div class="service-panel">
-                <div class="section-header">
-                    <h2>Menu Layanan</h2>
-                </div>
-                <div class="quick-actions">
-                    <a href="{{ route('pendaftaran.create') }}" class="action-card">
-                        <span class="action-icon blue">👤</span>
-                        <strong>Registrasi Pendataran</strong>
-                        <small>Input data pendaftar</small>
-                    </a>
-                    <a href="#" class="action-card">
-                        <span class="action-icon green">📋</span>
-                        <strong>Data Penduduk</strong>
-                        <small>Kelola data penduduk</small>
-                    </a>
-                    <a href="{{ route('laporan') }}" class="action-card">
-                        <span class="action-icon gold">📊</span>
-                        <strong>Laporan</strong>
-                        <small>Lihat laporan harian</small>
-                    </a>
-                </div>
-            </div>
-
-            <aside class="activity-panel">
-                <div class="section-header">
-                    <h2>Log Aktivitas Terbaru</h2>
-                    <a href="#">Lihat Semua</a>
-                </div>
-                <ul class="activity-list">
-                    <li>
-                        <span class="activity-dot"></span>
-                        <div class="activity-meta">
-                            <strong>Pendaftaran KTP baru</strong>
-                            <small>Nama: Andi Saputra</small>
-                        </div>
-                        <span class="activity-time">08:42</span>
-                    </li>
-                    <li>
-                        <span class="activity-dot"></span>
-                        <div class="activity-meta">
-                            <strong>Perubahan KK</strong>
-                            <small>Nama: Siti Nurhaliza</small>
-                        </div>
-                        <span class="activity-time">08:17</span>
-                    </li>
-                    <li>
-                        <span class="activity-dot"></span>
-                        <div class="activity-meta">
-                            <strong>Pendaftaran KTP / Pembaharuan</strong>
-                            <small>Nama: Budi Dwi Kurniawan</small>
-                        </div>
-                        <span class="activity-time">07:55</span>
-                    </li>
-                    <li>
-                        <span class="activity-dot"></span>
-                        <div class="activity-meta">
-                            <strong>Pendaftaran Kartu Kuning</strong>
-                            <small>Nama: Sulastri</small>
-                        </div>
-                        <span class="activity-time">07:32</span>
-                    </li>
-                    <li>
-                        <span class="activity-dot"></span>
-                        <div class="activity-meta">
-                            <strong>Pendaftaran KTP baru</strong>
-                            <small>Nama: Dwi Suci</small>
-                        </div>
-                        <span class="activity-time">07:10</span>
-                    </li>
-                </ul>
-            </aside>
-        </section>
-
-        <section class="table-panel">
-            <div class="section-header">
-                <h2>Data Pendaftaran Terbaru</h2>
-                <a href="{{ route('laporan') }}">Lihat Semua</a>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Jenis Layanan</th>
-                        <th>Tanggal Daftar</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($pendaftarans as $index => $item)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $item->nama_lengkap }}</td>
-                            <td>{{ $item->jenis_layanan }}</td>
-                            <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d-m-Y') }}</td>
-                            <td>
-                                <span class="badge {{ strtolower($item->status) === 'selesai' ? 'selected' : 'processing' }}">
-                                    {{ $item->status ?? 'Baru' }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="table-actions">
-                                    <a href="{{ route('pendaftaran.edit', $item) }}" class="table-action edit">Edit</a>
-                                    <form action="{{ route('pendaftaran.destroy', $item) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="table-action delete">Hapus</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" style="text-align:center; color:#667085; padding: 24px;">Belum ada data pendaftaran.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </section>
+            <section class="dashboard-panel recent-panel">
+                <div class="panel-heading"><div><h2>Data Pelayanan Terbaru</h2><p>Aktivitas pendaftaran yang baru dicatat</p></div></div>
+                <div class="table-scroll"><table>
+                    <thead><tr><th>No</th><th>Tanggal</th><th>Nama</th><th>Jenis Pelayanan</th><th>Status</th><th>Edit</th></tr></thead>
+                    <tbody>
+                        @forelse ($pendaftarans->take(8) as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d/m/Y') }}</td>
+                                <td class="person-name">{{ $item->nama_lengkap }}</td>
+                                <td>{{ $item->jenis_layanan }}</td>
+                                <td><span class="status-pill {{ strtolower($item->status ?? 'baru') }}">{{ $item->status ?? 'Baru' }}</span></td>
+                                <td><a href="{{ route('pendaftaran.edit', ['pendaftaran' => $item, 'jenis_layanan' => $item->jenis_layanan]) }}" class="table-action edit">Edit</a></td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" class="empty-state">Belum ada data pendaftaran.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table></div>
+            </section>
+        </div>
     </main>
 </div>
 @endsection

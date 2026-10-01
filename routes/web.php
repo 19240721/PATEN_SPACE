@@ -12,11 +12,11 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 Route::get('/laporan', [PendaftaranController::class, 'laporan'])->name('laporan');
+Route::get('/semua-data', [PendaftaranController::class, 'semuaData'])->name('pendaftaran.index');
+Route::get('/pelayanan/{jenisLayanan}', [PendaftaranController::class, 'layanan'])->name('pelayanan.index');
 
-Route::get('/register', [PendaftaranController::class, 'index'])->name('register');
 Route::get('/pendaftaran/create', [PendaftaranController::class, 'create'])->name('pendaftaran.create');
-Route::post('/register', [PendaftaranController::class, 'store'])->name('register.store');
-Route::get('/register/success', [PendaftaranController::class, 'success'])->name('register.success');
+Route::post('/pendaftaran', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
+Route::get('/pendaftaran/success', [PendaftaranController::class, 'success'])->name('pendaftaran.success');
 Route::get('/pendaftaran/{pendaftaran}/edit', [PendaftaranController::class, 'edit'])->name('pendaftaran.edit');
 Route::put('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'update'])->name('pendaftaran.update');
-Route::delete('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'destroy'])->name('pendaftaran.destroy');

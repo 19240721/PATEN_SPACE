@@ -6,7 +6,7 @@
 <div class="app-shell">
     <aside class="sidebar dark-sidebar">
         <div class="brand-wrap">
-            <div class="brand-mark">P</div>
+            <img src="{{ asset('image/logo-kecamatan.png') }}" alt="Logo Kecamatan Jatisari" class="brand-mark">
             <div class="brand-text">
                 <div class="brand-title">PATEN SPACE</div>
                 <div class="brand-sub">Kecamatan Jatisari</div>
@@ -16,10 +16,11 @@
         <div class="sidebar-nav">
             <div class="nav-group-label">Dashboard</div>
             <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item">Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item">Laporan</a>
 
             <div class="nav-group-label">Layanan PATEN</div>
-            <a href="{{ route('register') }}" class="sidebar-button active">Registrasi / Pendaftaran</a>
-            <a href="{{ route('laporan') }}" class="nav-item">Laporan</a>
+            <a href="{{ route('pendaftaran.create') }}" class="sidebar-button active">Tambah Data</a>
         </div>
     </aside>
 
@@ -53,7 +54,7 @@
                 @endif
 
                 <div class="success-actions">
-                    <a href="{{ route('register') }}" class="primary-btn">Tambah Data Lagi</a>
+                    <a href="{{ route('pendaftaran.create', ['jenis_layanan' => $pendaftaran?->jenis_layanan]) }}" class="primary-btn">Tambah Data Lagi</a>
                     <a href="{{ route('dashboard') }}" class="secondary-btn">Kembali ke Dashboard</a>
                 </div>
             </div>

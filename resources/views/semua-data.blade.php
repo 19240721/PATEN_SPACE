@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Pelayanan - PATEN SPACE')
+@section('title', 'Semua Data - PATEN SPACE')
 
 @section('content')
 <div class="app-shell dashboard-page">
@@ -12,8 +12,8 @@
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
-            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
-            <a href="{{ route('laporan') }}" class="nav-item active"><span>▥</span> Laporan</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item active"><span>▥</span> Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item"><span>▧</span> Laporan</a>
             <details class="service-menu" open>
                 <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
                 <div class="service-submenu">
@@ -34,21 +34,24 @@
 
         <div class="dashboard-content">
             <section class="dashboard-heading">
-                <div><h1>Laporan Pelayanan</h1><p>Ringkasan data pelayanan PATEN Kecamatan Jatisari.</p></div>
-                <span class="report-date">{{ now()->format('d/m/Y') }}</span>
+                <div><h1>Semua Data Pelayanan</h1><p>Daftar gabungan seluruh pelayanan PATEN.</p></div>
+                <a href="{{ route('pendaftaran.create') }}" class="dashboard-primary-link"><span>+</span> Tambah Data</a>
             </section>
 
-            <section class="dashboard-stats report-stats" aria-label="Ringkasan laporan">
-                <article class="dashboard-stat total-stat"><span class="stat-symbol">▤</span><div><span>Total Pendaftar</span><strong>{{ number_format($total, 0, ',', '.') }}</strong></div></article>
-                @foreach ($services as $service)
-                    <article class="dashboard-stat"><span class="stat-symbol {{ $loop->index % 2 ? 'green' : 'blue' }}">{{ $loop->index + 1 }}</span><div><span>{{ $service['title'] }}</span><strong>{{ number_format($service['count'], 0, ',', '.') }}</strong></div></article>
-                @endforeach
+            <section class="dashboard-stats report-stats" aria-label="Jumlah data">
+                <article class="dashboard-stat total-stat"><span class="stat-symbol">▥</span><div><span>Total Data</span><strong>{{ number_format($total, 0, ',', '.') }}</strong></div></article>
             </section>
 
             <section class="dashboard-panel recent-panel report-panel">
                 <div class="panel-heading"><div><h2>Daftar Pendaftaran</h2><p>{{ $pendaftarans->count() }} data ditampilkan</p></div></div>
-                <form method="GET" action="{{ route('laporan') }}" class="report-filters">
+                <form method="GET" action="{{ route('pendaftaran.index') }}" class="report-filters">
                     <label class="report-search"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ request('q') }}" placeholder="Cari nama atau NIK..."></label>
+                    <select name="jenis_layanan" aria-label="Filter jenis layanan">
+                        <option value="">Semua Layanan</option>
+                        @foreach ($services as $slug => $service)
+                            <option value="{{ $slug }}" {{ request('jenis_layanan') === $slug ? 'selected' : '' }}>{{ $service['title'] }}</option>
+                        @endforeach
+                    </select>
                     <select name="status" aria-label="Filter status">
                         <option value="">Semua Status</option>
                         @foreach (['Baru', 'Proses', 'Selesai'] as $status)
@@ -56,8 +59,8 @@
                         @endforeach
                     </select>
                     <button type="submit" class="report-filter-button">Terapkan</button>
-                    @if (request()->filled('q') || request()->filled('status'))
-                        <a href="{{ route('laporan') }}" class="report-reset">Reset</a>
+                    @if (request()->filled('q') || request()->filled('jenis_layanan') || request()->filled('status'))
+                        <a href="{{ route('pendaftaran.index') }}" class="report-reset">Reset</a>
                     @endif
                 </form>
                 <div class="table-scroll"><table class="report-table">
@@ -75,7 +78,7 @@
                                 <td><a href="{{ route('pendaftaran.edit', ['pendaftaran' => $item, 'jenis_layanan' => $item->jenis_layanan]) }}" class="table-action edit">Edit</a></td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="empty-state">Tidak ada data yang cocok dengan filter.</td></tr>
+                            <tr><td colspan="8" class="empty-state">Belum ada data yang sesuai.</td></tr>
                         @endforelse
                     </tbody>
                 </table></div>
