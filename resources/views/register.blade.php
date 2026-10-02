@@ -4,6 +4,34 @@
 
 @section('content')
 <div class="app-shell form-page-shell">
+    <aside class="sidebar">
+        <div class="brand-wrap">
+            <div class="brand-mark">P</div>
+            <div class="brand-text">
+                <div class="brand-title">PATEN SPACE</div>
+                <div class="brand-sub">Kecamatan Jatisari</div>
+            </div>
+        </div>
+
+        <button class="hamburger" aria-label="Menu">☰</button>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Dashboard</div>
+            <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
+
+            <div class="nav-group-label">Layanan PATEN</div>
+            <a href="{{ route('register') }}" class="nav-item active">Registrasi / Pendaftaran</a>
+            <a href="#" class="nav-item">Data Penduduk</a>
+
+            <div class="nav-group-label">Pengelolaan</div>
+            <a href="#" class="nav-item">Data Pengguna</a>
+            <a href="#" class="nav-item">Laporan</a>
+            <a href="#" class="nav-item">Pengaturan</a>
+        </nav>
+
+        <button class="logout-btn">Keluar</button>
+    </aside>
+
     <main class="main-panel form-page-main">
         <header class="topbar form-topbar">
             <button type="button" class="back-button" aria-label="Kembali" title="Kembali" onclick="if (document.referrer.startsWith(window.location.origin)) { window.history.back(); } else { window.location.href = '{{ route('dashboard') }}'; }">←</button>

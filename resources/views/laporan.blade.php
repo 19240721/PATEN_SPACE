@@ -1,86 +1,123 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Pelayanan - PATEN SPACE')
+@section('title', 'Laporan PATEN')
 
 @section('content')
-<div class="app-shell dashboard-page">
-    <aside class="sidebar dark-sidebar">
-        <a href="{{ route('dashboard') }}" class="brand-wrap">
-            <img src="{{ asset('image/logo-kecamatan.png') }}" alt="Logo Kecamatan Jatisari" class="brand-mark">
-            <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
-        </a>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand-wrap">
+            <div class="brand-mark">P</div>
+            <div class="brand-text">
+                <div class="brand-title">PATEN SPACE</div>
+                <div class="brand-sub">Kecamatan Jatisari</div>
+            </div>
+        </div>
+
         <nav class="sidebar-nav">
-            <div class="nav-group-label">Menu Utama</div>
-            <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
-            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
-            <a href="{{ route('laporan') }}" class="nav-item active"><span>▥</span> Laporan</a>
-            <details class="service-menu" open>
-                <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
-                <div class="service-submenu">
-                    @foreach ($services as $slug => $service)
-                        <a href="{{ route('pelayanan.index', $slug) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
-                    @endforeach
-                </div>
-            </details>
+            <div class="nav-group-label">Dashboard</div>
+            <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
+            <div class="nav-group-label">Layanan PATEN</div>
+            <a href="{{ route('register') }}" class="nav-item">Registrasi / Pendaftaran</a>
+            <a href="{{ route('laporan') }}" class="nav-item active">Laporan</a>
         </nav>
-        <div class="sidebar-profile"><span class="profile-avatar">OP</span><span><strong>Operator Kecamatan</strong><small>Administrator</small></span></div>
+
+        <button class="logout-btn">Keluar</button>
     </aside>
 
     <main class="main-panel">
-        <header class="dashboard-topbar">
-            <div><strong>Kecamatan Jatisari</strong><span>Kabupaten Karawang</span></div>
-            <div class="operator-chip"><span>Petugas PATEN</span><b>OP</b></div>
+        <header class="topbar">
+            <div>
+                <h1>Laporan</h1>
+                <p>Ringkasan data pelayanan PATEN Kecamatan Jatisari.</p>
+            </div>
+            <div class="date-pill">{{ now()->translatedFormat('l, d F Y') }}</div>
         </header>
 
-        <div class="dashboard-content">
-            <section class="dashboard-heading">
-                <div><h1>Laporan Pelayanan</h1><p>Ringkasan data pelayanan PATEN Kecamatan Jatisari.</p></div>
-                <span class="report-date">{{ now()->format('d/m/Y') }}</span>
-            </section>
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-icon green">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Pendaftar</div>
+                    <div class="stat-value">{{ $total }}</div>
+                    <div class="stat-trend up">Semua data</div>
+                </div>
+            </article>
 
-            <section class="dashboard-stats report-stats" aria-label="Ringkasan laporan">
-                <article class="dashboard-stat total-stat"><span class="stat-symbol">▤</span><div><span>Total Pendaftar</span><strong>{{ number_format($total, 0, ',', '.') }}</strong></div></article>
-                @foreach ($services as $service)
-                    <article class="dashboard-stat"><span class="stat-symbol {{ $loop->index % 2 ? 'green' : 'blue' }}">{{ $loop->index + 1 }}</span><div><span>{{ $service['title'] }}</span><strong>{{ number_format($service['count'], 0, ',', '.') }}</strong></div></article>
-                @endforeach
-            </section>
+            <article class="stat-card">
+                <div class="stat-icon mint">👥</div>
+                <div class="stat-content">
+                    <div class="stat-label">PRR / KTP Baru</div>
+                    <div class="stat-value">{{ $prr }}</div>
+                    <div class="stat-trend up">Data terdaftar</div>
+                </div>
+            </article>
 
-            <section class="dashboard-panel recent-panel report-panel">
-                <div class="panel-heading"><div><h2>Daftar Pendaftaran</h2><p>{{ $pendaftarans->count() }} data ditampilkan</p></div></div>
-                <form method="GET" action="{{ route('laporan') }}" class="report-filters">
-                    <label class="report-search"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ request('q') }}" placeholder="Cari nama atau NIK..."></label>
-                    <select name="status" aria-label="Filter status">
-                        <option value="">Semua Status</option>
-                        @foreach (['Baru', 'Proses', 'Selesai'] as $status)
-                            <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ $status }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="report-filter-button">Terapkan</button>
-                    @if (request()->filled('q') || request()->filled('status'))
-                        <a href="{{ route('laporan') }}" class="report-reset">Reset</a>
-                    @endif
-                </form>
-                <div class="table-scroll"><table class="report-table">
-                    <thead><tr><th>No</th><th>Nama</th><th>NIK</th><th>Jenis Layanan</th><th>Petugas</th><th>Tanggal Daftar</th><th>Status</th><th>Edit</th></tr></thead>
-                    <tbody>
-                        @forelse ($pendaftarans as $index => $item)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td class="person-name">{{ $item->nama_lengkap }}</td>
-                                <td>{{ $item->nik }}</td>
-                                <td>{{ $item->jenis_layanan }}</td>
-                                <td>{{ $item->petugas ?: '—' }}</td>
-                                <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d/m/Y') }}</td>
-                                <td><span class="status-pill {{ strtolower($item->status ?? 'baru') }}">{{ $item->status ?? 'Baru' }}</span></td>
-                                <td><a href="{{ route('pendaftaran.edit', ['pendaftaran' => $item, 'jenis_layanan' => $item->jenis_layanan]) }}" class="table-action edit">Edit</a></td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="8" class="empty-state">Tidak ada data yang cocok dengan filter.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table></div>
-            </section>
-        </div>
+            <article class="stat-card">
+                <div class="stat-icon violet">🪪</div>
+                <div class="stat-content">
+                    <div class="stat-label">KTP / Pembaharuan</div>
+                    <div class="stat-value">{{ $ktp }}</div>
+                    <div class="stat-trend up">Data terdaftar</div>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon violet">👨‍👩‍👧‍👦</div>
+                <div class="stat-content">
+                    <div class="stat-label">KK</div>
+                    <div class="stat-value">{{ $kk }}</div>
+                    <div class="stat-trend up">Data terdaftar</div>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon orange">📘</div>
+                <div class="stat-content">
+                    <div class="stat-label">Kartu Kuning</div>
+                    <div class="stat-value">{{ $kartuKuning }}</div>
+                    <div class="stat-trend up">Data terdaftar</div>
+                </div>
+            </article>
+        </section>
+
+        <section class="table-panel">
+            <div class="section-header">
+                <h2>Daftar Pendaftaran</h2>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Jenis Layanan</th>
+                        <th>Petugas</th>
+                        <th>Tanggal Daftar</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($pendaftarans as $index => $item)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $item->nama_lengkap }}</td>
+                            <td>{{ $item->jenis_layanan }}</td>
+                            <td>{{ $item->petugas ?? '-' }}</td>
+                            <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d-m-Y') }}</td>
+                            <td>
+                                <span class="badge {{ strtolower($item->status) === 'selesai' ? 'selected' : 'processing' }}">
+                                    {{ $item->status ?? 'Baru' }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="text-align:center; color:#667085; padding: 24px;">Belum ada data laporan.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
     </main>
 </div>
 @endsection
