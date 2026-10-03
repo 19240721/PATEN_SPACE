@@ -55,7 +55,12 @@
     <main class="main-panel">
         <header class="dashboard-topbar">
             <div><strong>Kecamatan Jatisari</strong><span>Kabupaten Karawang</span></div>
-            <div class="operator-chip"><span>Petugas PATEN</span><b>OP</b></div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <a href="{{ route('camat.dashboard') }}" style="font-size: 0.74rem; color: #0870c9; text-decoration: none; padding: 4px 8px; border-radius: 4px; background: #e0f2fe; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Buka Ruang Khusus Camat">
+                    <span>⇄</span> Ruang Camat
+                </a>
+                <div class="operator-chip"><span>Petugas PATEN</span><b>OP</b></div>
+            </div>
         </header>
 
         <div class="dashboard-content">
