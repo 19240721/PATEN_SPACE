@@ -70,26 +70,31 @@
             <span class="attention-icon-badge">⚠</span>
             <div>
                 <h2>Perlu Perhatian</h2>
-                <p>Status pelayanan dan pengaduan yang membutuhkan pengawasan atau tindak lanjut Camat</p>
+                <p>Status pelayanan yang membutuhkan pengawasan atau tindak lanjut Camat</p>
             </div>
         </div>
-        <span class="badge-camat warning">3 Poin Pengawasan</span>
+        <span class="badge-camat warning">1 Poin Pengawasan</span>
     </div>
 
     <div class="attention-list">
         @foreach ($perhatian as $item)
-            <div class="attention-item">
-                <div class="attention-item-top">
-                    <span class="warn-icon">⚠</span>
-                    <div class="attention-item-text">{{ $item['pesan'] }}</div>
+            @if (
+                !str_contains(strtolower($item['pesan']), 'revisi dokumen') &&
+                !str_contains(strtolower($item['pesan']), 'pengaduan warga')
+            )
+                <div class="attention-item">
+                    <div class="attention-item-top">
+                        <span class="warn-icon">⚠</span>
+                        <div class="attention-item-text">{{ $item['pesan'] }}</div>
+                    </div>
+                    <div class="attention-item-action">
+                        <span class="badge-camat {{ $item['level'] }}">{{ $item['badge'] }}</span>
+                        <a href="{{ $item['action_url'] }}" class="attention-link">
+                            {{ $item['action_label'] }} →
+                        </a>
+                    </div>
                 </div>
-                <div class="attention-item-action">
-                    <span class="badge-camat {{ $item['level'] }}">{{ $item['badge'] }}</span>
-                    <a href="{{ $item['action_url'] }}" class="attention-link">
-                        {{ $item['action_label'] }} →
-                    </a>
-                </div>
-            </div>
+            @endif
         @endforeach
     </div>
 </section>

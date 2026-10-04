@@ -298,7 +298,7 @@
                 <div class="nav-group-label">LAINNYA</div>
                 <a href="{{ route('camat.notifikasi') }}" class="nav-item {{ request()->routeIs('camat.notifikasi') ? 'active' : '' }}">
                     <span>🔔</span> Notifikasi
-                    <span class="sidebar-counter">4</span>
+                    <span class="sidebar-counter">1</span>
                 </a>
                 <a href="{{ route('camat.profil') }}" class="nav-item {{ request()->routeIs('camat.profil') ? 'active' : '' }}">
                     <span>👤</span> Profil
