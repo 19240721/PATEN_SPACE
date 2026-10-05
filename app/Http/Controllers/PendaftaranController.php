@@ -41,6 +41,58 @@ class PendaftaranController extends Controller
         return view('register');
     }
 
+    public function dashboard()
+    {
+        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $services = [
+            ['type' => 'PRR', 'title' => 'PRR / KTP Baru', 'label' => 'PRR', 'icon' => '▤', 'tone' => 'blue'],
+            ['type' => 'KTP', 'title' => 'KTP', 'label' => 'KTP', 'icon' => '▣', 'tone' => 'blue'],
+            ['type' => 'KK', 'title' => 'Kartu Keluarga', 'label' => 'KK', 'icon' => '♧', 'tone' => 'green'],
+            ['type' => 'Akta Lahir', 'title' => 'Akta Kelahiran', 'label' => 'Akta Lahir', 'icon' => '✳', 'tone' => 'gold'],
+            ['type' => 'Akta Kematian', 'title' => 'Akta Kematian', 'label' => 'Akta Mati', 'icon' => '▧', 'tone' => 'blue'],
+            ['type' => 'Kedatangan', 'title' => 'Kedatangan', 'label' => 'Kedatangan', 'icon' => '⌂', 'tone' => 'green'],
+            ['type' => 'Pindah', 'title' => 'Pindah', 'label' => 'Pindah', 'icon' => '→', 'tone' => 'blue'],
+        ];
+
+        foreach ($services as &$service) {
+            $service['count'] = $pendaftarans->where('jenis_layanan', $service['type'])->count();
+        }
+        unset($service);
+
+        $year = now()->year;
+        $monthlyCounts = collect(range(1, 12))->map(function ($month) use ($pendaftarans, $year) {
+            return $pendaftarans->filter(function ($item) use ($month, $year) {
+                if (blank($item->tanggal_daftar)) {
+                    return false;
+                }
+
+                $date = Carbon::parse($item->tanggal_daftar);
+
+                return $date->year === $year && $date->month === $month;
+            })->count();
+        });
+        $monthlyMax = max(1, (int) $monthlyCounts->max());
+        $chartPoints = $monthlyCounts->map(function ($count, $index) use ($monthlyMax) {
+            $x = 24 + ($index * 432 / 11);
+            $y = 128 - ($count / $monthlyMax * 100);
+
+            return round($x, 2) . ',' . round($y, 2);
+        })->implode(' ');
+
+        return view('dashboard-operator', [
+            'pendaftarans' => $pendaftarans,
+            'services' => $services,
+            'total' => $pendaftarans->count(),
+            'proses' => $pendaftarans->where('status', 'Proses')->count(),
+            'selesai' => $pendaftarans->where('status', 'Selesai')->count(),
+            'year' => $year,
+            'monthlyCounts' => $monthlyCounts,
+            'monthlyMax' => $monthlyMax,
+            'chartPoints' => $chartPoints,
+            'monthLabels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->merge([

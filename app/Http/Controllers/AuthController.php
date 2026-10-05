@@ -11,7 +11,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return redirect()->route($this->dashboardRouteForAuthenticatedUser());
         }
 
         return view('auth.login');
@@ -73,13 +73,13 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->route($this->dashboardRouteForAuthenticatedUser());
     }
 
     public function showRegister()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return redirect()->route($this->dashboardRouteForAuthenticatedUser());
         }
 
         return view('auth.register');
@@ -109,5 +109,10 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    private function dashboardRouteForAuthenticatedUser(): string
+    {
+        return Auth::user()->role === 'camat' ? 'camat.dashboard' : 'dashboard';
     }
 }

@@ -17,7 +17,7 @@
             <div class="nav-group-label">Dashboard</div>
             <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
             <div class="nav-group-label">Layanan PATEN</div>
-            <a href="{{ route('register') }}" class="nav-item">Registrasi / Pendaftaran</a>
+            <a href="{{ route('pendaftaran.create') }}" class="nav-item">Registrasi / Pendaftaran</a>
             <a href="{{ route('laporan') }}" class="nav-item active">Laporan</a>
         </nav>
 

@@ -20,7 +20,7 @@
             <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
 
             <div class="nav-group-label">Layanan PATEN</div>
-            <a href="{{ route('register') }}" class="nav-item active">Registrasi / Pendaftaran</a>
+            <a href="{{ route('pendaftaran.create') }}" class="nav-item active">Registrasi / Pendaftaran</a>
             <a href="#" class="nav-item">Data Penduduk</a>
 
             <div class="nav-group-label">Pengelolaan</div>
