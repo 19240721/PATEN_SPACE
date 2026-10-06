@@ -11,7 +11,7 @@
     </div>
     <div style="display: flex; gap: 10px;">
         <span class="badge-camat warning" style="font-size: 0.8rem; padding: 6px 14px;">
-            🔔 1 Notifikasi Baru
+            🔔 {{ $unreadCount }} Notifikasi Baru
         </span>
     </div>
 </section>
@@ -31,7 +31,7 @@
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 14px;">
-        @foreach ($notifications as $item)
+        @forelse ($notifications as $item)
             @if (
                 !str_contains(strtolower($item['judul']), 'verifikasi ulang') &&
                 !str_contains(strtolower($item['judul']), 'pengaduan') &&
@@ -77,7 +77,11 @@
                     </div>
                 </div>
             @endif
-        @endforeach
+        @empty
+            <div style="padding: 24px; text-align: center; color: #64748b; font-size: 0.88rem;">
+                Belum ada pemberitahuan atau notifikasi pelayanan saat ini.
+            </div>
+        @endforelse
     </div>
 </section>
 @endsection

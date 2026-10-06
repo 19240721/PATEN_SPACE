@@ -2,45 +2,113 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class CamatController extends Controller
 {
     /**
-     * Data dasar pelayanan Kecamatan Jatisari untuk Dashboard Camat
+     * Data dasar pelayanan Kecamatan Jatisari yang dihitung dinamis dari data Pendaftaran Operator
      */
-    private function getServicesCatalog(): array
+    private function getServicesCatalog($pendaftarans = null): array
     {
-        return [
-            ['key' => 'prr', 'label' => 'PRR / KTP Baru', 'short' => 'PRR', 'count' => 215, 'selesai' => 208, 'proses' => 7, 'menunggu' => 0, 'icon' => '▤', 'color' => '#0870c9'],
-            ['key' => 'ktp', 'label' => 'KTP', 'short' => 'KTP', 'count' => 182, 'selesai' => 175, 'proses' => 7, 'menunggu' => 0, 'icon' => '▣', 'color' => '#2463eb'],
-            ['key' => 'kk', 'label' => 'Kartu Keluarga', 'short' => 'KK', 'count' => 276, 'selesai' => 268, 'proses' => 8, 'menunggu' => 0, 'icon' => '♧', 'color' => '#168047'],
-            ['key' => 'akta_lahir', 'label' => 'Akta Kelahiran', 'short' => 'Akta Lahir', 'count' => 198, 'selesai' => 190, 'proses' => 8, 'menunggu' => 0, 'icon' => '✳', 'color' => '#c57d14'],
-            ['key' => 'akta_mati', 'label' => 'Akta Kematian', 'short' => 'Akta Mati', 'count' => 87, 'selesai' => 82, 'proses' => 5, 'menunggu' => 0, 'icon' => '▧', 'color' => '#64748b'],
-            ['key' => 'kedatangan', 'label' => 'Kedatangan', 'short' => 'Kedatangan', 'count' => 156, 'selesai' => 150, 'proses' => 6, 'menunggu' => 0, 'icon' => '⌂', 'color' => '#00a997'],
-            ['key' => 'pindah', 'label' => 'Pindah', 'short' => 'Pindah', 'count' => 134, 'selesai' => 130, 'proses' => 4, 'menunggu' => 0, 'icon' => '→', 'color' => '#4f46e5'],
+        if ($pendaftarans === null) {
+            $pendaftarans = Pendaftaran::all();
+        }
+
+        $catalogTemplates = [
+            ['key' => 'prr', 'type' => 'PRR', 'label' => 'PRR / KTP Baru', 'short' => 'PRR', 'icon' => '▤', 'color' => '#0870c9'],
+            ['key' => 'ktp', 'type' => 'KTP', 'label' => 'KTP', 'short' => 'KTP', 'icon' => '▣', 'color' => '#2463eb'],
+            ['key' => 'kk', 'type' => 'KK', 'label' => 'Kartu Keluarga', 'short' => 'KK', 'icon' => '♧', 'color' => '#168047'],
+            ['key' => 'akta_lahir', 'type' => 'Akta Lahir', 'label' => 'Akta Kelahiran', 'short' => 'Akta Lahir', 'icon' => '✳', 'color' => '#c57d14'],
+            ['key' => 'akta_mati', 'type' => 'Akta Kematian', 'label' => 'Akta Kematian', 'short' => 'Akta Mati', 'icon' => '▧', 'color' => '#64748b'],
+            ['key' => 'kedatangan', 'type' => 'Kedatangan', 'label' => 'Kedatangan', 'short' => 'Kedatangan', 'icon' => '⌂', 'color' => '#00a997'],
+            ['key' => 'pindah', 'type' => 'Pindah', 'label' => 'Pindah', 'short' => 'Pindah', 'icon' => '→', 'color' => '#4f46e5'],
         ];
+
+        $services = [];
+        foreach ($catalogTemplates as $tmpl) {
+            $items = $pendaftarans->filter(function ($item) use ($tmpl) {
+                $jl = trim(strtolower($item->jenis_layanan ?? ''));
+                return $jl === strtolower($tmpl['type']) ||
+                       $jl === strtolower($tmpl['short']) ||
+                       $jl === strtolower($tmpl['label']) ||
+                       $jl === strtolower($tmpl['key']);
+            });
+
+            $count = $items->count();
+            $selesai = $items->filter(fn($i) => strtolower($i->status ?? '') === 'selesai')->count();
+            $proses = $items->filter(fn($i) => strtolower($i->status ?? '') === 'proses')->count();
+            $menunggu = $items->filter(fn($i) => strtolower($i->status ?? '') === 'menunggu')->count();
+
+            if ($proses == 0 && $menunggu == 0 && $count > $selesai) {
+                $proses = $count - $selesai;
+            }
+
+            $services[] = [
+                'key' => $tmpl['key'],
+                'label' => $tmpl['label'],
+                'short' => $tmpl['short'],
+                'count' => $count,
+                'selesai' => $selesai,
+                'proses' => $proses,
+                'menunggu' => $menunggu,
+                'icon' => $tmpl['icon'],
+                'color' => $tmpl['color'],
+            ];
+        }
+
+        return $services;
     }
 
     /**
-     * Tren data bulanan pelayanan tahun 2026
+     * Tren data bulanan pelayanan tahun berjalan (berdasarkan data Pendaftaran)
      */
-    private function getMonthlyTrend(): array
+    private function getMonthlyTrend($pendaftarans = null, ?int $year = null): array
     {
-        return [
-            ['month' => 'Jan', 'name' => 'Januari', 'count' => 82],
-            ['month' => 'Feb', 'name' => 'Februari', 'count' => 95],
-            ['month' => 'Mar', 'name' => 'Maret', 'count' => 108],
-            ['month' => 'Apr', 'name' => 'April', 'count' => 91],
-            ['month' => 'Mei', 'name' => 'Mei', 'count' => 126],
-            ['month' => 'Jun', 'name' => 'Juni', 'count' => 137],
-            ['month' => 'Jul', 'name' => 'Juli', 'count' => 145],
-            ['month' => 'Agu', 'name' => 'Agustus', 'count' => 151],
-            ['month' => 'Sep', 'name' => 'September', 'count' => 186],
-            ['month' => 'Okt', 'name' => 'Oktober', 'count' => 0],
-            ['month' => 'Nov', 'name' => 'November', 'count' => 0],
-            ['month' => 'Des', 'name' => 'Desember', 'count' => 0],
+        if ($pendaftarans === null) {
+            $pendaftarans = Pendaftaran::all();
+        }
+
+        $year = $year ?? now()->year;
+        $monthNames = [
+            1 => ['short' => 'Jan', 'full' => 'Januari'],
+            2 => ['short' => 'Feb', 'full' => 'Februari'],
+            3 => ['short' => 'Mar', 'full' => 'Maret'],
+            4 => ['short' => 'Apr', 'full' => 'April'],
+            5 => ['short' => 'Mei', 'full' => 'Mei'],
+            6 => ['short' => 'Jun', 'full' => 'Juni'],
+            7 => ['short' => 'Jul', 'full' => 'Juli'],
+            8 => ['short' => 'Agu', 'full' => 'Agustus'],
+            9 => ['short' => 'Sep', 'full' => 'September'],
+            10 => ['short' => 'Okt', 'full' => 'Oktober'],
+            11 => ['short' => 'Nov', 'full' => 'November'],
+            12 => ['short' => 'Des', 'full' => 'Desember'],
         ];
+
+        $trend = [];
+        foreach (range(1, 12) as $m) {
+            $count = $pendaftarans->filter(function ($item) use ($year, $m) {
+                if (blank($item->tanggal_daftar)) {
+                    return false;
+                }
+                try {
+                    $date = Carbon::parse($item->tanggal_daftar);
+                    return $date->year === $year && $date->month === $m;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            })->count();
+
+            $trend[] = [
+                'month' => $monthNames[$m]['short'],
+                'name' => $monthNames[$m]['full'],
+                'count' => $count,
+            ];
+        }
+
+        return $trend;
     }
 
     /**
@@ -48,72 +116,109 @@ class CamatController extends Controller
      */
     public function dashboard()
     {
-        $services = $this->getServicesCatalog();
-        $monthlyTrend = $this->getMonthlyTrend();
+        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $year = now()->year;
+        $currentMonthName = now()->locale('id')->isoFormat('MMMM YYYY');
 
-        // Ringkasan Card Utama
+        $services = $this->getServicesCatalog($pendaftarans);
+        $monthlyTrend = $this->getMonthlyTrend($pendaftarans, $year);
+
+        $total = $pendaftarans->count();
+
+        // Hitung pelayanan bulan ini
+        $bulanIni = $pendaftarans->filter(function ($item) use ($year) {
+            if (blank($item->tanggal_daftar)) return false;
+            try {
+                $d = Carbon::parse($item->tanggal_daftar);
+                return $d->year === $year && $d->month === now()->month;
+            } catch (\Exception $e) {
+                return false;
+            }
+        })->count();
+
+        $selesai = $pendaftarans->filter(fn($i) => strtolower($i->status ?? '') === 'selesai')->count();
+        $dalamProses = $total - $selesai;
+
         $stats = [
-            'total' => 1248,
-            'bulan_ini' => 186,
-            'selesai' => 1210,
-            'dalam_proses' => 38,
-            'perlu_perhatian' => 12,
+            'total' => $total,
+            'bulan_ini' => $bulanIni,
+            'selesai' => $selesai,
+            'dalam_proses' => $dalamProses,
+            'perlu_perhatian' => 0,
         ];
 
-        // Status Pelayanan
+        // Persentase Status Pelayanan
+        $pctSelesai = $total > 0 ? round(($selesai / $total) * 100, 1) : 0;
+        $pctProses = $total > 0 ? round(($dalamProses / $total) * 100, 1) : 0;
+        $menungguCount = $pendaftarans->filter(fn($i) => strtolower($i->status ?? '') === 'menunggu')->count();
+        $pctMenunggu = $total > 0 ? round(($menungguCount / $total) * 100, 1) : 0;
+        $revisiCount = $pendaftarans->filter(fn($i) => in_array(strtolower($i->status ?? ''), ['perlu revisi', 'revisi']))->count();
+        $pctRevisi = $total > 0 ? round(($revisiCount / $total) * 100, 1) : 0;
+
         $statusPelayanan = [
-            'selesai' => ['label' => 'Selesai', 'count' => 1210, 'percentage' => 96.9, 'class' => 'selesai'],
-            'proses' => ['label' => 'Dalam Proses', 'count' => 38, 'percentage' => 3.0, 'class' => 'proses'],
-            'menunggu' => ['label' => 'Menunggu Verifikasi', 'count' => 17, 'percentage' => 1.4, 'class' => 'menunggu'],
-            'perlu_revisi' => ['label' => 'Perlu Revisi Dokumen', 'count' => 12, 'percentage' => 1.0, 'class' => 'revisi'],
+            'selesai' => ['label' => 'Selesai', 'count' => $selesai, 'percentage' => $pctSelesai, 'class' => 'selesai'],
+            'proses' => ['label' => 'Dalam Proses', 'count' => $dalamProses, 'percentage' => $pctProses, 'class' => 'proses'],
+            'menunggu' => ['label' => 'Menunggu Verifikasi', 'count' => $menungguCount, 'percentage' => $pctMenunggu, 'class' => 'menunggu'],
+            'perlu_revisi' => ['label' => 'Perlu Revisi Dokumen', 'count' => $revisiCount, 'percentage' => $pctRevisi, 'class' => 'revisi'],
         ];
 
-        // Catatan Perlu Perhatian
-        $perhatian = [
-            [
+        // Catatan Perlu Perhatian berbasis data pelayanan real
+        $perhatian = [];
+        if ($dalamProses > 0) {
+            $perhatian[] = [
                 'id' => 1,
-                'pesan' => '12 berkas permohonan masih memerlukan revisi dokumen warga',
-                'level' => 'warning',
-                'badge' => 'Perlu Revisi',
-                'action_label' => 'Lihat Data',
-                'action_url' => route('camat.monitoring'),
-            ],
-            [
-                'id' => 2,
-                'pesan' => '38 pelayanan administrasi saat ini masih dalam proses pengerjaan operator',
+                'pesan' => "{$dalamProses} pelayanan administrasi saat ini masih dalam proses pengerjaan operator",
                 'level' => 'info',
                 'badge' => 'Dalam Proses',
                 'action_label' => 'Pantau Progres',
                 'action_url' => route('camat.monitoring'),
-            ],
-            [
-                'id' => 3,
-                'pesan' => '5 pengaduan warga pada meja pelayanan belum ditindaklanjuti',
-                'level' => 'danger',
-                'badge' => 'Pengaduan',
-                'action_label' => 'Periksa Notifikasi',
-                'action_url' => route('camat.notifikasi'),
-            ],
-        ];
+            ];
+        }
+        if ($revisiCount > 0) {
+            $perhatian[] = [
+                'id' => 2,
+                'pesan' => "{$revisiCount} berkas permohonan memerlukan verifikasi ulang dokumen",
+                'level' => 'warning',
+                'badge' => 'Perlu Perhatian',
+                'action_label' => 'Lihat Data',
+                'action_url' => route('camat.monitoring'),
+            ];
+        }
 
-        // Pelayanan Terbaru (Data Agregat - Tanpa data pribadi sensitif)
-        $pelayananTerbaru = [
-            ['no' => '01', 'tanggal' => '30 Sep 2026', 'jenis' => 'Kartu Keluarga', 'jumlah' => 18, 'status' => 'Selesai'],
-            ['no' => '02', 'tanggal' => '30 Sep 2026', 'jenis' => 'KTP', 'jumlah' => 12, 'status' => 'Selesai'],
-            ['no' => '03', 'tanggal' => '29 Sep 2026', 'jenis' => 'Akta Kelahiran', 'jumlah' => 9, 'status' => 'Dalam Proses'],
-            ['no' => '04', 'tanggal' => '29 Sep 2026', 'jenis' => 'Pindah', 'jumlah' => 7, 'status' => 'Selesai'],
-            ['no' => '05', 'tanggal' => '28 Sep 2026', 'jenis' => 'PRR / KTP Baru', 'jumlah' => 14, 'status' => 'Selesai'],
-            ['no' => '06', 'tanggal' => '28 Sep 2026', 'jenis' => 'Kedatangan', 'jumlah' => 6, 'status' => 'Selesai'],
-            ['no' => '07', 'tanggal' => '27 Sep 2026', 'jenis' => 'Akta Kematian', 'jumlah' => 3, 'status' => 'Selesai'],
-            ['no' => '08', 'tanggal' => '26 Sep 2026', 'jenis' => 'Kartu Keluarga', 'jumlah' => 15, 'status' => 'Selesai'],
-        ];
+        $stats['perlu_perhatian'] = count($perhatian);
 
-        // Kalkulasi untuk Grafik Batang Jenis Pelayanan
-        $chartMax = max(1, max(array_column($services, 'count')));
+        // Pelayanan Terbaru (Data Agregat dari Pendaftaran real)
+        $grouped = $pendaftarans->groupBy(function ($item) {
+            $date = $item->tanggal_daftar ? Carbon::parse($item->tanggal_daftar)->format('Y-m-d') : 'tanpa_tanggal';
+            return $date . '_' . ($item->jenis_layanan ?? 'Pelayanan');
+        })->take(8);
 
-        // Kalkulasi untuk Grafik Tren Bulanan (SVG Points)
+        $pelayananTerbaru = [];
+        $no = 1;
+        foreach ($grouped as $key => $items) {
+            $first = $items->first();
+            $pelayananTerbaru[] = [
+                'no' => sprintf('%02d', $no++),
+                'tanggal' => $first->tanggal_daftar ? Carbon::parse($first->tanggal_daftar)->format('d M Y') : '—',
+                'jenis' => $first->jenis_layanan ?? 'Pelayanan',
+                'jumlah' => $items->count(),
+                'status' => $items->every(fn($i) => strtolower($i->status ?? '') === 'selesai') ? 'Selesai' : 'Dalam Proses',
+            ];
+        }
+
+        // Kalkulasi Grafik Jenis Pelayanan
+        $countsArray = array_column($services, 'count');
+        $maxServiceCount = !empty($countsArray) ? max($countsArray) : 0;
+        $chartMax = max(1, $maxServiceCount);
+
+        $highestService = collect($services)->sortByDesc('count')->first();
+        $highestServiceLabel = ($total > 0 && $highestService && $highestService['count'] > 0)
+            ? "{$highestService['label']} ({$highestService['count']})"
+            : "-";
+
+        // Kalkulasi Grafik Tren Bulanan (SVG Points)
         $monthlyCounts = array_column($monthlyTrend, 'count');
-        $monthlyMax = max(1, max($monthlyCounts));
+        $monthlyMax = max(1, !empty($monthlyCounts) ? max($monthlyCounts) : 0);
         $chartPoints = [];
         foreach ($monthlyCounts as $index => $count) {
             $x = 24 + ($index * 432 / 11);
@@ -121,6 +226,11 @@ class CamatController extends Controller
             $chartPoints[] = round($x, 2) . ',' . round($y, 2);
         }
         $chartPointsString = implode(' ', $chartPoints);
+
+        $peakMonth = collect($monthlyTrend)->sortByDesc('count')->first();
+        $peakMonthLabel = ($total > 0 && $peakMonth && $peakMonth['count'] > 0)
+            ? "{$peakMonth['name']} ({$peakMonth['count']} berkas)"
+            : "-";
 
         return view('camat.dashboard', [
             'stats' => $stats,
@@ -132,7 +242,11 @@ class CamatController extends Controller
             'statusPelayanan' => $statusPelayanan,
             'perhatian' => $perhatian,
             'pelayananTerbaru' => $pelayananTerbaru,
-            'year' => 2026,
+            'year' => $year,
+            'currentMonthName' => ucfirst($currentMonthName),
+            'highestServiceLabel' => $highestServiceLabel,
+            'peakMonthLabel' => $peakMonthLabel,
+            'totalPelayanan' => $total,
         ]);
     }
 
@@ -141,7 +255,8 @@ class CamatController extends Controller
      */
     public function monitoring(Request $request)
     {
-        $allServices = $this->getServicesCatalog();
+        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $allServices = $this->getServicesCatalog($pendaftarans);
         $periode = $request->input('periode', 'semua');
         $selectedLayanan = $request->input('jenis_layanan', 'semua');
 
@@ -149,7 +264,9 @@ class CamatController extends Controller
 
         if ($selectedLayanan !== 'semua' && !empty($selectedLayanan)) {
             $filteredServices = array_filter($filteredServices, function ($item) use ($selectedLayanan) {
-                return $item['key'] === $selectedLayanan || $item['short'] === $selectedLayanan || $item['label'] === $selectedLayanan;
+                return stripos($item['key'], $selectedLayanan) !== false ||
+                       stripos($item['short'], $selectedLayanan) !== false ||
+                       stripos($item['label'], $selectedLayanan) !== false;
             });
         }
 
@@ -167,7 +284,7 @@ class CamatController extends Controller
             'totalSelesai' => $totalSelesai,
             'totalProses' => $totalProses,
             'totalMenunggu' => $totalMenunggu,
-            'year' => 2026,
+            'year' => now()->year,
         ]);
     }
 
@@ -176,13 +293,17 @@ class CamatController extends Controller
      */
     public function statistik(Request $request)
     {
-        $services = $this->getServicesCatalog();
-        $monthlyTrend = $this->getMonthlyTrend();
-        $periode = $request->input('periode', '2026');
+        $pendaftarans = Pendaftaran::all();
+        $services = $this->getServicesCatalog($pendaftarans);
+        $year = now()->year;
+        $monthlyTrend = $this->getMonthlyTrend($pendaftarans, $year);
+        $periode = $request->input('periode', (string)$year);
 
-        $chartMax = max(1, max(array_column($services, 'count')));
+        $countsArray = array_column($services, 'count');
+        $chartMax = max(1, !empty($countsArray) ? max($countsArray) : 0);
         $monthlyCounts = array_column($monthlyTrend, 'count');
-        $monthlyMax = max(1, max($monthlyCounts));
+        $monthlyMax = max(1, !empty($monthlyCounts) ? max($monthlyCounts) : 0);
+
         $chartPoints = [];
         foreach ($monthlyCounts as $index => $count) {
             $x = 24 + ($index * 432 / 11);
@@ -192,20 +313,34 @@ class CamatController extends Controller
         $chartPointsString = implode(' ', $chartPoints);
 
         // Data sebaran per desa di Kecamatan Jatisari
-        $desaStats = [
-            ['desa' => 'Jatisari', 'jumlah' => 142, 'selesai' => 138],
-            ['desa' => 'Balonggandu', 'jumlah' => 125, 'selesai' => 121],
-            ['desa' => 'Cirejag', 'jumlah' => 110, 'selesai' => 106],
-            ['desa' => 'Kalijati', 'jumlah' => 98, 'selesai' => 95],
-            ['desa' => 'Mekarsari', 'jumlah' => 105, 'selesai' => 102],
-            ['desa' => 'Pacing', 'jumlah' => 92, 'selesai' => 89],
-            ['desa' => 'Jatibaru', 'jumlah' => 86, 'selesai' => 83],
-            ['desa' => 'Jatiragas', 'jumlah' => 81, 'selesai' => 79],
-            ['desa' => 'Barugbug', 'jumlah' => 78, 'selesai' => 76],
-            ['desa' => 'Telarsari', 'jumlah' => 89, 'selesai' => 86],
-            ['desa' => 'Sukamekar', 'jumlah' => 74, 'selesai' => 72],
-            ['desa' => 'Cikalongsari', 'jumlah' => 94, 'selesai' => 91],
-            ['desa' => 'Gembongsari', 'jumlah' => 74, 'selesai' => 72],
+        $desaGrouped = $pendaftarans->groupBy(fn($i) => !empty($i->desa) ? trim($i->desa) : 'Lainnya');
+        $desaStats = [];
+        foreach ($desaGrouped as $namaDesa => $items) {
+            $desaStats[] = [
+                'desa' => $namaDesa,
+                'jumlah' => $items->count(),
+                'selesai' => $items->filter(fn($i) => strtolower($i->status ?? '') === 'selesai')->count(),
+            ];
+        }
+
+        $totalPelayanan = $pendaftarans->count();
+        $selesaiCount = $pendaftarans->filter(fn($i) => strtolower($i->status ?? '') === 'selesai')->count();
+        $persenSelesai = $totalPelayanan > 0 ? round(($selesaiCount / $totalPelayanan) * 100, 1) : 0;
+        $rataBulanan = round($totalPelayanan / 12, 1);
+
+        $highestService = collect($services)->sortByDesc('count')->first();
+        $highestServiceTitle = ($totalPelayanan > 0 && $highestService && $highestService['count'] > 0) ? $highestService['label'] : '-';
+        $highestServiceCount = ($totalPelayanan > 0 && $highestService && $highestService['count'] > 0) ? "{$highestService['count']} Berkas Permohonan" : "0 Berkas";
+
+        $peakMonth = collect($monthlyTrend)->sortByDesc('count')->first();
+        $peakMonthLabel = ($totalPelayanan > 0 && $peakMonth && $peakMonth['count'] > 0) ? "{$peakMonth['name']} ({$peakMonth['count']})" : "-";
+
+        $dalamProses = $totalPelayanan - $selesaiCount;
+        $statusPelayanan = [
+            'selesai' => ['count' => $selesaiCount, 'percentage' => $persenSelesai],
+            'proses' => ['count' => $dalamProses, 'percentage' => $totalPelayanan > 0 ? round(($dalamProses / $totalPelayanan) * 100, 1) : 0],
+            'menunggu' => ['count' => 0, 'percentage' => 0],
+            'perlu_revisi' => ['count' => 0, 'percentage' => 0],
         ];
 
         return view('camat.statistik', [
@@ -216,10 +351,14 @@ class CamatController extends Controller
             'chartPoints' => $chartPointsString,
             'desaStats' => $desaStats,
             'periode' => $periode,
-            'year' => 2026,
-            'totalPelayanan' => 1248,
-            'rataBulanan' => 138,
-            'persenSelesai' => 96.9,
+            'year' => $year,
+            'totalPelayanan' => $totalPelayanan,
+            'rataBulanan' => $rataBulanan,
+            'persenSelesai' => $persenSelesai,
+            'highestServiceTitle' => $highestServiceTitle,
+            'highestServiceCount' => $highestServiceCount,
+            'peakMonthLabel' => $peakMonthLabel,
+            'statusPelayanan' => $statusPelayanan,
         ]);
     }
 
@@ -228,15 +367,18 @@ class CamatController extends Controller
      */
     public function laporan(Request $request)
     {
-        $allServices = $this->getServicesCatalog();
-        $tahun = $request->input('tahun', '2026');
+        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $allServices = $this->getServicesCatalog($pendaftarans);
+        $tahun = $request->input('tahun', (string)now()->year);
         $bulan = $request->input('bulan', 'semua');
         $jenisLayanan = $request->input('jenis_layanan', 'semua');
 
         $filteredServices = $allServices;
         if ($jenisLayanan !== 'semua' && !empty($jenisLayanan)) {
             $filteredServices = array_filter($filteredServices, function ($item) use ($jenisLayanan) {
-                return $item['key'] === $jenisLayanan || $item['short'] === $jenisLayanan || $item['label'] === $jenisLayanan;
+                return stripos($item['key'], $jenisLayanan) !== false ||
+                       stripos($item['short'], $jenisLayanan) !== false ||
+                       stripos($item['label'], $jenisLayanan) !== false;
             });
         }
 
@@ -262,13 +404,20 @@ class CamatController extends Controller
      */
     public function aktivitas(Request $request)
     {
-        $allLogs = [
-            ['id' => 1, 'operator' => 'Operator 01', 'aktivitas' => 'Menambahkan data KTP', 'jenis' => 'KTP', 'waktu' => '08:21', 'status' => 'Berhasil'],
-            ['id' => 2, 'operator' => 'Operator 02', 'aktivitas' => 'Memperbarui data KK', 'jenis' => 'Kartu Keluarga', 'waktu' => '09:15', 'status' => 'Berhasil'],
-            ['id' => 3, 'operator' => 'Operator 01', 'aktivitas' => 'Menyelesaikan pelayanan Akta Kelahiran', 'jenis' => 'Akta Kelahiran', 'waktu' => '10:02', 'status' => 'Berhasil'],
-            ['id' => 4, 'operator' => 'Operator 02', 'aktivitas' => 'Memperbarui status pelayanan', 'jenis' => 'Pelayanan', 'waktu' => '11:20', 'status' => 'Berhasil'],
-            ['id' => 5, 'operator' => 'Operator 01', 'aktivitas' => 'Membuat laporan pelayanan', 'jenis' => 'Laporan', 'waktu' => '13:10', 'status' => 'Berhasil'],
-        ];
+        $pendaftarans = Pendaftaran::latest()->get();
+        $allLogs = [];
+        $id = 1;
+
+        foreach ($pendaftarans as $p) {
+            $allLogs[] = [
+                'id' => $id++,
+                'operator' => !empty($p->petugas) ? $p->petugas : 'Petugas Operator',
+                'aktivitas' => "Pendaftaran " . ($p->jenis_layanan ?? 'Pelayanan'),
+                'jenis' => $p->jenis_layanan ?? 'Pelayanan',
+                'waktu' => $p->created_at ? $p->created_at->format('H:i') : ($p->tanggal_daftar ? Carbon::parse($p->tanggal_daftar)->format('H:i') : '—'),
+                'status' => 'Berhasil',
+            ];
+        }
 
         $filterOperator = $request->input('operator', 'semua');
         $filteredLogs = $allLogs;
@@ -279,10 +428,13 @@ class CamatController extends Controller
             });
         }
 
+        $operatorsCount = $pendaftarans->pluck('petugas')->filter()->unique()->count();
+
         return view('camat.aktivitas', [
             'logs' => $filteredLogs,
             'filterOperator' => $filterOperator,
             'totalAktivitas' => count($allLogs),
+            'operatorAktifCount' => max($operatorsCount, $pendaftarans->count() > 0 ? 1 : 0),
         ]);
     }
 
@@ -291,48 +443,38 @@ class CamatController extends Controller
      */
     public function notifikasi()
     {
-        $notifications = [
-            [
-                'id' => 1,
-                'judul' => '12 pelayanan membutuhkan perhatian',
-                'pesan' => 'Terdapat 12 berkas pelayanan yang membutuhkan verifikasi ulang dan perbaikan dokumen pemohon.',
-                'kategori' => 'Perhatian',
-                'badge_class' => 'warning',
-                'waktu' => '10 menit yang lalu',
-                'dibaca' => false,
-                'link' => route('camat.monitoring'),
-            ],
-            [
-                'id' => 2,
-                'judul' => '38 pelayanan masih dalam proses',
-                'pesan' => 'Sebanyak 38 berkas sedang dalam proses pengerjaan oleh petugas operator kecamatan.',
+        $pendaftarans = Pendaftaran::all();
+        $dalamProses = $pendaftarans->filter(fn($i) => strtolower($i->status ?? '') !== 'selesai')->count();
+        $total = $pendaftarans->count();
+
+        $notifications = [];
+        $id = 1;
+
+        if ($dalamProses > 0) {
+            $notifications[] = [
+                'id' => $id++,
+                'judul' => "{$dalamProses} pelayanan masih dalam proses",
+                'pesan' => "Sebanyak {$dalamProses} berkas sedang dalam proses pengerjaan oleh petugas operator kecamatan.",
                 'kategori' => 'Proses',
                 'badge_class' => 'info',
-                'waktu' => '1 jam yang lalu',
+                'waktu' => 'Terbaru',
                 'dibaca' => false,
                 'link' => route('camat.monitoring'),
-            ],
-            [
-                'id' => 3,
-                'judul' => 'Laporan September 2026 tersedia',
-                'pesan' => 'Rekapitulasi laporan pelayanan administrasi bulan September 2026 telah selesai dan siap ditinjau/dicetak.',
+            ];
+        }
+
+        if ($total > 0) {
+            $notifications[] = [
+                'id' => $id++,
+                'judul' => "Laporan Pelayanan Tersedia",
+                'pesan' => "Rekapitulasi laporan pelayanan administrasi telah diperbarui sesuai data pendaftaran.",
                 'kategori' => 'Laporan',
                 'badge_class' => 'success',
-                'waktu' => 'Kemarin, 16:30 WIB',
+                'waktu' => 'Terbaru',
                 'dibaca' => false,
                 'link' => route('camat.laporan'),
-            ],
-            [
-                'id' => 4,
-                'judul' => 'Terdapat 5 pengaduan yang belum ditindaklanjuti',
-                'pesan' => 'Terdapat 5 laporan aspirasi/pengaduan masyarakat yang membutuhkan tindak lanjut pimpinan.',
-                'kategori' => 'Pengaduan',
-                'badge_class' => 'danger',
-                'waktu' => '29 Sep 2026, 14:15 WIB',
-                'dibaca' => false,
-                'link' => route('camat.dashboard'),
-            ],
-        ];
+            ];
+        }
 
         return view('camat.notifikasi', [
             'notifications' => $notifications,

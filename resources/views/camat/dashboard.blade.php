@@ -34,7 +34,7 @@
         <div>
             <span>Pelayanan Bulan Ini</span>
             <strong>{{ number_format($stats['bulan_ini'], 0, ',', '.') }}</strong>
-            <small style="color: #2563eb; font-size: 0.68rem; margin-top: 2px;">September 2026</small>
+            <small style="color: #2563eb; font-size: 0.68rem; margin-top: 2px;">{{ $currentMonthName }}</small>
         </div>
     </div>
     <div class="dashboard-stat" style="border-left: 4px solid #16a34a;">
@@ -42,7 +42,7 @@
         <div>
             <span>Selesai</span>
             <strong style="color: #15803d;">{{ number_format($stats['selesai'], 0, ',', '.') }}</strong>
-            <small style="color: #16a34a; font-size: 0.68rem; margin-top: 2px;">96.9% Selesai</small>
+            <small style="color: #16a34a; font-size: 0.68rem; margin-top: 2px;">{{ $statusPelayanan['selesai']['percentage'] }}% Selesai</small>
         </div>
     </div>
     <div class="dashboard-stat" style="border-left: 4px solid #d97706;">
@@ -73,11 +73,11 @@
                 <p>Status pelayanan yang membutuhkan pengawasan atau tindak lanjut Camat</p>
             </div>
         </div>
-        <span class="badge-camat warning">1 Poin Pengawasan</span>
+        <span class="badge-camat warning">{{ count($perhatian) }} Poin Pengawasan</span>
     </div>
 
     <div class="attention-list">
-        @foreach ($perhatian as $item)
+        @forelse ($perhatian as $item)
             @if (
                 !str_contains(strtolower($item['pesan']), 'revisi dokumen') &&
                 !str_contains(strtolower($item['pesan']), 'pengaduan warga')
@@ -95,7 +95,11 @@
                     </div>
                 </div>
             @endif
-        @endforeach
+        @empty
+            <div style="grid-column: 1 / -1; color: #64748b; font-size: 0.82rem; padding: 4px 0;">
+                Tidak ada status pelayanan yang memerlukan perhatian khusus saat ini.
+            </div>
+        @endforelse
     </div>
 </section>
 
@@ -119,7 +123,7 @@
             @endforeach
         </div>
         <div style="display: flex; justify-content: space-between; margin-top: 14px; padding-top: 10px; border-top: 1px solid #edf2f7; font-size: 0.73rem; color: #64748b;">
-            <span>Layanan tertinggi: <strong>Kartu Keluarga (276)</strong></span>
+            <span>Layanan tertinggi: <strong>{{ $highestServiceLabel }}</strong></span>
             <span>Total: <strong>{{ number_format($stats['total'], 0, ',', '.') }} pelayanan</strong></span>
         </div>
     </article>
@@ -132,7 +136,7 @@
             </div>
             <span class="chart-year">{{ $year }}</span>
         </div>
-        <div class="trend-chart" role="img" aria-label="Grafik tren pelayanan bulanan 2026">
+        <div class="trend-chart" role="img" aria-label="Grafik tren pelayanan bulanan {{ $year }}">
             <svg viewBox="0 0 480 160" preserveAspectRatio="none" aria-hidden="true">
                 <line x1="24" y1="28" x2="456" y2="28" />
                 <line x1="24" y1="78" x2="456" y2="78" />
@@ -149,8 +153,8 @@
             </div>
         </div>
         <div style="display: flex; justify-content: space-between; margin-top: 14px; padding-top: 10px; border-top: 1px solid #edf2f7; font-size: 0.73rem; color: #64748b;">
-            <span>Puncak pelayanan: <strong>September (186 berkas)</strong></span>
-            <span style="color: #94a3b8;">* Okt - Des 2026: Data berjalan</span>
+            <span>Puncak pelayanan: <strong>{{ $peakMonthLabel }}</strong></span>
+            <span style="color: #94a3b8;">* Data berjalan</span>
         </div>
     </article>
 </section>
@@ -162,7 +166,7 @@
             <h2>Status Pelayanan</h2>
             <p>Distribusi dan efektivitas penyelesaian berkas administrasi</p>
         </div>
-        <span class="badge-camat success">Tingkat Selesai 96.9%</span>
+        <span class="badge-camat success">Tingkat Selesai {{ $statusPelayanan['selesai']['percentage'] }}%</span>
     </div>
 
     <div class="progress-bar-stacked" title="Distribusi Status">
@@ -176,7 +180,7 @@
         <div class="status-box selesai">
             <div class="status-box-header">
                 <span>SELESAI</span>
-                <span class="badge-camat success">96.9%</span>
+                <span class="badge-camat success">{{ $statusPelayanan['selesai']['percentage'] }}%</span>
             </div>
             <div class="status-box-val">{{ number_format($statusPelayanan['selesai']['count'], 0, ',', '.') }}</div>
             <small style="color: #15803d; font-size: 0.72rem;">Berkas tuntas diproses</small>
@@ -185,7 +189,7 @@
         <div class="status-box proses">
             <div class="status-box-header">
                 <span>DALAM PROSES</span>
-                <span class="badge-camat warning">3.0%</span>
+                <span class="badge-camat warning">{{ $statusPelayanan['proses']['percentage'] }}%</span>
             </div>
             <div class="status-box-val">{{ number_format($statusPelayanan['proses']['count'], 0, ',', '.') }}</div>
             <small style="color: #b45309; font-size: 0.72rem;">Sedang ditangani loket</small>
@@ -194,7 +198,7 @@
         <div class="status-box menunggu">
             <div class="status-box-header">
                 <span>MENUNGGU</span>
-                <span class="badge-camat info">1.4%</span>
+                <span class="badge-camat info">{{ $statusPelayanan['menunggu']['percentage'] }}%</span>
             </div>
             <div class="status-box-val">{{ number_format($statusPelayanan['menunggu']['count'], 0, ',', '.') }}</div>
             <small style="color: #1e40af; font-size: 0.72rem;">Antrean verifikasi petugas</small>
@@ -203,7 +207,7 @@
         <div class="status-box revisi">
             <div class="status-box-header">
                 <span>PERLU REVISI</span>
-                <span class="badge-camat danger">1.0%</span>
+                <span class="badge-camat danger">{{ $statusPelayanan['perlu_revisi']['percentage'] }}%</span>
             </div>
             <div class="status-box-val">{{ number_format($statusPelayanan['perlu_revisi']['count'], 0, ',', '.') }}</div>
             <small style="color: #991b1b; font-size: 0.72rem;">Dokumen belum lengkap</small>
@@ -211,7 +215,7 @@
     </div>
 </section>
 
-{{-- TABEL PELAYANAN TERBARU (AGREGAT MONITORING - TANPA NIK/NAMA WARGA SENSITIF) --}}
+{{-- TABEL PELAYANAN TERBARU --}}
 <section class="dashboard-panel recent-panel">
     <div class="panel-heading">
         <div>
@@ -234,7 +238,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($pelayananTerbaru as $item)
+                @forelse ($pelayananTerbaru as $item)
                     <tr>
                         <td><strong>{{ $item['no'] }}</strong></td>
                         <td>{{ $item['tanggal'] }}</td>
@@ -257,7 +261,13 @@
                             </a>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="6" class="empty-state" style="text-align: center; color: #64748b; padding: 20px;">
+                            Belum ada data pelayanan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

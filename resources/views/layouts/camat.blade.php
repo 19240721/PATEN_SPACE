@@ -48,6 +48,24 @@
             border: 1px solid #cbd5e1;
         }
 
+        .logout-nav-item {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+            border: none;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .logout-nav-item:hover {
+            background-color: #b91c1c !important;
+            color: #ffffff !important;
+        }
+        .logout-nav-item {
+            justify-content: center !important;
+            text-align: center !important;
+        }
+
         .sidebar-counter {
             margin-left: auto;
             background: #ef4444;
@@ -298,14 +316,22 @@
                 <div class="nav-group-label">LAINNYA</div>
                 <a href="{{ route('camat.notifikasi') }}" class="nav-item {{ request()->routeIs('camat.notifikasi') ? 'active' : '' }}">
                     <span>🔔</span> Notifikasi
-                    <span class="sidebar-counter">1</span>
+                    @php
+                        $unreadCount = \App\Models\Pendaftaran::where('status', '!=', 'Selesai')->orWhereNull('status')->count();
+                    @endphp
+                    @if($unreadCount > 0)
+                        <span class="sidebar-counter">{{ $unreadCount }}</span>
+                    @endif
                 </a>
                 <a href="{{ route('camat.profil') }}" class="nav-item {{ request()->routeIs('camat.profil') ? 'active' : '' }}">
                     <span>👤</span> Profil
                 </a>
-                <a href="{{ route('dashboard') }}" class="nav-item" title="Kembali ke Dashboard Operator">
-                    <span>↪</span> Keluar
-                </a>
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0; padding: 0;">
+                    @csrf
+                    <button type="submit" class="nav-item logout-nav-item" style="border: none; width: 100%; cursor: pointer; font-family: inherit; font-size: inherit; display: flex; align-items: center; justify-content: center; text-align: center;" title="Logout">
+                        Logout
+                    </button>
+                </form>
             </nav>
 
             <div class="sidebar-profile">
@@ -324,9 +350,6 @@
                     <span>Kabupaten Karawang</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <a href="{{ route('dashboard') }}" class="role-switch-link" title="Buka Dashboard Operator Kecamatan">
-                        <span>⇄</span> Beralih ke Operator
-                    </a>
                     <div class="operator-chip">
                         <span>Camat Jatisari</span>
                         <b title="Camat Jatisari">CJ</b>
