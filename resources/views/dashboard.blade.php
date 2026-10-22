@@ -5,6 +5,12 @@
 @section('content')
 <div class="app-shell">
     <aside class="sidebar dark-sidebar">
+        <button class="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar" aria-expanded="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
         <div class="brand-wrap">
             <div class="brand-mark">P</div>
             <div class="brand-text">
@@ -226,6 +232,22 @@
             </table>
         </section>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+
+            if (!sidebar || !toggle) {
+                return;
+            }
+
+            toggle.addEventListener('click', function () {
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+                toggle.setAttribute('aria-expanded', String(!isCollapsed));
+            });
+        });
+    </script>
 
 </body>
 </html>

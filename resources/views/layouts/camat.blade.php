@@ -248,6 +248,73 @@
             color: #0369a1;
         }
 
+        .sidebar-toggle {
+            position: absolute;
+            top: 16px;
+            right: 12px;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            border-radius: 999px;
+            background: #ffffff;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .sidebar {
+            position: relative;
+            transition: width 0.25s ease, padding 0.25s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 92px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .sidebar.collapsed .brand-wrap {
+            justify-content: center;
+            padding: 8px 0 18px;
+            gap: 0;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .sidebar-nav,
+        .sidebar.collapsed .sidebar-profile {
+            display: none;
+        }
+
+        .sidebar.collapsed .brand-mark {
+            margin: 0 auto;
+        }
+
+        .sidebar-toggle[aria-expanded="false"] span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .sidebar-toggle[aria-expanded="false"] span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .sidebar-toggle[aria-expanded="false"] span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
         @media print {
             .sidebar, .dashboard-topbar, .dashboard-primary-link, .report-filters, .table-action, .role-switch-link, .no-print {
                 display: none !important;
@@ -287,6 +354,12 @@
 <body>
     <div class="app-shell dashboard-page">
         <aside class="sidebar dark-sidebar">
+            <button class="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar" aria-expanded="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <a href="{{ route('camat.dashboard') }}" class="brand-wrap">
                 <img src="{{ asset('image/logo-kecamatan.png') }}" alt="Logo Kecamatan Jatisari" class="brand-mark">
                 <span class="brand-text">
@@ -362,5 +435,21 @@
             </div>
         </main>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+
+            if (!sidebar || !toggle) {
+                return;
+            }
+
+            toggle.addEventListener('click', function () {
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+                toggle.setAttribute('aria-expanded', String(!isCollapsed));
+            });
+        });
+    </script>
 </body>
 </html>
