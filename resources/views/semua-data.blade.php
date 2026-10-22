@@ -64,7 +64,7 @@
                     @endif
                 </form>
                 <div class="table-scroll"><table class="report-table">
-                    <thead><tr><th>No</th><th>Nama</th><th>NIK</th><th>Jenis Layanan</th><th>Petugas</th><th>Tanggal Daftar</th><th>Status</th><th>Edit</th></tr></thead>
+                    <thead><tr><th>No</th><th>Nama</th><th>NIK</th><th>Jenis Layanan</th><th>Asal</th><th>Petugas</th><th>Dokumen</th><th>Tanggal Daftar</th><th>Status</th><th>Edit</th></tr></thead>
                     <tbody>
                         @forelse ($pendaftarans as $index => $item)
                             <tr>
@@ -72,13 +72,21 @@
                                 <td class="person-name">{{ $item->nama_lengkap }}</td>
                                 <td>{{ $item->nik }}</td>
                                 <td>{{ $item->jenis_layanan }}</td>
+                                <td>{{ $item->intake_source === 'masyarakat' ? 'Daring' : 'Loket' }}</td>
                                 <td>{{ $item->petugas ?: '—' }}</td>
+                                <td>
+                                    @forelse ($item->documents ?? [] as $documentIndex => $document)
+                                        <a href="{{ route('pendaftaran.document', [$item, $documentIndex]) }}" class="table-action edit">{{ $document['original_name'] }}</a><br>
+                                    @empty
+                                        —
+                                    @endforelse
+                                </td>
                                 <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d/m/Y') }}</td>
                                 <td><span class="status-pill {{ strtolower($item->status ?? 'baru') }}">{{ $item->status ?? 'Baru' }}</span></td>
                                 <td><a href="{{ route('pendaftaran.edit', ['pendaftaran' => $item, 'jenis_layanan' => $item->jenis_layanan]) }}" class="table-action edit">Edit</a></td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="empty-state">Belum ada data yang sesuai.</td></tr>
+                            <tr><td colspan="10" class="empty-state">Belum ada data yang sesuai.</td></tr>
                         @endforelse
                     </tbody>
                 </table></div>

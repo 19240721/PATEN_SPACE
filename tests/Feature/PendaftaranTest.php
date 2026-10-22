@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Pendaftaran;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -9,9 +11,16 @@ class PendaftaranTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create(['role' => 'operator']));
+    }
+
     public function test_dashboard_page_can_be_rendered(): void
     {
-        $response = $this->get('/dashboard');
+        $response = $this->get('/petugas/dashboard');
 
         $response->assertOk();
         $response->assertSee('Dashboard');
@@ -110,7 +119,7 @@ class PendaftaranTest extends TestCase
             'status' => 'Selesai',
         ]);
 
-        $response = $this->get('/dashboard');
+        $response = $this->get('/petugas/dashboard');
 
         $response->assertOk();
         $response->assertSee('Siti Nurhaliza');
@@ -119,14 +128,14 @@ class PendaftaranTest extends TestCase
 
     public function test_service_page_only_shows_matching_service_records(): void
     {
-        \App\Models\Pendaftaran::create([
+        Pendaftaran::create([
             'nama_lengkap' => 'Siti Keluarga',
             'nik' => '3201010101010011',
             'alamat' => 'Jl. Jatisari',
             'jenis_layanan' => 'KK',
             'tanggal_daftar' => '2026-09-22',
         ]);
-        \App\Models\Pendaftaran::create([
+        Pendaftaran::create([
             'nama_lengkap' => 'Andi KTP',
             'nik' => '3201010101010012',
             'alamat' => 'Jl. Cikampek',
@@ -157,14 +166,14 @@ class PendaftaranTest extends TestCase
 
     public function test_all_data_page_shows_all_services_and_can_filter_by_service(): void
     {
-        \App\Models\Pendaftaran::create([
+        Pendaftaran::create([
             'nama_lengkap' => 'Siti Keluarga',
             'nik' => '3201010101010021',
             'alamat' => 'Jl. Jatisari',
             'jenis_layanan' => 'KK',
             'tanggal_daftar' => '2026-09-22',
         ]);
-        \App\Models\Pendaftaran::create([
+        Pendaftaran::create([
             'nama_lengkap' => 'Andi KTP',
             'nik' => '3201010101010022',
             'alamat' => 'Jl. Cikampek',
@@ -197,14 +206,14 @@ class PendaftaranTest extends TestCase
 
         $response->assertRedirect('/pendaftaran/success');
 
-        $pendaftaran = \App\Models\Pendaftaran::where('nik', '3201010101010007')->first();
+        $pendaftaran = Pendaftaran::where('nik', '3201010101010007')->first();
         $this->assertNotNull($pendaftaran);
         $this->assertNull($pendaftaran->kecamatan);
     }
 
     public function test_laporan_page_shows_summary_and_data(): void
     {
-        \App\Models\Pendaftaran::create([
+        Pendaftaran::create([
             'nama_lengkap' => 'Rudi Hartono',
             'nik' => '3201010101010031',
             'alamat' => 'Jl. Desa Jatisari 2',
@@ -262,7 +271,7 @@ class PendaftaranTest extends TestCase
 
     public function test_registration_can_be_updated(): void
     {
-        $pendaftaran = \App\Models\Pendaftaran::create([
+        $pendaftaran = Pendaftaran::create([
             'nama_lengkap' => 'Dewi Lestari',
             'nik' => '3201010101010004',
             'tempat_lahir' => 'Karawang',
@@ -275,7 +284,7 @@ class PendaftaranTest extends TestCase
             'status' => 'Baru',
         ]);
 
-        $response = $this->put('/pendaftaran/' . $pendaftaran->id, [
+        $response = $this->put('/pendaftaran/'.$pendaftaran->id, [
             'nama_lengkap' => 'Dewi Lestari',
             'nik' => '3201010101010004',
             'tempat_lahir' => 'Karawang',
@@ -297,9 +306,9 @@ class PendaftaranTest extends TestCase
         ]);
     }
 
-    public function test_registration_cannot_be_deleted(): void
+    public function test_registration_can_be_deleted_by_petugas(): void
     {
-        $pendaftaran = \App\Models\Pendaftaran::create([
+        $pendaftaran = Pendaftaran::create([
             'nama_lengkap' => 'Agus Pratama',
             'nik' => '3201010101010005',
             'tempat_lahir' => 'Cikampek',
@@ -312,10 +321,10 @@ class PendaftaranTest extends TestCase
             'status' => 'Proses',
         ]);
 
-        $response = $this->delete('/pendaftaran/' . $pendaftaran->id);
+        $response = $this->delete('/pendaftaran/'.$pendaftaran->id);
 
-        $response->assertStatus(405);
-        $this->assertDatabaseHas('pendaftarans', [
+        $response->assertRedirect('/dashboard');
+        $this->assertDatabaseMissing('pendaftarans', [
             'id' => $pendaftaran->id,
         ]);
     }

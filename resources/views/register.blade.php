@@ -3,6 +3,9 @@
 @section('title', 'Registrasi PATEN')
 
 @section('content')
+@php
+    $isCitizen = $isCitizen ?? false;
+@endphp
 <div class="app-shell form-page-shell">
     <aside class="sidebar">
         <div class="brand-wrap">
@@ -17,11 +20,11 @@
 
         <nav class="sidebar-nav">
             <div class="nav-group-label">Dashboard</div>
-            <a href="{{ route('dashboard') }}" class="nav-item">Dashboard</a>
+            <a href="{{ $isCitizen ? route('masyarakat.dashboard') : route('dashboard') }}" class="nav-item">Dashboard</a>
 
             <div class="nav-group-label">Layanan PATEN</div>
-            <a href="{{ route('pendaftaran.create') }}" class="nav-item active">Registrasi / Pendaftaran</a>
-            <a href="#" class="nav-item">Data Penduduk</a>
+            <a href="{{ $isCitizen ? route('masyarakat.permohonan.create') : route('pendaftaran.create') }}" class="nav-item active">{{ $isCitizen ? 'Ajukan Permohonan' : 'Registrasi / Pendaftaran' }}</a>
+            @unless($isCitizen)<a href="{{ route('pendaftaran.index') }}" class="nav-item">Daftar Permohonan</a>@endunless
 
             <div class="nav-group-label">Pengelolaan</div>
             <a href="#" class="nav-item">Data Pengguna</a>
@@ -29,29 +32,34 @@
             <a href="#" class="nav-item">Pengaturan</a>
         </nav>
 
-        <button class="logout-btn">Keluar</button>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button class="logout-btn" type="submit">Keluar</button>
+        </form>
     </aside>
 
     <main class="main-panel form-page-main">
         <header class="topbar form-topbar">
             <button type="button" class="back-button" aria-label="Kembali" title="Kembali" onclick="if (document.referrer.startsWith(window.location.origin)) { window.history.back(); } else { window.location.href = '{{ route('dashboard') }}'; }">←</button>
             <div>
-                <h1>Registrasi</h1>
-                <p>Input data pendaftaran layanan PATEN Kecamatan Jatisari.</p>
+                <h1>{{ $isCitizen ? 'Ajukan Permohonan' : 'Registrasi / Pendaftaran' }}</h1>
+                <p>{{ $isCitizen ? 'Isi formulir layanan dan unggah dokumen persyaratan.' : 'Form ini juga dapat digunakan untuk membantu warga yang belum memiliki ponsel atau belum terbiasa menggunakan gawai.' }}</p>
             </div>
-            <div class="date-pill">Senin, 8 September 2025</div>
+            <div class="date-pill">{{ now()->translatedFormat('d F Y') }}</div>
         </header>
 
         @php
             $pendaftaran = $pendaftaran ?? new \App\Models\Pendaftaran();
             $isEdit = isset($pendaftaran->id);
-            $actionUrl = $isEdit ? route('pendaftaran.update', $pendaftaran) : route('pendaftaran.store');
+            $actionUrl = $isEdit
+                ? route('pendaftaran.update', $pendaftaran)
+                : ($isCitizen ? route('masyarakat.permohonan.store') : route('pendaftaran.store'));
             $fixedService = $isEdit ? $pendaftaran->jenis_layanan : request('jenis_layanan');
             $hasFixedService = in_array($fixedService, ['PRR', 'KTP', 'KK', 'Akta Kematian', 'Akta Lahir', 'Kedatangan', 'Pindah'], true);
             $selectedService = old('jenis_layanan', $fixedService ?? 'KTP');
         @endphp
 
-        <form action="{{ $actionUrl }}" method="POST" class="form-shell">
+        <form action="{{ $actionUrl }}" method="POST" enctype="multipart/form-data" class="form-shell">
             @csrf
             @if($isEdit)
                 @method('PUT')
@@ -86,7 +94,7 @@
                     </div>
                     <div class="field-group">
                         <label for="nik">NIK</label>
-                        <input id="nik" name="nik" type="text" placeholder="Masukkan NIK" value="{{ old('nik', $pendaftaran->nik ?? '') }}" required>
+                        <input id="nik" name="nik" type="text" placeholder="Masukkan NIK" value="{{ old('nik', $isCitizen ? $citizen->nik : ($pendaftaran->nik ?? '')) }}" {{ $isCitizen ? 'readonly' : '' }} required>
                     </div>
                     <div class="field-group">
                         <label for="jenis_kelamin">Jenis Kelamin</label>
@@ -144,6 +152,7 @@
                         <label for="no_telepon">Nomor Telepon</label>
                         <input id="no_telepon" name="no_telepon" type="tel" placeholder="Masukkan nomor telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}">
                     </div>
+                    @unless($isCitizen)
                     <div class="field-group">
                         <label for="petugas">Petugas</label>
                         <select id="petugas" name="petugas">
@@ -163,8 +172,12 @@
                             <option value="Baru" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Baru' ? 'selected' : '' }}>Baru</option>
                             <option value="Proses" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Proses' ? 'selected' : '' }}>Proses</option>
                             <option value="Selesai" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="Ditolak" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                         </select>
                     </div>
+                    @else
+                        <input type="hidden" name="tanggal_daftar" value="{{ now()->format('Y-m-d') }}">
+                    @endunless
                 </div>
             </section>
 
@@ -179,7 +192,7 @@
                         <div class="field-group"><label>Minggu Ke</label><input type="text" name="minggu_ke" value="{{ old('minggu_ke', $pendaftaran->minggu_ke ?? '') }}" placeholder="Contoh: 1"></div>
                         <div class="field-group"><label>Tanggal Kedatangan</label><input type="date" name="tanggal_kedatangan" value="{{ old('tanggal_kedatangan', $pendaftaran->tanggal_kedatangan ?? '') }}"></div>
                         <div class="field-group"><label>Nama</label><input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $pendaftaran->nama_lengkap ?? '') }}" placeholder="Nama lengkap"></div>
-                        <div class="field-group"><label>NIK</label><input type="text" name="nik" value="{{ old('nik', $pendaftaran->nik ?? '') }}" placeholder="NIK"></div>
+                        <div class="field-group"><label>NIK</label><input type="text" name="nik" value="{{ old('nik', $isCitizen ? $citizen->nik : ($pendaftaran->nik ?? '')) }}" placeholder="NIK" {{ $isCitizen ? 'readonly' : '' }}></div>
                         <div class="field-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $pendaftaran->tempat_lahir ?? '') }}" placeholder="Tempat lahir"></div>
                         <div class="field-group"><label>Tanggal Lahir</label><input type="text" name="tanggal_lahir" value="{{ old('tanggal_lahir', $pendaftaran->tanggal_lahir ? \Carbon\Carbon::parse($pendaftaran->tanggal_lahir)->format('d-m-Y') : '') }}" placeholder="Contoh: 10-05-1998"></div>
                         <div class="field-group"><label>Jalan</label><input type="text" name="jalan" value="{{ old('jalan', $pendaftaran->jalan ?? '') }}" placeholder="Jalan"></div>
@@ -205,13 +218,16 @@
                                 <option value="Pacing" {{ old('desa', $pendaftaran->desa ?? '') == 'Pacing' ? 'selected' : '' }}>Pacing</option>
                             </select>
                         </div>
+                        @unless($isCitizen)
                         <div class="field-group"><label>Status</label>
                             <select name="status">
                                 <option value="Baru" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Baru' ? 'selected' : '' }}>Baru</option>
                                 <option value="Proses" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Proses' ? 'selected' : '' }}>Proses</option>
                                 <option value="Selesai" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                                <option value="Ditolak" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                             </select>
                         </div>
+                        @endunless
                         <div class="field-group"><label>No HP</label><input type="text" name="no_telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}" placeholder="Nomor HP"></div>
                     </div>
                 </div>
@@ -311,9 +327,32 @@
                 </div>
             </section>
 
+            <section class="form-card">
+                <div class="section-header form-section-header">
+                    <h2>Dokumen Persyaratan</h2>
+                </div>
+                <p>Unggah hingga 5 berkas gambar atau PDF, maksimal 5 MB per berkas. Di ponsel, tombol kamera dapat digunakan untuk memotret dokumen.</p>
+                <div class="form-grid compact-grid">
+                    <div class="field-group">
+                        <label for="documents-camera">Foto dengan kamera</label>
+                        <input id="documents-camera" type="file" name="documents[]" accept="image/*" capture="environment" multiple>
+                    </div>
+                    <div class="field-group">
+                        <label for="documents-scan">Pilih hasil scan / PDF</label>
+                        <input id="documents-scan" type="file" name="documents[]" accept="image/*,.pdf" multiple>
+                    </div>
+                </div>
+                @error('documents')
+                    <p class="form-error">{{ $message }}</p>
+                @enderror
+                @error('documents.*')
+                    <p class="form-error">{{ $message }}</p>
+                @enderror
+            </section>
+
             <div class="action-row">
-                <button type="button" class="btn btn-secondary" onclick="window.location='{{ route('dashboard') }}'">Batal</button>
-                <button type="submit" class="btn btn-primary">{{ $isEdit ? 'Update Data' : 'Simpan Data' }}</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location='{{ $isCitizen ? route('masyarakat.dashboard') : route('dashboard') }}'">Batal</button>
+                <button type="submit" class="btn btn-primary">{{ $isEdit ? 'Update Data' : ($isCitizen ? 'Kirim Permohonan' : 'Simpan Data') }}</button>
             </div>
         </form>
 
@@ -329,10 +368,18 @@
                     serviceSections.forEach(function (section) {
                         const show = section.dataset.service === selected;
                         section.hidden = !show;
+                        section.querySelectorAll('input, select, textarea').forEach(function (field) {
+                            field.disabled = !show;
+                        });
                     });
 
                     if (infoCard) {
                         infoCard.hidden = selected === 'PRR';
+                        infoCard.querySelectorAll('input, select, textarea').forEach(function (field) {
+                            field.disabled = selected === 'PRR'
+                                && field.name !== 'jenis_layanan'
+                                && field.name !== 'tanggal_daftar';
+                        });
                     }
                 }
 

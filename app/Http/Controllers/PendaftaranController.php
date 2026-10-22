@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Redirect;
- 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+
 class PendaftaranController extends Controller
 {
     private function normalizeManualDate(?string $value): ?string
@@ -38,7 +40,38 @@ class PendaftaranController extends Controller
      */
     public function create()
     {
-        return view('register');
+        return view('register', ['isCitizen' => false]);
+    }
+
+    public function citizenDashboard(Request $request)
+    {
+        $pendaftarans = Pendaftaran::where('user_id', $request->user()->id)
+            ->latest('tanggal_daftar')
+            ->get();
+
+        $stats = [
+            'total' => $pendaftarans->count(),
+            'proses' => $pendaftarans->where('status', 'Proses')->count(),
+            'selesai' => $pendaftarans->where('status', 'Selesai')->count(),
+            'ditolak' => $pendaftarans->where('status', 'Ditolak')->count(),
+        ];
+
+        return view('masyarakat.dashboard', compact('pendaftarans', 'stats'));
+    }
+
+    public function citizenCreate(Request $request)
+    {
+        return view('masyarakat.permohonan', [
+            'isCitizen' => true,
+            'citizen' => $request->user(),
+        ]);
+    }
+
+    public function citizenSuccess(Request $request, Pendaftaran $pendaftaran)
+    {
+        abort_unless($pendaftaran->user_id === $request->user()->id, 404);
+
+        return view('masyarakat.success', compact('pendaftaran'));
     }
 
     public function dashboard()
@@ -76,7 +109,7 @@ class PendaftaranController extends Controller
             $x = 24 + ($index * 432 / 11);
             $y = 128 - ($count / $monthlyMax * 100);
 
-            return round($x, 2) . ',' . round($y, 2);
+            return round($x, 2).','.round($y, 2);
         })->implode(' ');
 
         return view('dashboard-operator', [
@@ -95,6 +128,7 @@ class PendaftaranController extends Controller
 
     public function store(Request $request)
     {
+        $isCitizen = $request->user()->role === 'masyarakat';
         $request->merge([
             'tanggal_lahir' => $this->normalizeManualDate($request->input('tanggal_lahir')),
         ]);
@@ -102,7 +136,12 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'nama_kepala_keluarga' => ['nullable', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:20', 'unique:pendaftarans,nik'],
+            'nik' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('pendaftarans')->where(fn ($query) => $query->where('jenis_layanan', $request->input('jenis_layanan'))),
+            ],
             'jenis_kelamin' => ['nullable', 'string', 'max:20'],
             'tempat_lahir' => ['nullable', 'string', 'max:255'],
             'tanggal_lahir' => ['nullable', 'date'],
@@ -112,7 +151,7 @@ class PendaftaranController extends Controller
             'rw' => ['nullable', 'string', 'max:10'],
             'desa' => ['nullable', 'string', 'max:255'],
             'kecamatan' => ['nullable', 'string', 'max:100'],
-            'jenis_layanan' => ['required', 'string', 'max:100'],
+            'jenis_layanan' => ['required', 'string', Rule::in(['PRR', 'KTP', 'KK', 'Akta Kematian', 'Akta Lahir', 'Kedatangan', 'Pindah'])],
             'no_telepon' => ['nullable', 'string', 'max:30'],
             'petugas' => ['nullable', 'string', 'max:255'],
             'bulan' => ['nullable', 'string', 'max:20'],
@@ -155,11 +194,36 @@ class PendaftaranController extends Controller
             'alasan_pindah' => ['nullable', 'string', 'max:255'],
             'tanggal_daftar' => ['required', 'date'],
             'status' => ['nullable', 'string', 'max:50'],
+            'documents' => ['nullable', 'array', 'max:5'],
+            'documents.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
         ]);
 
+        if ($isCitizen) {
+            $validated['nik'] = $request->user()->nik;
+            $validated['status'] = 'Baru';
+            $validated['user_id'] = $request->user()->id;
+            $validated['intake_source'] = 'masyarakat';
+            $validated['petugas'] = null;
+            $validated['tanggal_daftar'] = now()->toDateString();
+        } else {
+            $validated['status'] = $validated['status'] ?? 'Baru';
+            $validated['intake_source'] = 'petugas';
+            $validated['petugas'] = $request->user()->name;
+        }
+
+        unset($validated['documents']);
         $pendaftaran = Pendaftaran::create($validated);
 
-        return redirect()->route('register.success')->with('success', 'Pendaftaran berhasil disimpan.')->with('pendaftaran_id', $pendaftaran->id);
+        $documents = $this->storeDocuments($request, $pendaftaran);
+        if ($documents !== []) {
+            $pendaftaran->update(['documents' => $documents]);
+        }
+
+        if ($isCitizen) {
+            return redirect()->route('masyarakat.permohonan.success', $pendaftaran);
+        }
+
+        return redirect()->route('pendaftaran.success')->with('success', 'Pendaftaran berhasil disimpan.');
     }
 
     public function success()
@@ -167,6 +231,39 @@ class PendaftaranController extends Controller
         $pendaftaran = Pendaftaran::latest()->first();
 
         return view('register-success', compact('pendaftaran'));
+    }
+
+    public function document(Request $request, Pendaftaran $pendaftaran, int $index)
+    {
+        $isStaff = in_array($request->user()->role, ['petugas', 'operator', 'admin'], true);
+        abort_unless($isStaff || $pendaftaran->user_id === $request->user()->id, 404);
+
+        $document = $pendaftaran->documents[$index] ?? null;
+        abort_unless($document && Storage::disk('local')->exists($document['path']), 404);
+
+        return Storage::disk('local')->download(
+            $document['path'],
+            $document['original_name']
+        );
+    }
+
+    private function storeDocuments(Request $request, Pendaftaran $pendaftaran): array
+    {
+        $documents = [];
+
+        foreach ($request->file('documents', []) as $file) {
+            $path = $file->store('pendaftaran/'.$pendaftaran->id, 'local');
+            if (! $path) {
+                throw new \RuntimeException('Dokumen pendaftaran gagal disimpan.');
+            }
+
+            $documents[] = [
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+            ];
+        }
+
+        return $documents;
     }
 
     /**
@@ -230,6 +327,105 @@ class PendaftaranController extends Controller
         ));
     }
 
+    public function semuaData(Request $request)
+    {
+        $services = $this->serviceCatalog();
+
+        $query = Pendaftaran::query()->latest('tanggal_daftar');
+        if ($request->filled('q')) {
+            $term = $request->string('q')->trim()->toString();
+            $query->where(fn ($builder) => $builder
+                ->where('nama_lengkap', 'like', "%{$term}%")
+                ->orWhere('nik', 'like', "%{$term}%"));
+        }
+        if ($request->filled('jenis_layanan') && isset($services[$request->input('jenis_layanan')])) {
+            $query->where('jenis_layanan', $services[$request->input('jenis_layanan')]['service']);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $pendaftarans = $query->get();
+        $total = $pendaftarans->count();
+
+        return view('semua-data', compact('pendaftarans', 'services', 'total'));
+    }
+
+    public function layanan(string $jenisLayanan)
+    {
+        $services = $this->serviceCatalog();
+        $columnsByService = [
+            'prr' => [
+                ['label' => 'Nama', 'field' => 'nama_lengkap'],
+                ['label' => 'NIK', 'field' => 'nik'],
+                ['label' => 'Tanggal Kedatangan', 'field' => 'tanggal_kedatangan', 'date' => true],
+                ['label' => 'Tanggal Daftar', 'field' => 'tanggal_daftar', 'date' => true],
+            ],
+            'ktp' => [
+                ['label' => 'Nama', 'field' => 'nama_lengkap'],
+                ['label' => 'NIK', 'field' => 'nik'],
+                ['label' => 'Alasan Pembaruan', 'field' => 'alasan_pembaruan'],
+                ['label' => 'Tanggal Daftar', 'field' => 'tanggal_daftar', 'date' => true],
+            ],
+            'kartu-keluarga' => [
+                ['label' => 'Nama', 'field' => 'nama_lengkap'],
+                ['label' => 'NIK', 'field' => 'nik'],
+                ['label' => 'Kepala Keluarga', 'field' => 'nama_kepala_keluarga'],
+                ['label' => 'Keterangan', 'field' => 'keterangan_kk'],
+                ['label' => 'Tanggal Daftar', 'field' => 'tanggal_daftar', 'date' => true],
+            ],
+            'akta-kematian' => [
+                ['label' => 'Nama Almarhum', 'field' => 'nama_alm'],
+                ['label' => 'Nama Pemohon', 'field' => 'nama_lengkap'],
+                ['label' => 'NIK', 'field' => 'nik'],
+                ['label' => 'Tanggal Meninggal', 'field' => 'tanggal_meninggal', 'date' => true],
+            ],
+            'akta-kelahiran' => [
+                ['label' => 'Nama Anak', 'field' => 'nama_anak_lahir'],
+                ['label' => 'Nama Pemohon', 'field' => 'nama_lengkap'],
+                ['label' => 'NIK', 'field' => 'nik'],
+                ['label' => 'Tanggal Daftar', 'field' => 'tanggal_daftar', 'date' => true],
+            ],
+            'kedatangan' => [
+                ['label' => 'Nama', 'field' => 'nama_kedatangan'],
+                ['label' => 'NIK', 'field' => 'nik_kedatangan'],
+                ['label' => 'Alamat Asal', 'field' => 'alamat_asal_kedatangan'],
+                ['label' => 'Alamat Tujuan', 'field' => 'alamat_tujuan_kedatangan'],
+                ['label' => 'Tanggal Kedatangan', 'field' => 'tanggal_kedatangan', 'date' => true],
+            ],
+            'pindah' => [
+                ['label' => 'Nama', 'field' => 'nama_pindah'],
+                ['label' => 'NIK', 'field' => 'nik_pindah'],
+                ['label' => 'Alamat Asal', 'field' => 'alamat_asal_pindah'],
+                ['label' => 'Alamat Tujuan', 'field' => 'alamat_tujuan_pindah'],
+                ['label' => 'Alasan', 'field' => 'alasan_pindah'],
+            ],
+        ];
+
+        abort_unless(isset($services[$jenisLayanan]), 404);
+
+        $serviceTitle = $services[$jenisLayanan]['title'];
+        $serviceType = $services[$jenisLayanan]['service'];
+        $serviceSlug = $jenisLayanan;
+        $columns = $columnsByService[$jenisLayanan];
+        $pendaftarans = Pendaftaran::where('jenis_layanan', $serviceType)->latest('tanggal_daftar')->get();
+
+        return view('layanan', compact('services', 'serviceSlug', 'serviceTitle', 'serviceType', 'columns', 'pendaftarans'));
+    }
+
+    private function serviceCatalog(): array
+    {
+        return [
+            'prr' => ['title' => 'PRR / KTP Baru', 'service' => 'PRR'],
+            'ktp' => ['title' => 'KTP / Pembaharuan', 'service' => 'KTP'],
+            'kartu-keluarga' => ['title' => 'Kartu Keluarga', 'service' => 'KK'],
+            'akta-kematian' => ['title' => 'Akta Kematian', 'service' => 'Akta Kematian'],
+            'akta-kelahiran' => ['title' => 'Akta Kelahiran', 'service' => 'Akta Lahir'],
+            'kedatangan' => ['title' => 'Kedatangan', 'service' => 'Kedatangan'],
+            'pindah' => ['title' => 'Pindah', 'service' => 'Pindah'],
+        ];
+    }
+
     /**
      * Menampilkan form edit data pendaftaran.
      */
@@ -247,7 +443,14 @@ class PendaftaranController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'nama_kepala_keluarga' => ['nullable', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:20', 'unique:pendaftarans,nik,' . $pendaftaran->id],
+            'nik' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('pendaftarans')
+                    ->where(fn ($query) => $query->where('jenis_layanan', $request->input('jenis_layanan')))
+                    ->ignore($pendaftaran->id),
+            ],
             'jenis_kelamin' => ['nullable', 'string', 'max:20'],
             'tempat_lahir' => ['nullable', 'string', 'max:255'],
             'tanggal_lahir' => ['nullable', 'date'],
@@ -257,7 +460,7 @@ class PendaftaranController extends Controller
             'rw' => ['nullable', 'string', 'max:10'],
             'desa' => ['nullable', 'string', 'max:255'],
             'kecamatan' => ['nullable', 'string', 'max:100'],
-            'jenis_layanan' => ['required', 'string', 'max:100'],
+            'jenis_layanan' => ['required', 'string', Rule::in(['PRR', 'KTP', 'KK', 'Akta Kematian', 'Akta Lahir', 'Kedatangan', 'Pindah'])],
             'no_telepon' => ['nullable', 'string', 'max:30'],
             'petugas' => ['nullable', 'string', 'max:255'],
             'bulan' => ['nullable', 'string', 'max:20'],
@@ -302,10 +505,19 @@ class PendaftaranController extends Controller
             'alasan_pembaruan' => ['nullable', 'string', 'max:255'],
             'tanggal_daftar' => ['required', 'date'],
             'status' => ['nullable', 'string', 'max:50'],
+            'documents' => ['nullable', 'array', 'max:5'],
+            'documents.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
         ]);
 
+        $newDocuments = $this->storeDocuments($request, $pendaftaran);
+        unset($validated['documents']);
+        if ($newDocuments !== []) {
+            $validated['documents'] = array_merge($pendaftaran->documents ?? [], $newDocuments);
+        }
+        $pendaftaran->update($validated);
+
         return redirect()
-            ->route('laporan')
+            ->route('dashboard')
             ->with('success', 'Data pendaftaran berhasil diperbarui.');
     }
 
@@ -314,5 +526,66 @@ class PendaftaranController extends Controller
         $pendaftaran->delete();
 
         return Redirect::route('dashboard')->with('success', 'Data pendaftaran berhasil dihapus.');
+    }
+
+    public function petugasDashboard()
+    {
+        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->take(10)->get();
+        $stats = [
+            'total' => Pendaftaran::count(),
+            'baru' => Pendaftaran::where('status', 'Baru')->count(),
+            'proses' => Pendaftaran::where('status', 'Proses')->count(),
+            'selesai' => Pendaftaran::where('status', 'Selesai')->count(),
+            'ditolak' => Pendaftaran::where('status', 'Ditolak')->count(),
+        ];
+        $newFromCitizen = Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Baru')->count();
+
+        return view('petugas.dashboard', compact('pendaftarans', 'stats', 'newFromCitizen'));
+    }
+
+    public function permohonanMasuk(Request $request)
+    {
+        $query = Pendaftaran::where('intake_source', 'masyarakat')->latest('tanggal_daftar');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        if ($request->filled('jenis_layanan')) {
+            $query->where('jenis_layanan', $request->input('jenis_layanan'));
+        }
+
+        $pendaftarans = $query->get();
+        $counts = [
+            'baru' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Baru')->count(),
+            'proses' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Proses')->count(),
+            'selesai' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Selesai')->count(),
+            'ditolak' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Ditolak')->count(),
+        ];
+
+        return view('petugas.permohonan-masuk', compact('pendaftarans', 'counts'));
+    }
+
+    public function showPermohonan(Pendaftaran $pendaftaran)
+    {
+        return view('petugas.detail-permohonan', compact('pendaftaran'));
+    }
+
+    public function updateStatus(Request $request, Pendaftaran $pendaftaran)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', Rule::in(['Baru', 'Proses', 'Selesai', 'Ditolak'])],
+            'alasan_penolakan' => ['nullable', 'string', 'max:1000', 'required_if:status,Ditolak'],
+            'catatan_petugas' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $pendaftaran->update([
+            'status' => $validated['status'],
+            'alasan_penolakan' => $validated['alasan_penolakan'] ?? null,
+            'catatan_petugas' => $validated['catatan_petugas'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('petugas.permohonan.show', $pendaftaran)
+            ->with('success', 'Status permohonan berhasil diperbarui menjadi '.$validated['status'].'.');
     }
 }

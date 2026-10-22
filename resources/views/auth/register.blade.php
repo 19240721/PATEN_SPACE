@@ -225,20 +225,20 @@
             </div>
 
             <div class="account-copy">
-                <h1>Daftar Akun<br><strong>Operator</strong></h1>
-                <p>Buat akun untuk mengakses pelayanan administrasi terpadu Kecamatan Jatisari.</p>
+                <h1>Daftar Akun<br><strong>Masyarakat</strong></h1>
+                <p>Buat akun untuk mengajukan dan memantau permohonan administrasi Kecamatan Jatisari.</p>
             </div>
 
             <div class="account-features">
                 <span>Aman dan terpercaya</span>
                 <span>Pelayanan lebih cepat</span>
-                <span>Khusus petugas kecamatan</span>
+                <span>Akun khusus masyarakat</span>
             </div>
         </section>
 
         <section class="account-form" aria-labelledby="register-title">
-            <h2 id="register-title">Daftar Akun Operator</h2>
-            <p class="account-subtitle">Silakan isi data berikut untuk membuat akun operator.</p>
+            <h2 id="register-title">Daftar Akun Masyarakat</h2>
+            <p class="account-subtitle">Gunakan NIK yang sama dengan data pemohon.</p>
 
             @if ($errors->any())
                 <div class="account-error">

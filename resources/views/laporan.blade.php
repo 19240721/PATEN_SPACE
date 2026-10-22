@@ -27,7 +27,7 @@
     <main class="main-panel">
         <header class="topbar">
             <div>
-                <h1>Laporan</h1>
+                <h1>Laporan Pelayanan</h1>
                 <p>Ringkasan data pelayanan PATEN Kecamatan Jatisari.</p>
             </div>
             <div class="date-pill">{{ now()->translatedFormat('l, d F Y') }}</div>
@@ -101,7 +101,7 @@
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $item->nama_lengkap }}</td>
-                            <td>{{ $item->jenis_layanan }}</td>
+                            <td>{{ $item->jenis_layanan === 'KK' ? 'Kartu Keluarga' : $item->jenis_layanan }}</td>
                             <td>{{ $item->petugas ?? '-' }}</td>
                             <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d-m-Y') }}</td>
                             <td>

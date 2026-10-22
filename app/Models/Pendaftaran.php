@@ -69,5 +69,18 @@ class Pendaftaran extends Model
         'alasan_pembaruan',
         'tanggal_daftar',
         'status',
+        'user_id',
+        'documents',
+        'intake_source',
+        'alasan_penolakan',
+        'catatan_petugas',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'documents' => 'array',
+            'tanggal_daftar' => 'date',
+        ];
+    }
 }
