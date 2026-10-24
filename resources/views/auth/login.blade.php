@@ -31,8 +31,10 @@
         overflow: hidden;
         padding: 34px 42px 30px;
         color: #fff;
-        background-image: linear-gradient(180deg, rgba(8, 103, 178, .78) 0%, rgba(10, 115, 187, .24) 38%, rgba(8, 80, 137, .10) 72%, rgba(8, 80, 137, .25) 100%), url('/images/paten-building.jpg');
+        background-image: linear-gradient(180deg, rgba(8, 103, 178, .78) 0%, rgba(10, 115, 187, .24) 38%, rgba(8, 80, 137, .10) 72%, rgba(8, 80, 137, .25) 100%), url('{{ asset('images/paten-building-login.png') }}');
         background-position: center center;
+        background-color: #0a73bb;
+        background-repeat: no-repeat;
         background-size: cover;
     }
 
@@ -593,7 +595,7 @@
     <div class="login-shell">
         <section class="login-visual" aria-label="Informasi PATEN SPACE">
             <div class="institution">
-                <img class="institution-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
+                <img class="institution-logo" src="{{ asset('images/logo-karawang-transparent.png') }}" alt="Logo Kabupaten Karawang">
                 <span>PEMERINTAH KABUPATEN<br>PELAYANAN TERPADU</span>
             </div>
 
@@ -612,7 +614,7 @@
         </section>
 
         <section class="login-card" aria-labelledby="login-title">
-            <img class="login-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
+            <img class="login-logo" src="{{ asset('images/logo-karawang-transparent.png') }}" alt="Logo Kabupaten Karawang">
             <h1 id="login-title">PATEN SPACE</h1>
             <p>Pelayanan Administrasi Terpadu Kecamatan Jatisari</p>
 
