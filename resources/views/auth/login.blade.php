@@ -213,6 +213,55 @@
         box-shadow: 0 0 0 3px rgba(22, 128, 208, .12);
     }
 
+    .password-input-wrap {
+        position: relative;
+    }
+
+    .password-input-wrap input {
+        padding-right: 44px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        display: grid;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+        place-items: center;
+        transform: translateY(-50%);
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: #607c92;
+        cursor: pointer;
+    }
+
+    .password-toggle:hover {
+        background: #eaf2f8;
+        color: #164e7e;
+    }
+
+    .password-toggle:focus-visible {
+        outline: 2px solid #1680d0;
+        outline-offset: 2px;
+    }
+
+    .password-toggle svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.8;
+    }
+
+    .password-toggle [hidden] {
+        display: none;
+    }
+
     .captcha-field {
         margin-bottom: 14px;
     }
@@ -383,7 +432,28 @@
 
                 <div class="login-field">
                     <label for="password">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Masukkan password">
+                    <div class="password-input-wrap">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Masukkan password">
+                        <button
+                            class="password-toggle"
+                            id="toggle-password"
+                            type="button"
+                            aria-label="Tampilkan password"
+                            aria-pressed="false"
+                            aria-controls="password"
+                        >
+                            <svg class="password-eye" aria-hidden="true" viewBox="0 0 24 24">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="password-eye-off" aria-hidden="true" viewBox="0 0 24 24" hidden>
+                                <path d="m3 3 18 18"></path>
+                                <path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a15.8 15.8 0 0 1-3 3.8"></path>
+                                <path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7c1.3 0 2.5-.3 3.5-.8"></path>
+                                <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="captcha-field">
@@ -418,6 +488,17 @@
 </main>
 
 <script>
+    document.getElementById('toggle-password').addEventListener('click', function () {
+        const password = document.getElementById('password');
+        const isVisible = password.type === 'text';
+
+        password.type = isVisible ? 'password' : 'text';
+        this.setAttribute('aria-pressed', String(!isVisible));
+        this.setAttribute('aria-label', isVisible ? 'Tampilkan password' : 'Sembunyikan password');
+        this.querySelector('.password-eye').hidden = !isVisible;
+        this.querySelector('.password-eye-off').hidden = isVisible;
+    });
+
     document.getElementById('refresh-captcha').addEventListener('click', function () {
         const image = document.getElementById('login-captcha-image');
         image.src = `{{ route('login.captcha') }}?refresh=${Date.now()}`;
