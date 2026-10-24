@@ -385,7 +385,209 @@
         .visual-footer { display: none; }
         .login-card { padding: 32px 20px 38px; }
     }
+
+    /* ==========================================================================
+       SPLASH SCREEN (INTRO ANIMASI LOGO PATEN SPACE)
+       Modern Government Digital Service Intro
+       ========================================================================== */
+    .paten-splash-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #f5f9fd;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.65s ease;
+    }
+
+    .splash-glow {
+        position: absolute;
+        top: 44%;
+        left: 50%;
+        width: 480px;
+        height: 480px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(147, 197, 253, 0.28) 0%, rgba(219, 234, 254, 0.14) 42%, rgba(245, 249, 253, 0) 70%);
+        filter: blur(28px);
+        animation: splashGlowPulse 3.2s ease-in-out infinite alternate;
+        pointer-events: none;
+    }
+
+    .splash-ring {
+        position: absolute;
+        top: 44%;
+        left: 50%;
+        border-radius: 50%;
+        border: 1px solid rgba(59, 130, 246, 0.16);
+        transform: translate(-50%, -50%) scale(0.6);
+        pointer-events: none;
+    }
+
+    .splash-ring.r-1 {
+        width: 320px;
+        height: 320px;
+        animation: splashRingExpand 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .splash-ring.r-2 {
+        width: 440px;
+        height: 440px;
+        border-style: dashed;
+        border-color: rgba(59, 130, 246, 0.12);
+        animation: splashRingExpand 3.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    }
+
+    .splash-particle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(59, 130, 246, 0.35);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+        pointer-events: none;
+        animation: splashParticleFloat 4s ease-in-out infinite alternate;
+    }
+
+    .splash-particle.p-1 { width: 5px; height: 5px; top: 20%; left: 22%; animation-delay: 0.2s; }
+    .splash-particle.p-2 { width: 7px; height: 7px; top: 26%; right: 24%; animation-delay: 0.6s; }
+    .splash-particle.p-3 { width: 4px; height: 4px; bottom: 28%; left: 26%; animation-delay: 1.0s; }
+    .splash-particle.p-4 { width: 6px; height: 6px; bottom: 22%; right: 25%; animation-delay: 0.4s; }
+    .splash-particle.p-5 { width: 5px; height: 5px; top: 48%; left: 16%; animation-delay: 0.8s; }
+    .splash-particle.p-6 { width: 6px; height: 6px; top: 52%; right: 18%; animation-delay: 1.2s; }
+
+    .splash-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        max-width: 580px;
+        width: 100%;
+        user-select: none;
+    }
+
+    .splash-logo-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+        animation: splashLogoEnter 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards, splashLogoFloat 3.4s ease-in-out infinite 1.1s;
+    }
+
+    .splash-logo-img {
+        display: block;
+        width: clamp(280px, 48vw, 460px);
+        height: auto;
+        aspect-ratio: 1000 / 782;
+        object-fit: contain;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        filter: none !important;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    .splash-tagline {
+        margin: 0;
+        color: #4a7fa8;
+        font-size: clamp(0.78rem, 1.6vw, 0.92rem);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        animation: splashTaglineEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+    }
+
+    @keyframes splashGlowPulse {
+        0% { transform: translate(-50%, -50%) scale(0.88); opacity: 0.6; }
+        100% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+    }
+
+    @keyframes splashRingExpand {
+        0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+        40% { opacity: 0.8; }
+        100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.4; }
+    }
+
+    @keyframes splashParticleFloat {
+        0% { transform: translateY(0) translateX(0); opacity: 0.25; }
+        50% { transform: translateY(-12px) translateX(6px); opacity: 0.55; }
+        100% { transform: translateY(-24px) translateX(-4px); opacity: 0.2; }
+    }
+
+    @keyframes splashLogoEnter {
+        0% {
+            opacity: 0;
+            transform: scale(0.86) translateY(12px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    @keyframes splashLogoFloat {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+    }
+
+    @keyframes splashTaglineEnter {
+        0% {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .splash-fade-out {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.65s ease !important;
+        pointer-events: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .paten-splash-screen {
+            display: none !important;
+        }
+    }
 </style>
+
+<noscript>
+    <style>
+        .paten-splash-screen { display: none !important; }
+    </style>
+</noscript>
+
+<div id="paten-splash" class="paten-splash-screen" role="dialog" aria-modal="true" aria-label="Intro PATEN SPACE">
+    <div class="splash-glow" aria-hidden="true"></div>
+    <div class="splash-ring r-1" aria-hidden="true"></div>
+    <div class="splash-ring r-2" aria-hidden="true"></div>
+
+    <div class="splash-particle p-1" aria-hidden="true"></div>
+    <div class="splash-particle p-2" aria-hidden="true"></div>
+    <div class="splash-particle p-3" aria-hidden="true"></div>
+    <div class="splash-particle p-4" aria-hidden="true"></div>
+    <div class="splash-particle p-5" aria-hidden="true"></div>
+    <div class="splash-particle p-6" aria-hidden="true"></div>
+
+    <div class="splash-container">
+        <div class="splash-logo-wrap">
+            <img class="splash-logo-img" src="{{ asset('images/logo-paten-space.png') }}" alt="Logo PATEN SPACE KECAMATAN JATISARI">
+        </div>
+
+        <p class="splash-tagline">Pelayanan Administrasi Terpadu</p>
+    </div>
+</div>
 
 <main class="login-page">
     <div class="login-shell">
@@ -503,5 +705,41 @@
         const image = document.getElementById('login-captcha-image');
         image.src = `{{ route('login.captcha') }}?refresh=${Date.now()}`;
     });
+
+    (function () {
+        const splash = document.getElementById('paten-splash');
+        if (!splash) return;
+
+        @if ((isset($errors) && $errors->any()) || session('status') || old('email'))
+            splash.style.display = 'none';
+            return;
+        @endif
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceSplash = urlParams.has('splash') || urlParams.has('intro');
+        const splashSeen = sessionStorage.getItem('paten_space_splash_seen');
+
+        if (splashSeen && !forceSplash) {
+            splash.style.display = 'none';
+            return;
+        }
+
+        sessionStorage.setItem('paten_space_splash_seen', 'true');
+
+        function dismissSplash() {
+            if (!splash || splash.classList.contains('splash-fade-out')) return;
+            splash.classList.add('splash-fade-out');
+            setTimeout(function () {
+                splash.style.display = 'none';
+            }, 700);
+        }
+
+        const autoDismiss = setTimeout(dismissSplash, 3200);
+
+        splash.addEventListener('click', function () {
+            clearTimeout(autoDismiss);
+            dismissSplash();
+        });
+    })();
 </script>
 @endsection
