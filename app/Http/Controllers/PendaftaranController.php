@@ -235,7 +235,7 @@ class PendaftaranController extends Controller
 
     public function document(Request $request, Pendaftaran $pendaftaran, int $index)
     {
-        $isStaff = in_array($request->user()->role, ['petugas', 'operator', 'admin'], true);
+        $isStaff = $request->user()->role === 'petugas';
         abort_unless($isStaff || $pendaftaran->user_id === $request->user()->id, 404);
 
         $document = $pendaftaran->documents[$index] ?? null;

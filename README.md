@@ -7,6 +7,18 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Demo login accounts
+
+Create the demo accounts by running `php artisan db:seed`:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Petugas | `petugas@patenspace.test` | `Paten@12345` |
+| Camat | `camat@patenspace.test` | `Paten@12345` |
+| Masyarakat | `masyarakat@patenspace.test` | `Paten@12345` |
+
+These accounts are intended for local/demo use. Change the passwords before deploying the application.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

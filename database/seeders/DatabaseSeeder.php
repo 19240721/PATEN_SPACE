@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,6 +17,13 @@ class DatabaseSeeder extends Seeder
     {
         $accounts = [
             [
+                'name' => 'Petugas PATEN',
+                'email' => 'petugas@patenspace.test',
+                'role' => 'petugas',
+                'nik' => '3200000000000004',
+                'phone' => '081200000004',
+            ],
+            [
                 'name' => 'Camat Jatisari',
                 'email' => 'camat@patenspace.test',
                 'role' => 'camat',
@@ -25,18 +31,11 @@ class DatabaseSeeder extends Seeder
                 'phone' => '081200000001',
             ],
             [
-                'name' => 'Operator PATEN',
-                'email' => 'operator@patenspace.test',
-                'role' => 'operator',
-                'nik' => '3200000000000002',
-                'phone' => '081200000002',
-            ],
-            [
-                'name' => 'Admin PATEN',
-                'email' => 'admin@patenspace.test',
-                'role' => 'admin',
-                'nik' => '3200000000000003',
-                'phone' => '081200000003',
+                'name' => 'Masyarakat PATEN',
+                'email' => 'masyarakat@patenspace.test',
+                'role' => 'masyarakat',
+                'nik' => '3200000000000005',
+                'phone' => '081200000005',
             ],
         ];
 
@@ -44,7 +43,7 @@ class DatabaseSeeder extends Seeder
             User::updateOrCreate(
                 ['email' => $account['email']],
                 array_merge($account, [
-                    'password' => Hash::make('Paten@12345'),
+                    'password' => 'Paten@12345',
                     'terms_accepted' => true,
                     'email_verified_at' => now(),
                 ])
