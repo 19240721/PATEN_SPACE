@@ -1,0 +1,17 @@
+[33mcommit d62455de76917d2fb2c55865a4add752f69d1665[m
+Author: Sarinah <19240858@bsi.ac.id>
+Date:   Sat Oct 24 17:52:02 2026 +0700
+
+    update warna tampilan login
+
+ app/Http/Controllers/PendaftaranController.php     |  12 [32m+[m[31m-[m
+ public/images/logo-karawang-transparent.png        | Bin [31m0[m -> [32m124015[m bytes
+ public/images/paten-building-login.png             | Bin [31m0[m -> [32m500548[m bytes
+ resources/views/auth/login.blade.php               |  45 [32m+[m[31m-[m
+ resources/views/dashboard-operator.blade.php       | 628 [32m+++++++++++++++++++[m[31m-[m
+ resources/views/laporan.blade.php                  |  33 [32m+[m[31m-[m
+ .../views/partials/operator-sidebar.blade.php      | 652 [32m+++++++++++++++++++++[m
+ resources/views/register.blade.php                 |  56 [32m+[m[31m-[m
+ routes/console.php                                 |  17 [32m+[m
+ routes/web.php                                     |   4 [32m+[m[31m-[m
+ 10 files changed, 1363 insertions(+), 84 deletions(-)

@@ -23,7 +23,9 @@ class PendaftaranTest extends TestCase
         $response = $this->get('/petugas/dashboard');
 
         $response->assertOk();
-        $response->assertSee('Dashboard');
+        $response->assertSee('Pelayanan Berdasarkan Jenis');
+        $response->assertSee('Tren Pelayanan Bulanan');
+        $response->assertSee('Data Pelayanan Terbaru');
     }
 
     public function test_create_data_page_can_be_rendered(): void

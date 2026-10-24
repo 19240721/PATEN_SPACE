@@ -530,17 +530,7 @@ class PendaftaranController extends Controller
 
     public function petugasDashboard()
     {
-        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->take(10)->get();
-        $stats = [
-            'total' => Pendaftaran::count(),
-            'baru' => Pendaftaran::where('status', 'Baru')->count(),
-            'proses' => Pendaftaran::where('status', 'Proses')->count(),
-            'selesai' => Pendaftaran::where('status', 'Selesai')->count(),
-            'ditolak' => Pendaftaran::where('status', 'Ditolak')->count(),
-        ];
-        $newFromCitizen = Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Baru')->count();
-
-        return view('petugas.dashboard', compact('pendaftarans', 'stats', 'newFromCitizen'));
+        return $this->dashboard();
     }
 
     public function permohonanMasuk(Request $request)
