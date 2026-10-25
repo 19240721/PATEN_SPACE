@@ -23,7 +23,10 @@
                 </div>
             </details>
         </nav>
-        <div class="sidebar-profile"><span class="profile-avatar">OP</span><span><strong>Operator Kecamatan</strong><small>Administrator</small></span></div>
+        <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
+            <span class="profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            <span><strong>{{ auth()->user()->name }}</strong><small>Operator Kecamatan</small></span>
+        </a>
     </aside>
 
     <main class="main-panel">

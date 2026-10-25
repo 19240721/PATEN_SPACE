@@ -376,18 +376,48 @@
         text-align: center;
     }
 
+    .citizen-login-page {
+        padding: 24px 14px;
+        background: #f3f0e7;
+    }
+
+    .citizen-login-page .login-shell {
+        display: block;
+        width: min(100%, 430px);
+        min-height: 0;
+        border: 1px solid #e8e1d1;
+        border-radius: 18px;
+        box-shadow: 0 16px 40px rgba(69, 59, 39, .14);
+    }
+
+    .citizen-login-page .login-visual { display: none; }
+
+    .citizen-login-page .login-card {
+        width: 100%;
+        padding: 34px 24px 30px;
+    }
+
+    .citizen-login-page .login-logo {
+        width: 58px;
+        height: 64px;
+    }
+
+    .citizen-login-page .login-card h1 { font-size: 1.35rem; }
+    .citizen-login-page .login-card > p { margin-bottom: 22px; }
+
     @media (max-width: 760px) {
-        .login-page { padding: 16px; }
-        .login-shell { grid-template-columns: 1fr; min-height: auto; }
-        .login-visual { min-height: 285px; padding: 24px; }
-        .visual-copy { margin-top: 34px; }
-        .visual-copy h1 { font-size: 2rem; }
-        .visual-footer { display: none; }
-        .login-card { padding: 32px 20px 38px; }
+        .citizen-login-page { display: block; padding: 0; }
+        .citizen-login-page .login-shell { width: 100%; min-height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
+        .citizen-login-page .login-card { padding: 38px 22px 36px; }
+    }
+
+    @media (max-width: 380px) {
+        .citizen-login-page .login-card { padding-right: 18px; padding-left: 18px; }
+        .citizen-login-page .login-field input { padding: 10px 11px; }
     }
 </style>
 
-<main class="login-page">
+<main class="login-page {{ $citizenLogin ? 'citizen-login-page' : '' }}">
     <div class="login-shell">
         <section class="login-visual" aria-label="Informasi PATEN SPACE">
             <div class="institution">
@@ -411,8 +441,8 @@
 
         <section class="login-card" aria-labelledby="login-title">
             <img class="login-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
-            <h1 id="login-title">PATEN SPACE</h1>
-            <p>Pelayanan Administrasi Terpadu Kecamatan Jatisari</p>
+            <h1 id="login-title">{{ $citizenLogin ? 'Login Masyarakat' : 'PATEN SPACE' }}</h1>
+            <p>{{ $citizenLogin ? 'Masuk untuk mengajukan dan memantau permohonan Anda.' : 'Pelayanan Administrasi Terpadu Kecamatan Jatisari' }}</p>
 
             @if ($errors->any())
                 <div class="login-error">{{ $errors->first() }}</div>
@@ -422,7 +452,7 @@
                 <div class="login-success">{{ session('status') }}</div>
             @endif
 
-            <form action="{{ route('login.store') }}" method="POST">
+            <form action="{{ $citizenLogin ? route('login.citizen.store') : route('login.store') }}" method="POST">
                 @csrf
 
                 <div class="login-field">
@@ -482,7 +512,11 @@
                 <button class="login-submit" type="submit">Login</button>
             </form>
 
-            <p class="login-help">Belum punya akun? Silakan hubungi administrator sistem untuk mendapatkan akses.</p>
+            @if ($citizenLogin)
+                <p class="login-help">Belum punya akun masyarakat? <a href="{{ route('account.register') }}">Daftar akun masyarakat</a>.</p>
+            @else
+                <p class="login-help">Login khusus operator dan camat. Untuk akun masyarakat, <a href="{{ route('login.citizen') }}">buka halaman login masyarakat</a>.</p>
+            @endif
         </section>
     </div>
 </main>

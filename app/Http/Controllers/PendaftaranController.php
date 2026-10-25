@@ -111,10 +111,15 @@ class PendaftaranController extends Controller
 
             return round($x, 2).','.round($y, 2);
         })->implode(' ');
+        $newFromCitizen = $pendaftarans
+            ->where('intake_source', 'masyarakat')
+            ->where('status', 'Baru')
+            ->count();
 
         return view('dashboard-operator', [
             'pendaftarans' => $pendaftarans,
             'services' => $services,
+            'newFromCitizen' => $newFromCitizen,
             'total' => $pendaftarans->count(),
             'proses' => $pendaftarans->where('status', 'Proses')->count(),
             'selesai' => $pendaftarans->where('status', 'Selesai')->count(),
@@ -313,8 +318,24 @@ class PendaftaranController extends Controller
             ->where('jenis_layanan', 'Kartu Kuning')
             ->count();
 
+        $services = [
+            ['type' => 'PRR', 'title' => 'PRR / KTP Baru'],
+            ['type' => 'KTP', 'title' => 'KTP'],
+            ['type' => 'KK', 'title' => 'Kartu Keluarga'],
+            ['type' => 'Akta Lahir', 'title' => 'Akta Kelahiran'],
+            ['type' => 'Akta Kematian', 'title' => 'Akta Kematian'],
+            ['type' => 'Kedatangan', 'title' => 'Kedatangan'],
+            ['type' => 'Pindah', 'title' => 'Pindah'],
+        ];
+        $newFromCitizen = $pendaftarans
+            ->where('intake_source', 'masyarakat')
+            ->where('status', 'Baru')
+            ->count();
+
         return view('laporan', compact(
             'pendaftarans',
+            'services',
+            'newFromCitizen',
             'totalPelayanan',
             'rekapLayanan',
             'total',
@@ -347,8 +368,11 @@ class PendaftaranController extends Controller
 
         $pendaftarans = $query->get();
         $total = $pendaftarans->count();
+        $newFromCitizen = Pendaftaran::where('intake_source', 'masyarakat')
+            ->where('status', 'Baru')
+            ->count();
 
-        return view('semua-data', compact('pendaftarans', 'services', 'total'));
+        return view('semua-data', compact('pendaftarans', 'services', 'total', 'newFromCitizen'));
     }
 
     public function layanan(string $jenisLayanan)
@@ -551,8 +575,15 @@ class PendaftaranController extends Controller
             'selesai' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Selesai')->count(),
             'ditolak' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Ditolak')->count(),
         ];
+        $services = collect($this->serviceCatalog())
+            ->map(fn (array $service) => [
+                'title' => $service['title'],
+                'type' => $service['service'],
+            ])
+            ->values()
+            ->all();
 
-        return view('petugas.permohonan-masuk', compact('pendaftarans', 'counts'));
+        return view('petugas.permohonan-masuk', compact('pendaftarans', 'counts', 'services'));
     }
 
     public function showPermohonan(Pendaftaran $pendaftaran)

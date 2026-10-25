@@ -14,7 +14,16 @@ class AuthController extends Controller
             return redirect()->route($this->dashboardRouteForAuthenticatedUser());
         }
 
-        return view('auth.login');
+        return view('auth.login', ['citizenLogin' => false]);
+    }
+
+    public function showCitizenLogin()
+    {
+        if (Auth::check()) {
+            return redirect()->route($this->dashboardRouteForAuthenticatedUser());
+        }
+
+        return view('auth.login', ['citizenLogin' => true]);
     }
 
     public function captchaImage(Request $request)
@@ -50,6 +59,16 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        return $this->authenticate($request, ['petugas', 'camat', 'operator', 'admin']);
+    }
+
+    public function loginCitizen(Request $request)
+    {
+        return $this->authenticate($request, ['masyarakat']);
+    }
+
+    private function authenticate(Request $request, array $allowedRoles)
+    {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -64,6 +83,8 @@ class AuthController extends Controller
         }
 
         unset($credentials['captcha']);
+
+        $credentials['role'] = fn ($query) => $query->whereIn('role', $allowedRoles);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
@@ -89,7 +110,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'nik' => ['required', 'digits:16', 'unique:users,nik'],
+            'nik' => ['nullable', 'digits:16', 'unique:users,nik'],
             'phone' => ['required', 'string', 'max:20'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -99,17 +120,19 @@ class AuthController extends Controller
         $validated['role'] = 'masyarakat';
         User::create($validated);
 
-        return redirect()->route('login')->with('status', 'Akun berhasil dibuat. Silakan login.');
+        return redirect()->route('login.citizen')->with('status', 'Akun berhasil dibuat. Silakan login.');
     }
 
     public function logout(Request $request)
     {
+        $loginRoute = Auth::user()?->role === 'masyarakat' ? 'login.citizen' : 'login';
+
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route($loginRoute);
     }
 
     private function dashboardRouteForAuthenticatedUser(): string

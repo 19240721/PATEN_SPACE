@@ -223,7 +223,7 @@
                     <div class="masy-logo-sub">Kecamatan Jatisari</div>
                 </div>
             </div>
-            <div class="masy-avatar">👤</div>
+            <a href="{{ route('account.profile') }}" class="masy-avatar" aria-label="Buka profil akun" style="color:inherit;text-decoration:none;">👤</a>
         </div>
         <div class="masy-greeting">
             <div class="masy-greeting-sub">Selamat datang,</div>

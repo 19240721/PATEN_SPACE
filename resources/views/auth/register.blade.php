@@ -9,7 +9,7 @@
         display: grid;
         place-items: center;
         padding: 34px;
-        background: #eaf2f8;
+        background: #f3f0e7;
     }
 
     .account-shell {
@@ -20,7 +20,7 @@
         overflow: hidden;
         background: #fff;
         border-radius: 10px;
-        box-shadow: 0 24px 60px rgba(21, 59, 91, .18);
+        box-shadow: 0 24px 60px rgba(69, 59, 39, .14);
     }
 
     .account-visual {
@@ -29,10 +29,10 @@
         padding: 34px 42px 30px;
         position: relative;
         overflow: hidden;
-        color: #164e7e;
-        background-color: #e9f5ff;
-        background-image: linear-gradient(180deg, rgba(233, 245, 255, .98) 0%, rgba(233, 245, 255, .96) 45%, rgba(233, 245, 255, .2) 68%, rgba(8, 108, 184, .2) 100%), url('/images/paten-building.jpg');
-        background-position: center bottom;
+        color: #171611;
+        background-color: #e9e2d0;
+        background-image: linear-gradient(180deg, rgba(247, 244, 234, .9) 0%, rgba(247, 244, 234, .83) 56%, rgba(230, 221, 197, .58) 100%), url('/images/paten-building.jpg');
+        background-position: center 52%;
         background-size: cover;
     }
 
@@ -40,23 +40,19 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #1260a8;
+        color: #171611;
         font-size: .78rem;
         font-weight: 700;
         letter-spacing: .08em;
     }
 
     .account-mark {
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 38px;
-        border: 3px solid rgba(255, 255, 255, .78);
-        border-radius: 7px 7px 12px 12px;
-        background: #f6d957;
-        color: #1260a8;
-        font-size: 1.1rem;
-        font-weight: 900;
+        display: block;
+        width: 42px;
+        height: 46px;
+        flex: 0 0 42px;
+        object-fit: contain;
+        mix-blend-mode: multiply;
     }
 
     .account-copy {
@@ -68,17 +64,20 @@
 
     .account-copy h1 {
         margin: 0 0 8px;
+        color: #171611;
         font-size: clamp(1.8rem, 3.2vw, 2.55rem);
         line-height: 1.04;
-        text-shadow: 0 2px 10px rgba(255, 255, 255, .7);
+        text-shadow: 0 1px 4px rgba(255, 255, 255, .9);
     }
 
     .account-copy p {
         max-width: 330px;
         margin: 0;
-        color: #426b87;
+        color: #171611;
         font-size: .9rem;
+        font-weight: 600;
         line-height: 1.6;
+        text-shadow: 0 1px 3px rgba(255, 255, 255, .95);
     }
 
     .account-features {
@@ -88,7 +87,7 @@
         gap: 9px;
         max-width: 270px;
         margin-top: 26px;
-        color: #2a638d;
+        color: #171611;
         font-size: .7rem;
         font-weight: 700;
     }
@@ -106,7 +105,7 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background: #087bd1;
+        background: #796743;
         color: #fff;
         font-size: .6rem;
     }
@@ -120,14 +119,14 @@
 
     .account-form h2 {
         margin: 0 0 7px;
-        color: #164e7e;
+        color: #171611;
         font-size: 1.5rem;
         text-align: center;
     }
 
     .account-subtitle {
         margin: 0 0 25px;
-        color: #7890a3;
+        color: #514b3d;
         font-size: .78rem;
         text-align: center;
     }
@@ -139,7 +138,7 @@
     }
 
     .account-field label {
-        color: #607c92;
+        color: #171611;
         font-size: .74rem;
         font-weight: 600;
     }
@@ -147,17 +146,17 @@
     .account-field input {
         width: 100%;
         padding: 11px 13px;
-        border: 1px solid #c7d7e3;
+        border: 1px solid #d8ceb6;
         border-radius: 5px;
         outline: none;
-        color: #28516e;
+        color: #171611;
         font-size: .78rem;
-        background: #fbfdff;
+        background: #fdfcf9;
     }
 
     .account-field input:focus {
-        border-color: #1680d0;
-        box-shadow: 0 0 0 3px rgba(22, 128, 208, .12);
+        border-color: #9b875d;
+        box-shadow: 0 0 0 3px rgba(155, 135, 93, .16);
     }
 
     .account-error {
@@ -174,53 +173,93 @@
         padding: 12px 16px;
         border: 0;
         border-radius: 5px;
-        background: #087bd1;
+        background: #796743;
         color: #fff;
         cursor: pointer;
         font-size: .8rem;
         font-weight: 700;
     }
 
-    .account-submit:hover { background: #0669b4; }
+    .account-submit:hover { background: #635435; }
 
     .account-terms {
         display: flex;
         align-items: flex-start;
         gap: 8px;
         margin: 2px 0 17px;
-        color: #607c92;
+        color: #171611;
         font-size: .72rem;
         line-height: 1.45;
     }
 
-    .account-terms input { margin-top: 2px; accent-color: #087bd1; }
+    .account-terms input { margin-top: 2px; accent-color: #796743; }
 
     .account-login {
         display: block;
         margin-top: 17px;
-        color: #087bd1;
+        color: #796743;
         font-size: .74rem;
         font-weight: 700;
         text-align: center;
         text-decoration: none;
     }
 
-    .account-login:hover { color: #0669b4; text-decoration: underline; }
+    .account-login:hover { color: #635435; text-decoration: underline; }
+
+    .citizen-account-page {
+        padding: 24px 14px;
+        background: #f3f0e7;
+    }
+
+    .citizen-account-page .account-shell {
+        display: block;
+        width: min(100%, 430px);
+        min-height: 0;
+        border: 1px solid #e8e1d1;
+        border-radius: 18px;
+        box-shadow: 0 16px 40px rgba(69, 59, 39, .14);
+    }
+
+    .citizen-account-page .account-visual {
+        display: flex;
+        min-height: 230px;
+        padding: 20px 24px;
+        background-position: center 52%;
+    }
+
+    .citizen-account-page .account-institution { color: #171611; font-size: .68rem; }
+    .citizen-account-page .account-mark { width: 36px; height: 40px; flex-basis: 36px; }
+    .citizen-account-page .account-copy { margin-top: 24px; }
+    .citizen-account-page .account-copy h1 { color: #171611; font-size: 1.7rem; }
+    .citizen-account-page .account-copy p { color: #171611; font-size: .78rem; font-weight: 700; }
+    .citizen-account-page .account-features { display: none; }
+
+    .citizen-account-page .account-form {
+        width: 100%;
+        padding: 28px 24px 30px;
+    }
+
+    .citizen-account-page .account-form h2 { font-size: 1.35rem; }
+    .citizen-account-page .account-subtitle { margin-bottom: 20px; }
 
     @media (max-width: 760px) {
-        .account-page { padding: 16px; }
-        .account-shell { grid-template-columns: 1fr; min-height: auto; }
-        .account-visual { min-height: 285px; padding: 24px; }
-        .account-copy { margin-top: 34px; }
-        .account-form { padding: 32px 20px 38px; }
+        .citizen-account-page { display: block; padding: 0; }
+        .citizen-account-page .account-shell { width: 100%; min-height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
+        .citizen-account-page .account-visual { min-height: 220px; padding: 20px 22px; }
+        .citizen-account-page .account-form { padding: 30px 22px 36px; }
+    }
+
+    @media (max-width: 380px) {
+        .citizen-account-page .account-form { padding-right: 18px; padding-left: 18px; }
+        .citizen-account-page .account-field input { padding: 10px 11px; }
     }
 </style>
 
-<main class="account-page">
+<main class="account-page citizen-account-page">
     <div class="account-shell">
         <section class="account-visual" aria-label="Informasi PATEN SPACE">
             <div class="account-institution">
-                <div class="account-mark">P</div>
+                <img class="account-mark" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
                 <span>PEMERINTAH KABUPATEN<br>PELAYANAN TERPADU</span>
             </div>
 
@@ -238,7 +277,7 @@
 
         <section class="account-form" aria-labelledby="register-title">
             <h2 id="register-title">Daftar Akun Masyarakat</h2>
-            <p class="account-subtitle">Gunakan NIK yang sama dengan data pemohon.</p>
+            <p class="account-subtitle">Lengkapi data berikut untuk mulai menggunakan layanan PATEN.</p>
 
             @if ($errors->any())
                 <div class="account-error">
@@ -252,11 +291,6 @@
                 <div class="account-field">
                     <label for="name">Nama Lengkap</label>
                     <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" placeholder="Masukkan nama lengkap" required autofocus>
-                </div>
-
-                <div class="account-field">
-                    <label for="nik">NIK</label>
-                    <input id="nik" name="nik" type="text" value="{{ old('nik') }}" inputmode="numeric" maxlength="16" placeholder="Masukkan NIK (16 digit)" required>
                 </div>
 
                 <div class="account-field">
@@ -287,7 +321,7 @@
                 <button class="account-submit" type="submit">Daftar Akun</button>
             </form>
 
-            <a class="account-login" href="{{ route('login') }}">Sudah punya akun? Login</a>
+            <a class="account-login" href="{{ route('login.citizen') }}">Sudah punya akun? Login</a>
         </section>
     </div>
 </main>

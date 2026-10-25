@@ -13,16 +13,22 @@
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item active"><span>◫</span> Dashboard</a>
             <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span>＋</span> Pendaftaran Baru</a>
+            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item"><span>▣</span> Daftar Permohonan @if($newFromCitizen > 0)<span class="nav-counter">{{ $newFromCitizen }}</span>@endif</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
             <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Data dan Laporan</a>
-            <div class="nav-group-label">Jenis Layanan</div>
-            @foreach ($services as $service)
-                <a href="{{ route('pendaftaran.create', ['jenis_layanan' => $service['type']]) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
-            @endforeach
+            <details class="service-menu" open>
+                <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
+                <div class="service-submenu">
+                    @foreach ($services as $service)
+                        <a href="{{ route('pendaftaran.create', ['jenis_layanan' => $service['type']]) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
+                    @endforeach
+                </div>
+            </details>
         </nav>
-        <div class="sidebar-profile">
+        <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
             <span class="profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
             <span><strong>{{ auth()->user()->name }}</strong><small>Operator Kecamatan</small></span>
-        </div>
+        </a>
     </aside>
 
     <main class="main-panel">

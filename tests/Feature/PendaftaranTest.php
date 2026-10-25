@@ -34,6 +34,10 @@ class PendaftaranTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Registrasi');
+        $response->assertSee('class="sidebar-toggle"', false);
+        $response->assertSee('aria-label="Tutup menu samping"', false);
+        $response->assertSee('aria-expanded="true"', false);
+        $response->assertDontSee('class="back-button"', false);
     }
 
     public function test_service_specific_form_hides_service_selector_and_keeps_service_value(): void
@@ -228,6 +232,13 @@ class PendaftaranTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Laporan Pelayanan');
+        $response->assertSee('Menu Utama');
+        $response->assertSee('Data dan Laporan');
+        $response->assertSee('<details class="service-menu" open>', false);
+        $response->assertSee('<a href="'.route('laporan').'" class="nav-item active" aria-current="page">', false);
+        foreach (['Dashboard', 'Pendaftaran Baru', 'Daftar Permohonan', 'Semua Data', 'PRR / KTP Baru', 'Kartu Keluarga'] as $menuItem) {
+            $response->assertSee($menuItem);
+        }
         $response->assertSee('Rudi Hartono');
         $response->assertSee('Kartu Keluarga');
     }
