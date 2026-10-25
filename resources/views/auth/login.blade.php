@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login PATEN SPACE')
+@section('title', $citizenLogin ? 'Login Masyarakat - PATEN SPACE' : 'Login PATEN SPACE')
 
 @section('content')
 <style>
@@ -376,7 +376,60 @@
         text-align: center;
     }
 
+    @media (max-width: 900px) {
+        .login-page {
+            padding: 24px 14px;
+        }
+
+        .login-shell {
+            display: block;
+            width: min(100%, 450px);
+            min-height: 0;
+            border-radius: 16px;
+        }
+
+        .login-visual {
+            min-height: 190px;
+            padding: 24px 24px 20px;
+        }
+
+        .visual-copy {
+            margin-top: 18px;
+            max-width: 100%;
+        }
+
+        .visual-copy h1 {
+            font-size: 1.5rem;
+        }
+
+        .visual-footer {
+            display: none;
+        }
+
+        .login-card {
+            width: 100%;
+            padding: 28px 22px 30px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-page {
+            padding: 0;
+        }
+
+        .login-shell {
+            width: 100%;
+            min-height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+        }
+    }
+
+    @if($citizenLogin)
     .citizen-login-page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
         padding: 24px 14px;
         background: #f3f0e7;
     }
@@ -388,33 +441,203 @@
         border: 1px solid #e8e1d1;
         border-radius: 18px;
         box-shadow: 0 16px 40px rgba(69, 59, 39, .14);
+        background: #fff;
+        overflow: hidden;
     }
 
-    .citizen-login-page .login-visual { display: none; }
+    .citizen-login-page .login-visual {
+        display: flex;
+        flex-direction: column;
+        min-height: 230px;
+        padding: 20px 24px;
+        position: relative;
+        overflow: hidden;
+        color: #171611;
+        background-color: #e9e2d0;
+        background-image: linear-gradient(180deg, rgba(247, 244, 234, .9) 0%, rgba(247, 244, 234, .83) 56%, rgba(230, 221, 197, .58) 100%), url('/images/paten-building.jpg');
+        background-position: center 52%;
+        background-size: cover;
+    }
+
+    .citizen-login-page .institution {
+        color: #171611;
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+    }
+
+    .citizen-login-page .institution-logo {
+        width: 36px;
+        height: 40px;
+        flex-basis: 36px;
+        object-fit: contain;
+        mix-blend-mode: multiply;
+    }
+
+    .citizen-login-page .visual-copy {
+        margin-top: 24px;
+        max-width: 310px;
+    }
+
+    .citizen-login-page .visual-copy h1 {
+        margin: 0 0 6px;
+        color: #171611;
+        font-size: 1.7rem;
+        line-height: 1.08;
+        letter-spacing: normal;
+        text-shadow: 0 1px 4px rgba(255, 255, 255, .9);
+    }
+
+    .citizen-login-page .visual-copy p {
+        margin: 0;
+        color: #171611;
+        font-size: .78rem;
+        font-weight: 700;
+        line-height: 1.5;
+        text-shadow: 0 1px 3px rgba(255, 255, 255, .95);
+    }
+
+    .citizen-login-page .visual-footer {
+        display: none;
+    }
 
     .citizen-login-page .login-card {
         width: 100%;
-        padding: 34px 24px 30px;
+        padding: 28px 24px 30px;
+        background: #fff;
     }
 
-    .citizen-login-page .login-logo {
-        width: 58px;
-        height: 64px;
+    .citizen-login-page .login-card h1 {
+        margin: 0 0 7px;
+        color: #171611;
+        font-size: 1.35rem;
+        text-align: center;
+        font-weight: 700;
     }
 
-    .citizen-login-page .login-card h1 { font-size: 1.35rem; }
-    .citizen-login-page .login-card > p { margin-bottom: 22px; }
+    .citizen-login-page .login-card > p {
+        margin: 0 0 20px;
+        color: #514b3d;
+        font-size: .78rem;
+        text-align: center;
+    }
+
+    .citizen-login-page .login-field {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .citizen-login-page .login-field label {
+        color: #171611;
+        font-size: .74rem;
+        font-weight: 600;
+    }
+
+    .citizen-login-page .login-field input {
+        width: 100%;
+        padding: 11px 13px;
+        border: 1px solid #d8ceb6;
+        border-radius: 5px;
+        outline: none;
+        color: #171611;
+        font-size: .78rem;
+        background: #fdfcf9;
+    }
+
+    .citizen-login-page .login-field input:focus {
+        border-color: #9b875d;
+        box-shadow: 0 0 0 3px rgba(155, 135, 93, .16);
+    }
+
+    .citizen-login-page .password-toggle {
+        color: #796743;
+    }
+
+    .citizen-login-page .password-toggle:hover {
+        background: #f7f4ec;
+        color: #635435;
+    }
+
+    .citizen-login-page .captcha-field > label {
+        color: #171611;
+        font-size: .74rem;
+        font-weight: 600;
+    }
+
+    .citizen-login-page .captcha-image-wrap,
+    .citizen-login-page .captcha-refresh {
+        border-color: #d8ceb6;
+        background: #fdfcf9;
+    }
+
+    .citizen-login-page .captcha-refresh {
+        color: #796743;
+    }
+
+    .citizen-login-page .captcha-refresh:hover {
+        background: #f7f4ec;
+    }
+
+    .citizen-login-page .login-remember {
+        color: #514b3d;
+        font-size: .72rem;
+        accent-color: #796743;
+        margin: 0 0 17px;
+    }
+
+    .citizen-login-page .login-submit {
+        width: 100%;
+        padding: 12px 16px;
+        border: 0;
+        border-radius: 5px;
+        background: #796743;
+        color: #fff;
+        cursor: pointer;
+        font-size: .8rem;
+        font-weight: 700;
+        transition: background 0.15s;
+    }
+
+    .citizen-login-page .login-submit:hover {
+        background: #635435;
+    }
+
+    .citizen-login-page .login-help {
+        margin: 18px 0 0;
+        padding: 11px 12px;
+        border-radius: 6px;
+        background: #f7f4ec;
+        border: 1px solid #e8e1d1;
+        color: #514b3d;
+        font-size: .74rem;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    .citizen-login-page .login-help a {
+        color: #796743;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .citizen-login-page .login-help a:hover {
+        color: #635435;
+        text-decoration: underline;
+    }
 
     @media (max-width: 760px) {
         .citizen-login-page { display: block; padding: 0; }
         .citizen-login-page .login-shell { width: 100%; min-height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
-        .citizen-login-page .login-card { padding: 38px 22px 36px; }
+        .citizen-login-page .login-visual { min-height: 220px; padding: 20px 22px; }
+        .citizen-login-page .login-card { padding: 30px 22px 36px; }
     }
 
     @media (max-width: 380px) {
         .citizen-login-page .login-card { padding-right: 18px; padding-left: 18px; }
         .citizen-login-page .login-field input { padding: 10px 11px; }
     }
+    @endif
 </style>
 
 <main class="login-page {{ $citizenLogin ? 'citizen-login-page' : '' }}">
@@ -426,10 +649,11 @@
             </div>
 
             <div class="visual-copy">
-                <h1>Selamat Datang di<br><strong>PATEN SPACE</strong></h1>
-                <p>Pelayanan Administrasi Terpadu Kecamatan Jatisari yang mudah, cepat, dan transparan.</p>
+                <h1>{{ $citizenLogin ? 'Login Akun' : 'Selamat Datang di' }}<br><strong>{{ $citizenLogin ? 'Masyarakat' : 'PATEN SPACE' }}</strong></h1>
+                <p>{{ $citizenLogin ? 'Masuk untuk mengajukan dan memantau permohonan administrasi Kecamatan Jatisari.' : 'Pelayanan Administrasi Terpadu Kecamatan Jatisari yang mudah, cepat, dan transparan.' }}</p>
             </div>
 
+            @unless($citizenLogin)
             <div class="building" aria-hidden="true"></div>
 
             <div class="visual-footer">
@@ -437,12 +661,15 @@
                 <span>Cepat dan transparan</span>
                 <span>Pelayanan terpadu</span>
             </div>
+            @endunless
         </section>
 
         <section class="login-card" aria-labelledby="login-title">
+            @unless($citizenLogin)
             <img class="login-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
-            <h1 id="login-title">{{ $citizenLogin ? 'Login Masyarakat' : 'PATEN SPACE' }}</h1>
-            <p>{{ $citizenLogin ? 'Masuk untuk mengajukan dan memantau permohonan Anda.' : 'Pelayanan Administrasi Terpadu Kecamatan Jatisari' }}</p>
+            @endunless
+            <h1 id="login-title">{{ $citizenLogin ? 'Login Akun Masyarakat' : 'PATEN SPACE' }}</h1>
+            <p>{{ $citizenLogin ? 'Masukkan email dan password Anda untuk masuk ke sistem.' : 'Pelayanan Administrasi Terpadu Kecamatan Jatisari' }}</p>
 
             @if ($errors->any())
                 <div class="login-error">{{ $errors->first() }}</div>
@@ -513,7 +740,10 @@
             </form>
 
             @if ($citizenLogin)
-                <p class="login-help">Belum punya akun masyarakat? <a href="{{ route('account.register') }}">Daftar akun masyarakat</a>.</p>
+                <p class="login-help">Belum punya akun masyarakat? <a href="{{ route('account.register') }}">Daftar akun masyarakat</a></p>
+                <div style="margin-top: 14px; text-align: center;">
+                    <a href="{{ route('login') }}" style="color: #796743; font-size: 0.74rem; font-weight: 700; text-decoration: none;">Login Petugas / Camat &rarr;</a>
+                </div>
             @else
                 <p class="login-help">Login khusus operator dan camat. Untuk akun masyarakat, <a href="{{ route('login.citizen') }}">buka halaman login masyarakat</a>.</p>
             @endif

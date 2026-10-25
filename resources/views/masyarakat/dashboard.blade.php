@@ -744,39 +744,9 @@
                     <p>Kecamatan Jatisari</p>
                 </div>
             </div>
-<<<<<<< Updated upstream
-            <a href="{{ route('account.profile') }}" class="masy-avatar" aria-label="Buka profil akun" style="color:inherit;text-decoration:none;">👤</a>
-        </div>
-        <div class="masy-greeting">
-            <div class="masy-greeting-sub">Selamat datang,</div>
-            <div class="masy-greeting-name">{{ auth()->user()->name }}</div>
-            <div class="masy-greeting-date">{{ now()->translatedFormat('l, d F Y') }}</div>
-        </div>
-    </div>
-
-    {{-- Stat cards --}}
-    <div class="masy-stats-wrap">
-        <div class="masy-stats">
-            <div class="masy-stat">
-                <div class="masy-stat-num blue">{{ $stats['total'] }}</div>
-                <div class="masy-stat-lbl">Total</div>
-            </div>
-            <div class="masy-stat">
-                <div class="masy-stat-num yellow">{{ $stats['proses'] }}</div>
-                <div class="masy-stat-lbl">Proses</div>
-            </div>
-            <div class="masy-stat">
-                <div class="masy-stat-num green">{{ $stats['selesai'] }}</div>
-                <div class="masy-stat-lbl">Selesai</div>
-            </div>
-            <div class="masy-stat">
-                <div class="masy-stat-num red">{{ $stats['ditolak'] }}</div>
-                <div class="masy-stat-lbl">Ditolak</div>
-=======
             <div class="mob-user-badge">
                 <span>👤</span>
                 <span>Warga</span>
->>>>>>> Stashed changes
             </div>
         </div>
 
