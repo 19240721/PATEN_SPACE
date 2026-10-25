@@ -4,11 +4,19 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CamatController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserAccountController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+    if (Auth::check()) {
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+    }
+
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
@@ -21,13 +29,28 @@ Route::get('/dashboard', function () {
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+Route::get('/login/masyarakat', [AuthController::class, 'showCitizenLogin'])->name('login.citizen');
+Route::post('/login/masyarakat', [AuthController::class, 'loginCitizen'])->name('login.citizen.store');
 Route::get('/login/captcha', [AuthController::class, 'captchaImage'])->name('login.captcha');
 Route::get('/daftar', [AuthController::class, 'showRegister'])->name('account.register');
 Route::post('/daftar', [AuthController::class, 'register'])->name('account.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::get('/profil-akun', [ProfileController::class, 'edit'])->name('account.profile');
+    Route::get('/profil-akun/data', [ProfileController::class, 'editData'])->name('account.profile.data');
+    Route::put('/profil-akun/data', [ProfileController::class, 'updateData'])->name('account.profile.data.update');
+    Route::get('/profil-akun/password', [ProfileController::class, 'editPassword'])->name('account.profile.password');
+    Route::put('/profil-akun/password', [ProfileController::class, 'updatePassword'])->name('account.profile.password.update');
+    Route::get('/profil-akun/pengaturan', [ProfileController::class, 'settings'])->name('account.profile.settings');
+});
+Route::middleware(['auth', 'role:petugas'])->prefix('petugas')->name('account.users.')->group(function () {
+    Route::get('/akun-baru', [UserAccountController::class, 'create'])->name('create');
+    Route::post('/akun-baru', [UserAccountController::class, 'store'])->name('store');
+});
 
 Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/dashboard', [PendaftaranController::class, 'citizenDashboard'])->name('dashboard');
+    Route::get('/riwayat', [PendaftaranController::class, 'citizenRiwayat'])->name('riwayat');
     Route::get('/permohonan', [PendaftaranController::class, 'citizenCreate'])->name('permohonan.create');
     Route::post('/permohonan', [PendaftaranController::class, 'store'])->name('permohonan.store');
     Route::get('/permohonan/{pendaftaran}/sukses', [PendaftaranController::class, 'citizenSuccess'])->name('permohonan.success');

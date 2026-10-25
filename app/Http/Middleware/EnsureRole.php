@@ -12,7 +12,15 @@ class EnsureRole
     {
         $user = $request->user();
 
-        abort_unless($user && in_array($user->role, $roles, true), 403);
+        $roleAliases = [
+            'petugas' => ['petugas', 'operator', 'admin'],
+        ];
+
+        $allowedRoles = collect($roles)
+            ->flatMap(fn (string $role) => $roleAliases[$role] ?? [$role])
+            ->all();
+
+        abort_unless($user && in_array($user->role, $allowedRoles, true), 403);
 
         return $next($request);
     }

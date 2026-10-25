@@ -3,44 +3,32 @@
 @section('title', 'Permohonan Masuk - PATEN SPACE')
 
 @section('content')
-<div class="app-shell">
+<div class="app-shell dashboard-page">
     <aside class="sidebar dark-sidebar">
-        <button class="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar" aria-expanded="true">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
-        <div class="brand-wrap">
-            <div class="brand-mark">P</div>
-            <div class="brand-text">
-                <div class="brand-title">PATEN SPACE</div>
-                <div class="brand-sub">Kecamatan Jatisari</div>
-            </div>
-        </div>
-
-        <div class="sidebar-nav">
-            <div class="nav-group-label">Dashboard</div>
-            <a href="{{ route('petugas.dashboard') }}" class="nav-item">Dashboard</a>
-
-            <div class="nav-group-label">Permohonan</div>
-            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item active">
-                Permohonan Masuk
-                @if(($counts['baru'] ?? 0) > 0)
-                    <span style="background:#ef4444;color:#fff;border-radius:9999px;padding:2px 8px;font-size:11px;margin-left:6px;font-weight:700;">{{ $counts['baru'] }}</span>
-                @endif
-            </a>
-            <a href="{{ route('pendaftaran.create') }}" class="nav-item">Input Manual</a>
-            <a href="{{ route('pendaftaran.index') }}" class="nav-item">Semua Data</a>
-
-            <div class="nav-group-label">Laporan</div>
-            <a href="{{ route('laporan') }}" class="nav-item">Laporan</a>
-        </div>
-
-        <form method="POST" action="{{ route('logout') }}" style="padding: 16px;">
-            @csrf
-            <button class="logout-btn" type="submit">Keluar</button>
-        </form>
+        <a href="{{ route('dashboard') }}" class="brand-wrap">
+            <img src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang" class="brand-mark">
+            <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
+        </a>
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Menu Utama</div>
+            <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
+            <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span>＋</span> Pendaftaran Baru</a>
+            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item active"><span>▣</span> Daftar Permohonan @if(($counts['baru'] ?? 0) > 0)<span class="nav-counter">{{ $counts['baru'] }}</span>@endif</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Data dan Laporan</a>
+            <details class="service-menu" open>
+                <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
+                <div class="service-submenu">
+                    @foreach ($services as $service)
+                        <a href="{{ route('pendaftaran.create', ['jenis_layanan' => $service['type']]) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
+                    @endforeach
+                </div>
+            </details>
+        </nav>
+        <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
+            <span class="profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            <span><strong>{{ auth()->user()->name }}</strong><small>Operator Kecamatan</small></span>
+        </a>
     </aside>
 
     <main class="main-panel">
@@ -194,16 +182,5 @@
         </section>
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.sidebar');
-            const toggle = document.querySelector('.sidebar-toggle');
-            if (!sidebar || !toggle) return;
-            toggle.addEventListener('click', function () {
-                const isCollapsed = sidebar.classList.toggle('collapsed');
-                toggle.setAttribute('aria-expanded', String(!isCollapsed));
-            });
-        });
-    </script>
 </div>
 @endsection

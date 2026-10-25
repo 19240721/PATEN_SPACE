@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login PATEN SPACE')
+@section('title', $citizenLogin ? 'Login - PATEN SPACE' : 'Login Petugas & Camat - PATEN SPACE')
 
 @section('content')
 <style>
@@ -8,19 +8,20 @@
         min-height: 100vh;
         display: grid;
         place-items: center;
-        padding: 34px;
-        background: #eaf2f8;
+        padding: 34px 20px;
+        background: #f3f0e7;
     }
 
     .login-shell {
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr);
-        width: min(100%, 1040px);
-        min-height: 650px;
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, .95fr);
+        width: min(100%, 1020px);
+        min-height: 620px;
         overflow: hidden;
         background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 24px 60px rgba(21, 59, 91, .18);
+        border: 1px solid #e8e1d1;
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(69, 59, 39, .14);
     }
 
     .login-visual {
@@ -29,18 +30,12 @@
         flex-direction: column;
         justify-content: flex-start;
         overflow: hidden;
-        padding: 34px 42px 30px;
-        color: #fff;
-        background-image: linear-gradient(180deg, rgba(8, 103, 178, .78) 0%, rgba(10, 115, 187, .24) 38%, rgba(8, 80, 137, .10) 72%, rgba(8, 80, 137, .25) 100%), url('{{ asset('images/paten-building-login.png') }}');
-        background-position: center center;
-        background-color: #0a73bb;
-        background-repeat: no-repeat;
+        padding: 38px 44px 34px;
+        color: #171611;
+        background-color: #e9e2d0;
+        background-image: linear-gradient(180deg, rgba(247, 244, 234, .9) 0%, rgba(247, 244, 234, .83) 56%, rgba(230, 221, 197, .58) 100%), url('/images/paten-building.jpg');
+        background-position: center 52%;
         background-size: cover;
-    }
-
-    .login-visual::before,
-    .login-visual::after {
-        display: none;
     }
 
     .login-visual > * { position: relative; z-index: 1; }
@@ -48,143 +43,106 @@
     .institution {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        color: #171611;
         font-size: .78rem;
         font-weight: 700;
-        letter-spacing: .08em;
-    }
-
-    .institution-mark,
-    .login-mark {
-        display: grid;
-        place-items: center;
-        color: #1260a8;
-        background: #f6d957;
-        border: 3px solid rgba(255, 255, 255, .78);
-        border-radius: 7px 7px 12px 12px;
-        font-weight: 900;
-    }
-
-    .institution-mark {
-        width: 34px;
-        height: 38px;
-        font-size: 1.1rem;
+        letter-spacing: .02em;
+        line-height: 1.35;
     }
 
     .institution-logo {
-        width: 38px;
-        height: 42px;
+        width: 42px;
+        height: 46px;
         object-fit: contain;
+        mix-blend-mode: multiply;
     }
 
     .visual-copy {
         width: 100%;
-        max-width: 500px;
-        margin-top: 92px;
+        max-width: 400px;
+        margin-top: 50px;
     }
 
     .visual-copy h1 {
-        margin: 0 0 8px;
-        font-size: clamp(1.8rem, 3.2vw, 2.55rem);
-        line-height: 1.04;
-        letter-spacing: -.02em;
-        text-shadow: 0 2px 10px rgba(0, 49, 91, .2);
+        margin: 0 0 10px;
+        color: #171611;
+        font-size: clamp(1.8rem, 2.8vw, 2.4rem);
+        line-height: 1.1;
+        letter-spacing: -.01em;
+        text-shadow: 0 1px 4px rgba(255, 255, 255, .9);
     }
 
     .visual-copy p {
         margin: 0;
-        max-width: 330px;
-        color: rgba(255, 255, 255, .86);
-        font-size: .9rem;
+        max-width: 360px;
+        color: #171611;
+        font-size: .88rem;
+        font-weight: 600;
         line-height: 1.6;
+        text-shadow: 0 1px 3px rgba(255, 255, 255, .95);
     }
 
-    .building {
-        display: none;
-    }
-
-    .building::before {
-        content: '';
-        position: absolute;
-        left: -22px;
-        bottom: 0;
-        width: 280px;
-        height: 34px;
-        background: #427b9f;
-        clip-path: polygon(0 100%, 8% 35%, 23% 65%, 40% 25%, 55% 62%, 73% 20%, 100% 68%, 100% 100%);
-    }
-
-    .building::after {
-        content: 'PATEN';
-        position: absolute;
-        left: 76px;
-        top: 44px;
-        padding: 5px 10px;
-        color: #fff;
-        background: #2783bd;
-        font-size: .63rem;
-        font-weight: 800;
-        letter-spacing: .1em;
-    }
-
-    .visual-footer {
-        position: absolute;
-        left: 42px;
-        bottom: 30px;
-        display: flex;
-        gap: 22px;
-        color: #155b91;
-        font-size: .68rem;
+    .visual-features {
+        display: grid;
+        gap: 10px;
+        max-width: 340px;
+        margin-top: 32px;
+        color: #171611;
+        font-size: .74rem;
         font-weight: 700;
     }
 
-    .visual-footer span::before {
-        content: 'o';
-        display: inline-grid;
+    .visual-features span {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .visual-features span::before {
+        content: 'P';
+        display: grid;
         place-items: center;
-        width: 17px;
-        height: 17px;
-        margin-right: 5px;
-        border: 1px solid currentColor;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        font-size: .55rem;
+        background: #796743;
+        color: #fff;
+        font-size: .65rem;
+        flex-shrink: 0;
     }
 
     .login-card {
         align-self: center;
-        width: min(100%, 365px);
+        width: min(100%, 375px);
         margin: auto;
-        padding: 34px 20px;
+        padding: 38px 26px;
         background: #fff;
-    }
-
-    .login-mark {
-        width: 54px;
-        height: 58px;
-        margin: 0 auto 14px;
-        font-size: 1.45rem;
     }
 
     .login-logo {
         display: block;
-        width: 72px;
-        height: 78px;
+        width: 60px;
+        height: 66px;
         margin: 0 auto 14px;
         object-fit: contain;
+        mix-blend-mode: multiply;
     }
 
     .login-card h1 {
         margin: 0 0 7px;
-        color: #164e7e;
-        font-size: 1.5rem;
+        color: #171611;
+        font-size: 1.45rem;
         text-align: center;
+        font-weight: 800;
     }
 
     .login-card > p {
-        margin: 0 0 25px;
-        color: #7890a3;
+        margin: 0 0 24px;
+        color: #514b3d;
         font-size: .78rem;
         text-align: center;
+        line-height: 1.45;
     }
 
     .login-field {
@@ -194,7 +152,7 @@
     }
 
     .login-field label {
-        color: #607c92;
+        color: #171611;
         font-size: .74rem;
         font-weight: 600;
     }
@@ -202,17 +160,17 @@
     .login-field input {
         width: 100%;
         padding: 11px 13px;
-        border: 1px solid #c7d7e3;
+        border: 1px solid #d8ceb6;
         border-radius: 5px;
         outline: none;
-        color: #28516e;
+        color: #171611;
         font-size: .78rem;
-        background: #fbfdff;
+        background: #fdfcf9;
     }
 
     .login-field input:focus {
-        border-color: #1680d0;
-        box-shadow: 0 0 0 3px rgba(22, 128, 208, .12);
+        border-color: #9b875d;
+        box-shadow: 0 0 0 3px rgba(155, 135, 93, .16);
     }
 
     .password-input-wrap {
@@ -236,17 +194,17 @@
         border: 0;
         border-radius: 4px;
         background: transparent;
-        color: #607c92;
+        color: #796743;
         cursor: pointer;
     }
 
     .password-toggle:hover {
-        background: #eaf2f8;
-        color: #164e7e;
+        background: #f7f4ec;
+        color: #635435;
     }
 
     .password-toggle:focus-visible {
-        outline: 2px solid #1680d0;
+        outline: 2px solid #9b875d;
         outline-offset: 2px;
     }
 
@@ -271,9 +229,9 @@
     .captcha-field > label {
         display: block;
         margin-bottom: 7px;
-        color: #607c92;
-        font-size: .68rem;
-        font-weight: 700;
+        color: #171611;
+        font-size: .74rem;
+        font-weight: 600;
     }
 
     .captcha-row {
@@ -284,10 +242,10 @@
 
     .captcha-image-wrap,
     .captcha-refresh {
-        height: 56px;
-        border: 1px solid #d6d0ff;
-        border-radius: 9px;
-        background: #fbfaff;
+        height: 54px;
+        border: 1px solid #d8ceb6;
+        border-radius: 8px;
+        background: #fdfcf9;
     }
 
     .captcha-image-wrap {
@@ -301,20 +259,21 @@
         display: block;
         width: 150px;
         max-width: 100%;
-        height: 48px;
+        height: 46px;
     }
 
     .captcha-refresh {
         display: grid;
         flex: 0 0 46px;
         place-items: center;
-        color: #713df2;
+        color: #796743;
         cursor: pointer;
         font-size: 1.35rem;
     }
 
     .captcha-refresh:hover {
-        background: #f1eeff;
+        background: #f7f4ec;
+        color: #635435;
     }
 
     .captcha-field input {
@@ -348,9 +307,10 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        margin: 3px 0 19px;
-        color: #7890a3;
+        margin: 2px 0 18px;
+        color: #514b3d;
         font-size: .72rem;
+        accent-color: #796743;
     }
 
     .login-submit {
@@ -358,40 +318,243 @@
         padding: 12px 16px;
         border: 0;
         border-radius: 5px;
-        background: #087bd1;
+        background: #796743;
         color: #fff;
         cursor: pointer;
-        font-size: .8rem;
+        font-size: .82rem;
         font-weight: 700;
+        transition: background 0.15s;
     }
 
-    .login-submit:hover { background: #0669b4; }
+    .login-submit:hover { background: #635435; }
 
     .login-help {
         margin: 18px 0 0;
-        padding: 10px 12px;
-        border-radius: 5px;
-        background: #eaf5fc;
-        color: #54758e;
-        font-size: .68rem;
+        padding: 11px 12px;
+        border-radius: 6px;
+        background: #f7f4ec;
+        border: 1px solid #e8e1d1;
+        color: #514b3d;
+        font-size: .74rem;
         line-height: 1.5;
         text-align: center;
     }
 
-    @media (max-width: 760px) {
-        .login-page { padding: 16px; }
-        .login-shell { grid-template-columns: 1fr; min-height: auto; }
-        .login-visual { min-height: 285px; padding: 24px; }
-        .visual-copy { margin-top: 34px; }
-        .visual-copy h1 { font-size: 2rem; }
-        .visual-footer { display: none; }
-        .login-card { padding: 32px 20px 38px; }
+    .login-help a {
+        color: #796743;
+        font-weight: 700;
+        text-decoration: none;
     }
 
-    /* ==========================================================================
+    .login-help a:hover {
+        color: #635435;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+        .login-page {
+            padding: 24px 14px;
+        }
+
+        .login-shell {
+            display: block;
+            width: min(100%, 450px);
+            min-height: 0;
+            border-radius: 16px;
+        }
+
+        .login-visual {
+            min-height: 200px;
+            padding: 22px 24px 20px;
+        }
+
+        .visual-copy {
+            margin-top: 18px;
+            max-width: 100%;
+        }
+
+        .visual-copy h1 {
+            font-size: 1.5rem;
+        }
+
+        .visual-features {
+            display: none;
+        }
+
+        .login-card {
+            width: 100%;
+            padding: 28px 22px 30px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-page {
+            padding: 0;
+        }
+
+        .login-shell {
+            width: 100%;
+            min-height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
+        }
+    }
+
+    @if($citizenLogin)
+    /* Khusus Halaman Login Masyarakat (Tampilan Mobile Card Khaki) */
+    .citizen-login-page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px 14px;
+        background: #f3f0e7;
+    }
+
+    .citizen-login-page .login-shell {
+        display: block;
+        width: min(100%, 430px);
+        min-height: 0;
+        border: 1px solid #e8e1d1;
+        border-radius: 18px;
+        box-shadow: 0 16px 40px rgba(69, 59, 39, .14);
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .citizen-login-page .login-visual {
+        display: flex;
+        flex-direction: column;
+        min-height: 230px;
+        padding: 20px 24px;
+        position: relative;
+        overflow: hidden;
+        color: #171611;
+        background-color: #e9e2d0;
+        background-image: linear-gradient(180deg, rgba(247, 244, 234, .9) 0%, rgba(247, 244, 234, .83) 56%, rgba(230, 221, 197, .58) 100%), url('/images/paten-building.jpg');
+        background-position: center 52%;
+        background-size: cover;
+    }
+
+    .citizen-login-page .institution {
+        color: #171611;
+        font-size: .70rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+        line-height: 1.35;
+    }
+
+    .citizen-login-page .institution-logo {
+        width: 36px;
+        height: 40px;
+        flex-basis: 36px;
+        object-fit: contain;
+        mix-blend-mode: multiply;
+    }
+
+    .citizen-login-page .visual-copy {
+        margin-top: 24px;
+        max-width: 310px;
+    }
+
+    .citizen-login-page .visual-copy h1 {
+        margin: 0 0 6px;
+        color: #171611;
+        font-size: 1.7rem;
+        line-height: 1.08;
+        letter-spacing: normal;
+        text-shadow: 0 1px 4px rgba(255, 255, 255, .9);
+    }
+
+    .citizen-login-page .visual-copy p {
+        margin: 0;
+        color: #171611;
+        font-size: .78rem;
+        font-weight: 700;
+        line-height: 1.5;
+        text-shadow: 0 1px 3px rgba(255, 255, 255, .95);
+    }
+
+    .citizen-login-page .visual-features {
+        display: none;
+    }
+
+    .citizen-login-page .login-card {
+        width: 100%;
+        padding: 28px 24px 30px;
+        background: #fff;
+    }
+
+    .citizen-login-page .login-card h1 {
+        margin: 0 0 7px;
+        color: #171611;
+        font-size: 1.35rem;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .citizen-login-page .login-card > p {
+        margin: 0 0 20px;
+        color: #514b3d;
+        font-size: .78rem;
+        text-align: center;
+    }
+
+    @media (max-width: 760px) {
+        .citizen-login-page { display: block; padding: 0; }
+        .citizen-login-page .login-shell { width: 100%; min-height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
+        .citizen-login-page .login-visual { min-height: 220px; padding: 20px 22px; }
+        .citizen-login-page .login-card { padding: 30px 22px 36px; }
+    }
+
+    @media (max-width: 380px) {
+        .citizen-login-page .login-card { padding-right: 18px; padding-left: 18px; }
+        .citizen-login-page .login-field input { padding: 10px 11px; }
+    }
+    @endif
+
+    @if(!$citizenLogin)
+    @media (max-width: 820px) {
+        .login-page {
+            display: block;
+            padding: 16px;
+        }
+
+        .login-shell {
+            grid-template-columns: 1fr;
+            min-height: auto;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .login-visual {
+            min-height: auto;
+            padding: 24px 22px 20px;
+        }
+
+        .visual-copy {
+            margin-top: 18px;
+        }
+
+        .visual-copy h1 {
+            font-size: 1.5rem;
+        }
+
+        .visual-features {
+            display: none;
+        }
+
+        .login-card {
+            padding: 30px 22px 36px;
+        }
+    }
+    @endif
+
+    /* --------------------------------------------------------------------------
        SPLASH SCREEN (INTRO ANIMASI LOGO PATEN SPACE)
        Modern Government Digital Service Intro
-       ========================================================================== */
+       -------------------------------------------------------------------------- */
     .paten-splash-screen {
         position: fixed;
         inset: 0;
@@ -500,18 +663,18 @@
         color: #4a7fa8;
         font-size: clamp(0.78rem, 1.6vw, 0.92rem);
         font-weight: 600;
-        letter-spacing: 0.16em;
+        letter-spacing: 0.28em;
         text-transform: uppercase;
-        animation: splashTaglineEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+        animation: splashTaglineEnter 1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
     }
 
     @keyframes splashGlowPulse {
-        0% { transform: translate(-50%, -50%) scale(0.88); opacity: 0.6; }
+        0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.7; }
         100% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
     }
 
     @keyframes splashRingExpand {
-        0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
         40% { opacity: 0.8; }
         100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.4; }
     }
@@ -591,32 +754,38 @@
     </div>
 </div>
 
-<main class="login-page">
+<main class="login-page {{ $citizenLogin ? 'citizen-login-page' : '' }}">
     <div class="login-shell">
         <section class="login-visual" aria-label="Informasi PATEN SPACE">
             <div class="institution">
-                <img class="institution-logo" src="{{ asset('images/logo-karawang-transparent.png') }}" alt="Logo Kabupaten Karawang">
-                <span>PEMERINTAH KABUPATEN<br>PELAYANAN TERPADU</span>
+                <img class="institution-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
+                <span>Pelayanan Administrasi Terpadu<br>Kecamatan Jatisari</span>
             </div>
 
             <div class="visual-copy">
-                <h1>Selamat Datang di<br><strong>PATEN SPACE</strong></h1>
-                <p>Pelayanan Administrasi Terpadu Kecamatan Jatisari yang mudah, cepat, dan transparan.</p>
+                @unless($citizenLogin)
+                <h1>Portal Pelayanan<br><strong>Kecamatan Jatisari</strong></h1>
+                <p>Sistem Informasi Pelayanan Administrasi Terpadu Kecamatan Jatisari Kabupaten Karawang.</p>
+                @else
+                <p>Masuk untuk mengajukan dan memantau permohonan administrasi Kecamatan Jatisari.</p>
+                @endunless
             </div>
 
-            <div class="building" aria-hidden="true"></div>
-
-            <div class="visual-footer">
-                <span>Mudah diakses</span>
-                <span>Cepat dan transparan</span>
-                <span>Pelayanan terpadu</span>
+            @unless($citizenLogin)
+            <div class="visual-features">
+                <span>Verifikasi &amp; Pemrosesan Berkas</span>
+                <span>Pelayanan Terpadu Satu Pintu</span>
+                <span>Monitoring &amp; Pelaporan Real-time</span>
             </div>
+            @endunless
         </section>
 
         <section class="login-card" aria-labelledby="login-title">
-            <img class="login-logo" src="{{ asset('images/logo-karawang-transparent.png') }}" alt="Logo Kabupaten Karawang">
-            <h1 id="login-title">PATEN SPACE</h1>
-            <p>Pelayanan Administrasi Terpadu Kecamatan Jatisari</p>
+            @unless($citizenLogin)
+            <img class="login-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
+            @endunless
+            <h1 id="login-title">Login</h1>
+            <p>{{ $citizenLogin ? 'Masukkan email dan password Anda untuk masuk ke sistem.' : 'Masuk untuk mengelola pelayanan dan administrasi kecamatan.' }}</p>
 
             @if ($errors->any())
                 <div class="login-error">{{ $errors->first() }}</div>
@@ -626,18 +795,18 @@
                 <div class="login-success">{{ session('status') }}</div>
             @endif
 
-            <form action="{{ route('login.store') }}" method="POST">
+            <form action="{{ $citizenLogin ? route('login.citizen.store') : route('login.store') }}" method="POST" autocomplete="off">
                 @csrf
 
                 <div class="login-field">
                     <label for="email">Email / Username</label>
-                    <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required autofocus placeholder="Masukkan email anda">
+                    <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="off" required placeholder="Masukkan email anda">
                 </div>
 
                 <div class="login-field">
                     <label for="password">Password</label>
                     <div class="password-input-wrap">
-                        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Masukkan password">
+                        <input id="password" name="password" type="password" autocomplete="new-password" required placeholder="Masukkan password">
                         <button
                             class="password-toggle"
                             id="toggle-password"
@@ -686,12 +855,40 @@
                 <button class="login-submit" type="submit">Login</button>
             </form>
 
-            <p class="login-help">Belum punya akun? Silakan hubungi administrator sistem untuk mendapatkan akses.</p>
+            @if ($citizenLogin)
+                <p class="login-help">Belum punya akun? <a href="{{ route('account.register') }}">Daftar akun masyarakat</a></p>
+                <div style="margin-top: 14px; text-align: center;">
+                    <a href="{{ route('login') }}" style="color: #796743; font-size: 0.74rem; font-weight: 700; text-decoration: none;">Login Petugas / Camat &rarr;</a>
+                </div>
+            @else
+                <p class="login-help">Login khusus operator dan camat. Untuk akun masyarakat, <a href="{{ route('login.citizen') }}">buka halaman login masyarakat</a>.</p>
+            @endif
         </section>
     </div>
 </main>
 
 <script>
+    function clearLoginAutofill() {
+        @if(!$errors->any() && !old('email'))
+        const emailInput = document.getElementById('email');
+        if (emailInput && !emailInput.defaultValue) {
+            emailInput.value = '';
+        }
+        @endif
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+            passwordInput.value = '';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', clearLoginAutofill);
+    window.addEventListener('pageshow', clearLoginAutofill);
+    window.addEventListener('load', function () {
+        clearLoginAutofill();
+        setTimeout(clearLoginAutofill, 50);
+        setTimeout(clearLoginAutofill, 250);
+    });
+
     document.getElementById('toggle-password').addEventListener('click', function () {
         const password = document.getElementById('password');
         const isVisible = password.type === 'text';

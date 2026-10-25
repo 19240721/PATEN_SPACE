@@ -407,13 +407,13 @@
                 </form>
             </nav>
 
-            <div class="sidebar-profile">
+            <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil akun">
                 <span class="profile-avatar">CJ</span>
                 <span>
                     <strong>Camat Kecamatan</strong>
                     <small>Pimpinan / Camat</small>
                 </span>
-            </div>
+            </a>
         </aside>
 
         <main class="main-panel">

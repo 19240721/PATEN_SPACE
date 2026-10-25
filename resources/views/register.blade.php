@@ -16,7 +16,11 @@
             </div>
         </div>
 
-        <button class="hamburger" aria-label="Menu">☰</button>
+        <button class="sidebar-toggle" type="button" aria-label="Tutup menu samping" aria-expanded="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
         <nav class="sidebar-nav">
             <div class="nav-group-label">Dashboard</div>
@@ -32,6 +36,11 @@
             <a href="#" class="nav-item">Pengaturan</a>
         </nav>
 
+        <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
+            <span class="profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            <span><strong>{{ auth()->user()->name }}</strong><small>{{ ucfirst(auth()->user()->role) }} PATEN</small></span>
+        </a>
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button class="logout-btn" type="submit">Keluar</button>
@@ -40,7 +49,6 @@
 
     <main class="main-panel form-page-main">
         <header class="topbar form-topbar">
-            <button type="button" class="back-button" aria-label="Kembali" title="Kembali" onclick="if (document.referrer.startsWith(window.location.origin)) { window.history.back(); } else { window.location.href = '{{ route('dashboard') }}'; }">←</button>
             <div>
                 <h1>{{ $isCitizen ? 'Ajukan Permohonan' : 'Registrasi / Pendaftaran' }}</h1>
                 <p>{{ $isCitizen ? 'Isi formulir layanan dan unggah dokumen persyaratan.' : 'Form ini juga dapat digunakan untuk membantu warga yang belum memiliki ponsel atau belum terbiasa menggunakan gawai.' }}</p>
@@ -360,6 +368,16 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const serviceSelect = document.getElementById('jenis_layanan');
                 const serviceSections = document.querySelectorAll('.service-section');
+                const sidebar = document.querySelector('.form-page-shell .sidebar');
+                const sidebarToggle = document.querySelector('.form-page-shell .sidebar-toggle');
+
+                if (sidebar && sidebarToggle) {
+                    sidebarToggle.addEventListener('click', function () {
+                        const isCollapsed = sidebar.classList.toggle('collapsed');
+                        sidebarToggle.setAttribute('aria-expanded', String(!isCollapsed));
+                        sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Buka menu samping' : 'Tutup menu samping');
+                    });
+                }
 
                 function updateServiceSections() {
                     const selected = serviceSelect.value || 'KTP';

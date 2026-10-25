@@ -6,24 +6,37 @@
 <div class="app-shell dashboard-page">
     <aside class="sidebar dark-sidebar">
         <a href="{{ route('dashboard') }}" class="brand-wrap">
-            <img src="{{ asset('image/logo-kecamatan.png') }}" alt="Logo Kecamatan Jatisari" class="brand-mark">
+            <img src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang" class="brand-mark">
             <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
         </a>
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
-            <a href="{{ route('pendaftaran.index') }}" class="nav-item active"><span>▥</span> Semua Data</a>
-            <a href="{{ route('laporan') }}" class="nav-item"><span>▧</span> Laporan</a>
+            <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span>＋</span> Pendaftaran Baru</a>
+            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item"><span>▣</span> Daftar Permohonan @if($newFromCitizen > 0)<span class="nav-counter">{{ $newFromCitizen }}</span>@endif</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item active" aria-current="page"><span>▥</span> Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Data dan Laporan</a>
             <details class="service-menu" open>
                 <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
                 <div class="service-submenu">
-                    @foreach ($services as $slug => $service)
-                        <a href="{{ route('pelayanan.index', $slug) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
+                    @foreach ([
+                        ['type' => 'PRR', 'title' => 'PRR / KTP Baru'],
+                        ['type' => 'KTP', 'title' => 'KTP'],
+                        ['type' => 'KK', 'title' => 'Kartu Keluarga'],
+                        ['type' => 'Akta Lahir', 'title' => 'Akta Kelahiran'],
+                        ['type' => 'Akta Kematian', 'title' => 'Akta Kematian'],
+                        ['type' => 'Kedatangan', 'title' => 'Kedatangan'],
+                        ['type' => 'Pindah', 'title' => 'Pindah'],
+                    ] as $service)
+                        <a href="{{ route('pendaftaran.create', ['jenis_layanan' => $service['type']]) }}" class="nav-item service-nav-item">{{ $service['title'] }}</a>
                     @endforeach
                 </div>
             </details>
         </nav>
-        <div class="sidebar-profile"><span class="profile-avatar">OP</span><span><strong>Operator Kecamatan</strong><small>Administrator</small></span></div>
+        <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
+            <span class="profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            <span><strong>{{ auth()->user()->name }}</strong><small>Operator Kecamatan</small></span>
+        </a>
     </aside>
 
     <main class="main-panel">
