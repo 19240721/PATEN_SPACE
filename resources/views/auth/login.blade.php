@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $citizenLogin ? 'Login Masyarakat - PATEN SPACE' : 'Login Petugas & Camat - PATEN SPACE')
+@section('title', $citizenLogin ? 'Login - PATEN SPACE' : 'Login Petugas & Camat - PATEN SPACE')
 
 @section('content')
 <style>
@@ -561,8 +561,12 @@
             </div>
 
             <div class="visual-copy">
-                <h1>{{ $citizenLogin ? 'Login Akun' : 'Portal Pelayanan' }}<br><strong>{{ $citizenLogin ? 'Masyarakat' : 'Kecamatan Jatisari' }}</strong></h1>
-                <p>{{ $citizenLogin ? 'Masuk untuk mengajukan dan memantau permohonan administrasi Kecamatan Jatisari.' : 'Sistem Informasi Pelayanan Administrasi Terpadu Kecamatan Jatisari Kabupaten Karawang.' }}</p>
+                @unless($citizenLogin)
+                <h1>Portal Pelayanan<br><strong>Kecamatan Jatisari</strong></h1>
+                <p>Sistem Informasi Pelayanan Administrasi Terpadu Kecamatan Jatisari Kabupaten Karawang.</p>
+                @else
+                <p>Masuk untuk mengajukan dan memantau permohonan administrasi Kecamatan Jatisari.</p>
+                @endunless
             </div>
 
             @unless($citizenLogin)
@@ -578,7 +582,7 @@
             @unless($citizenLogin)
             <img class="login-logo" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
             @endunless
-            <h1 id="login-title">{{ $citizenLogin ? 'Login Akun Masyarakat' : 'Login' }}</h1>
+            <h1 id="login-title">Login</h1>
             <p>{{ $citizenLogin ? 'Masukkan email dan password Anda untuk masuk ke sistem.' : 'Masuk untuk mengelola pelayanan dan administrasi kecamatan.' }}</p>
 
             @if ($errors->any())
@@ -650,7 +654,7 @@
             </form>
 
             @if ($citizenLogin)
-                <p class="login-help">Belum punya akun masyarakat? <a href="{{ route('account.register') }}">Daftar akun masyarakat</a></p>
+                <p class="login-help">Belum punya akun? <a href="{{ route('account.register') }}">Daftar akun masyarakat</a></p>
                 <div style="margin-top: 14px; text-align: center;">
                     <a href="{{ route('login') }}" style="color: #796743; font-size: 0.74rem; font-weight: 700; text-decoration: none;">Login Petugas / Camat &rarr;</a>
                 </div>
