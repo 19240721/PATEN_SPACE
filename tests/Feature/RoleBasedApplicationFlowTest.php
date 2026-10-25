@@ -168,6 +168,16 @@ class RoleBasedApplicationFlowTest extends TestCase
         $this->actingAs($camat)->get(route('dashboard'))->assertRedirect(route('camat.dashboard'));
     }
 
+    public function test_visiting_home_always_clears_an_existing_login_and_redirects_to_login(): void
+    {
+        $citizen = User::factory()->create(['role' => 'masyarakat']);
+
+        $this->actingAs($citizen)
+            ->get('/')
+            ->assertRedirect(route('login'))
+            ->assertGuest();
+    }
+
     public function test_legacy_operator_role_can_open_the_petugas_dashboard(): void
     {
         $operator = User::factory()->create(['role' => 'operator']);

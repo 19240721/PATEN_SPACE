@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+    if (Auth::check()) {
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+    }
+
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
