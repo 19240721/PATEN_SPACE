@@ -43,6 +43,40 @@ class PendaftaranController extends Controller
         return view('register', ['isCitizen' => false]);
     }
 
+    public function citizenRiwayat(Request $request)
+    {
+        $query = Pendaftaran::where('user_id', $request->user()->id)
+            ->latest('tanggal_daftar')
+            ->latest('id');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        if ($request->filled('layanan')) {
+            $query->where('jenis_layanan', $request->input('layanan'));
+        }
+        if ($request->filled('q')) {
+            $search = $request->input('q');
+            $query->where(function ($q) use ($search) {
+                $q->where('jenis_layanan', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%")
+                  ->orWhere('nama_lengkap', 'like', "%{$search}%");
+            });
+        }
+
+        $pendaftarans = $query->get();
+
+        $stats = [
+            'total'   => Pendaftaran::where('user_id', $request->user()->id)->count(),
+            'baru'    => Pendaftaran::where('user_id', $request->user()->id)->where('status', 'Baru')->count(),
+            'proses'  => Pendaftaran::where('user_id', $request->user()->id)->where('status', 'Proses')->count(),
+            'selesai' => Pendaftaran::where('user_id', $request->user()->id)->where('status', 'Selesai')->count(),
+            'ditolak' => Pendaftaran::where('user_id', $request->user()->id)->where('status', 'Ditolak')->count(),
+        ];
+
+        return view('masyarakat.riwayat', compact('pendaftarans', 'stats'));
+    }
+
     public function citizenDashboard(Request $request)
     {
         $pendaftarans = Pendaftaran::where('user_id', $request->user()->id)
@@ -51,6 +85,7 @@ class PendaftaranController extends Controller
 
         $stats = [
             'total' => $pendaftarans->count(),
+            'baru' => $pendaftarans->where('status', 'Baru')->count(),
             'proses' => $pendaftarans->where('status', 'Proses')->count(),
             'selesai' => $pendaftarans->where('status', 'Selesai')->count(),
             'ditolak' => $pendaftarans->where('status', 'Ditolak')->count(),
@@ -76,7 +111,8 @@ class PendaftaranController extends Controller
 
     public function dashboard()
     {
-        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->latest('id')->get();
+        $newCitizenCount = Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Baru')->count();
         $services = [
             ['type' => 'PRR', 'title' => 'PRR / KTP Baru', 'label' => 'PRR', 'icon' => '▤', 'tone' => 'blue'],
             ['type' => 'KTP', 'title' => 'KTP', 'label' => 'KTP', 'icon' => '▣', 'tone' => 'blue'],
@@ -128,6 +164,7 @@ class PendaftaranController extends Controller
             'monthlyMax' => $monthlyMax,
             'chartPoints' => $chartPoints,
             'monthLabels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            'newCitizenCount' => $newCitizenCount,
         ]);
     }
 

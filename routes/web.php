@@ -44,6 +44,7 @@ Route::middleware(['auth', 'role:petugas'])->prefix('petugas')->name('account.us
 
 Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/dashboard', [PendaftaranController::class, 'citizenDashboard'])->name('dashboard');
+    Route::get('/riwayat', [PendaftaranController::class, 'citizenRiwayat'])->name('riwayat');
     Route::get('/permohonan', [PendaftaranController::class, 'citizenCreate'])->name('permohonan.create');
     Route::post('/permohonan', [PendaftaranController::class, 'store'])->name('permohonan.store');
     Route::get('/permohonan/{pendaftaran}/sukses', [PendaftaranController::class, 'citizenSuccess'])->name('permohonan.success');

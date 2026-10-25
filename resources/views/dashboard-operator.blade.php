@@ -12,9 +12,19 @@
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item active"><span>◫</span> Dashboard</a>
+            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item">
+                <span>📥</span> Pengajuan Baru (Warga)
+                @if(($newCitizenCount ?? 0) > 0)
+                    <span style="background:#ef4444;color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:700;margin-left:auto;">{{ $newCitizenCount }}</span>
+                @endif
+            </a>
             <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span>＋</span> Pendaftaran Baru</a>
+<<<<<<< Updated upstream
             <a href="{{ route('petugas.permohonan.index') }}" class="nav-item"><span>▣</span> Daftar Permohonan @if($newFromCitizen > 0)<span class="nav-counter">{{ $newFromCitizen }}</span>@endif</a>
             <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
+=======
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>📋</span> Semua Data</a>
+>>>>>>> Stashed changes
             <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Data dan Laporan</a>
             <details class="service-menu" open>
                 <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
@@ -41,6 +51,19 @@
         </header>
 
         <div class="dashboard-content">
+            @if(($newCitizenCount ?? 0) > 0)
+                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; color: #92400e; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.5rem;">🔔</span>
+                        <div>
+                            <strong style="font-size: 0.95rem;">Ada {{ $newCitizenCount }} Permohonan Baru Masuk Otomatis dari Masyarakat!</strong>
+                            <p style="font-size: 0.8rem; margin-top: 2px; color: #78350f;">Pengajuan daring warga otomatis masuk ke antrean dan siap diverifikasi.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('petugas.permohonan.index') }}" style="background: #b45309; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; text-decoration: none; white-space: nowrap;">Buka Pengajuan Baru ({{ $newCitizenCount }}) →</a>
+                </div>
+            @endif
+
             <section class="dashboard-heading">
                 <div><h1>Dashboard Pelayanan</h1><p>Ringkasan pelayanan administrasi Kecamatan Jatisari.</p></div>
                 <a href="{{ route('pendaftaran.create') }}" class="dashboard-primary-link"><span>+</span> Pendaftaran Baru</a>
@@ -79,9 +102,19 @@
             </section>
 
             <section class="dashboard-panel recent-panel">
-                <div class="panel-heading"><div><h2>Data Pelayanan Terbaru</h2><p>{{ min($pendaftarans->count(), 8) }} data terbaru</p></div><a href="{{ route('laporan') }}" class="panel-link">Lihat laporan</a></div>
+                <div class="panel-heading">
+                    <div>
+                        <h2>Data Pelayanan Terbaru</h2>
+                        <p>{{ min($pendaftarans->count(), 8) }} data pendaftaran & pengajuan terbaru</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="{{ route('petugas.permohonan.index') }}" class="panel-link">Pengajuan Warga @if(($newCitizenCount ?? 0) > 0)<span style="background:#ef4444;color:#fff;border-radius:999px;padding:1px 6px;font-size:11px;font-weight:700;">{{ $newCitizenCount }}</span>@endif</a>
+                        <a href="{{ route('pendaftaran.index') }}" class="panel-link">Semua Data</a>
+                        <a href="{{ route('laporan') }}" class="panel-link">Lihat laporan</a>
+                    </div>
+                </div>
                 <div class="table-scroll"><table>
-                    <thead><tr><th>No</th><th>Tanggal</th><th>Nama</th><th>Jenis Pelayanan</th><th>Status</th><th>Aksi</th></tr></thead>
+                    <thead><tr><th>No</th><th>Tanggal</th><th>Nama</th><th>Jenis Pelayanan</th><th>Sumber</th><th>Status</th><th>Aksi</th></tr></thead>
                     <tbody>
                         @forelse ($pendaftarans->take(8) as $index => $item)
                             <tr>
@@ -89,11 +122,24 @@
                                 <td>{{ $item->tanggal_daftar ? \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d/m/Y') : '—' }}</td>
                                 <td class="person-name">{{ $item->nama_lengkap }}</td>
                                 <td>{{ $item->jenis_layanan }}</td>
+                                <td>
+                                    @if($item->intake_source === 'masyarakat')
+                                        <span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">Daring (Warga)</span>
+                                    @else
+                                        <span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">Loket</span>
+                                    @endif
+                                </td>
                                 <td><span class="status-pill {{ strtolower($item->status ?? 'baru') }}">{{ $item->status ?? 'Baru' }}</span></td>
-                                <td><a href="{{ route('pendaftaran.edit', $item) }}" class="table-action edit">Edit</a></td>
+                                <td>
+                                    @if($item->intake_source === 'masyarakat')
+                                        <a href="{{ route('petugas.permohonan.show', $item) }}" class="table-action edit" style="background:#059669;color:#fff;">Verifikasi</a>
+                                    @else
+                                        <a href="{{ route('pendaftaran.edit', $item) }}" class="table-action edit">Edit</a>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="empty-state">Belum ada data pendaftaran.</td></tr>
+                            <tr><td colspan="7" class="empty-state">Belum ada data pendaftaran.</td></tr>
                         @endforelse
                     </tbody>
                 </table></div>
