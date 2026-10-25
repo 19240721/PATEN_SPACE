@@ -260,7 +260,7 @@
         <section class="account-visual" aria-label="Informasi PATEN SPACE">
             <div class="account-institution">
                 <img class="account-mark" src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang">
-                <span>PEMERINTAH KABUPATEN<br>PELAYANAN TERPADU</span>
+                <span>Pelayanan Administrasi Terpadu<br>Kecamatan Jatisari</span>
             </div>
 
             <div class="account-copy">

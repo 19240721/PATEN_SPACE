@@ -174,8 +174,9 @@ class RoleBasedApplicationFlowTest extends TestCase
 
         $this->actingAs($citizen)
             ->get('/')
-            ->assertRedirect(route('login'))
-            ->assertGuest();
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
     }
 
     public function test_legacy_operator_role_can_open_the_petugas_dashboard(): void
