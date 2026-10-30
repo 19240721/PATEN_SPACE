@@ -255,36 +255,98 @@ class CamatController extends Controller
      */
     public function monitoring(Request $request)
     {
-        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
-        $allServices = $this->getServicesCatalog($pendaftarans);
-        $periode = $request->input('periode', 'semua');
-        $selectedLayanan = $request->input('jenis_layanan', 'semua');
+        $year = (int)$request->input('tahun', now()->year);
+        $periode = (string)$request->input('periode', 'semua');
+        $selectedLayanan = (string)$request->input('jenis_layanan', 'semua');
 
-        $filteredServices = $allServices;
+        $allRecords = Pendaftaran::latest('tanggal_daftar')->latest('id')->get();
+        $allServicesCatalog = $this->getServicesCatalog();
 
-        if ($selectedLayanan !== 'semua' && !empty($selectedLayanan)) {
-            $filteredServices = array_filter($filteredServices, function ($item) use ($selectedLayanan) {
-                return stripos($item['key'], $selectedLayanan) !== false ||
-                       stripos($item['short'], $selectedLayanan) !== false ||
-                       stripos($item['label'], $selectedLayanan) !== false;
+        $filtered = $allRecords;
+
+        // 1. Filter Tahun (Tahun berjalan)
+        $filtered = $filtered->filter(function ($item) use ($year) {
+            if (blank($item->tanggal_daftar)) {
+                return false;
+            }
+            try {
+                return (int)Carbon::parse($item->tanggal_daftar)->year === $year;
+            } catch (\Exception $e) {
+                return false;
+            }
+        });
+
+        // 2. Filter Periode
+        if ($periode === 'bulan_ini') {
+            $currentMonth = (int)now()->month;
+            $filtered = $filtered->filter(function ($item) use ($currentMonth) {
+                try {
+                    return (int)Carbon::parse($item->tanggal_daftar)->month === $currentMonth;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif ($periode === 'triwulan_1') {
+            $filtered = $filtered->filter(function ($item) {
+                try {
+                    return in_array((int)Carbon::parse($item->tanggal_daftar)->month, [1, 2, 3]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif ($periode === 'triwulan_2') {
+            $filtered = $filtered->filter(function ($item) {
+                try {
+                    return in_array((int)Carbon::parse($item->tanggal_daftar)->month, [4, 5, 6]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif ($periode === 'triwulan_3') {
+            $filtered = $filtered->filter(function ($item) {
+                try {
+                    return in_array((int)Carbon::parse($item->tanggal_daftar)->month, [7, 8, 9]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif ($periode === 'triwulan_4') {
+            $filtered = $filtered->filter(function ($item) {
+                try {
+                    return in_array((int)Carbon::parse($item->tanggal_daftar)->month, [10, 11, 12]);
+                } catch (\Exception $e) {
+                    return false;
+                }
             });
         }
 
-        $totalPermohonan = array_sum(array_column($filteredServices, 'count'));
-        $totalSelesai = array_sum(array_column($filteredServices, 'selesai'));
-        $totalProses = array_sum(array_column($filteredServices, 'proses'));
-        $totalMenunggu = array_sum(array_column($filteredServices, 'menunggu'));
+        // Rekapitulasi per layanan berdasarkan data pendaftaran yang telah difilter
+        $services = $this->getServicesCatalog($filtered);
+
+        // 3. Filter Jenis Pelayanan
+        if ($selectedLayanan !== 'semua' && !empty($selectedLayanan)) {
+            $services = array_values(array_filter($services, function ($item) use ($selectedLayanan) {
+                return stripos($item['key'], $selectedLayanan) !== false ||
+                       stripos($item['short'], $selectedLayanan) !== false ||
+                       stripos($item['label'], $selectedLayanan) !== false;
+            }));
+        }
+
+        $totalPermohonan = array_sum(array_column($services, 'count'));
+        $totalSelesai = array_sum(array_column($services, 'selesai'));
+        $totalProses = array_sum(array_column($services, 'proses'));
+        $totalMenunggu = array_sum(array_column($services, 'menunggu'));
 
         return view('camat.monitoring', [
-            'services' => $filteredServices,
-            'allServices' => $allServices,
+            'services' => $services,
+            'allServices' => $allServicesCatalog,
             'periode' => $periode,
             'selectedLayanan' => $selectedLayanan,
             'totalPermohonan' => $totalPermohonan,
             'totalSelesai' => $totalSelesai,
             'totalProses' => $totalProses,
             'totalMenunggu' => $totalMenunggu,
-            'year' => now()->year,
+            'year' => $year,
         ]);
     }
 
