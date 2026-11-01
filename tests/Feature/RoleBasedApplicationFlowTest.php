@@ -338,4 +338,45 @@ class RoleBasedApplicationFlowTest extends TestCase
             ->assertOk()
             ->assertSee('belum memiliki ponsel');
     }
+
+    public function test_petugas_can_view_and_print_application_formulir_with_signature_and_materai(): void
+    {
+        $petugas = User::factory()->create(['role' => 'petugas']);
+        $application = Pendaftaran::create([
+            'nama_lengkap' => 'Budi Santoso',
+            'nik' => '3215000000000001',
+            'alamat' => 'Desa Cirejag RT 01 RW 02',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-11-01',
+            'status' => 'Baru',
+            'intake_source' => 'masyarakat',
+        ]);
+
+        $response = $this->actingAs($petugas)->get(route('petugas.permohonan.formulir', $application));
+
+        $response->assertOk()
+            ->assertSee('FORMULIR PERMOHONAN PELAYANAN ADMINISTRASI')
+            ->assertSee('Budi Santoso')
+            ->assertSee('3215000000000001')
+            ->assertSee('MATERAI TEMPEL')
+            ->assertSee('Rp 10.000,-')
+            ->assertSee('Pemohon,')
+            ->assertSee('Petugas Pelayanan PATEN Jatisari');
+
+        // Test list and detail page show print link
+        $listResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.index'));
+        $listResponse->assertOk()
+            ->assertSee(route('petugas.permohonan.formulir', $application));
+
+        $detailResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.show', $application));
+        $detailResponse->assertOk()
+            ->assertSee(route('petugas.permohonan.formulir', $application));
+
+        // Test PDF streaming if DomPDF installed, otherwise renders printable view
+        $pdfResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.formulir', [$application, 'pdf' => 1]));
+        $pdfResponse->assertOk();
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdfResponse->assertHeader('content-type', 'application/pdf');
+        }
+    }
 }

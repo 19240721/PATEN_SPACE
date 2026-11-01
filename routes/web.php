@@ -62,6 +62,7 @@ Route::get('/petugas/dashboard', [PendaftaranController::class, 'petugasDashboar
 Route::middleware(['auth', 'role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
     Route::get('/permohonan', [PendaftaranController::class, 'permohonanMasuk'])->name('permohonan.index');
     Route::get('/permohonan/{pendaftaran}', [PendaftaranController::class, 'showPermohonan'])->name('permohonan.show');
+    Route::get('/permohonan/{pendaftaran}/formulir', [PendaftaranController::class, 'cetakFormulir'])->name('permohonan.formulir');
     Route::patch('/permohonan/{pendaftaran}/status', [PendaftaranController::class, 'updateStatus'])->name('permohonan.status');
 });
 

@@ -46,7 +46,13 @@
                 <h1>Detail Permohonan</h1>
                 <p>ID #{{ $pendaftaran->id }} — {{ $pendaftaran->jenis_layanan }}</p>
             </div>
-            <div class="date-pill">{{ now()->translatedFormat('l, d F Y') }}</div>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+                <a href="{{ route('petugas.permohonan.formulir', $pendaftaran) }}" target="_blank"
+                   style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #0284c7; color: #fff; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                    🖨️ Cetak Formulir
+                </a>
+                <div class="date-pill">{{ now()->translatedFormat('l, d F Y') }}</div>
+            </div>
         </header>
 
         @if(session('success'))
@@ -244,7 +250,11 @@
                     </form>
                 </section>
 
-                <div style="margin-top:12px;">
+                <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <a href="{{ route('petugas.permohonan.formulir', $pendaftaran) }}" target="_blank"
+                       style="display:block;text-align:center;padding:10px;background:#0284c7;color:#fff;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;">
+                        🖨️ Cetak Formulir Permohonan
+                    </a>
                     <a href="{{ route('petugas.permohonan.index') }}"
                        style="display:block;text-align:center;padding:10px;background:#f3f4f6;color:#374151;border-radius:6px;text-decoration:none;font-size:14px;">
                         ← Kembali ke Daftar Permohonan

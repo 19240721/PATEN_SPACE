@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Redirect;
@@ -626,6 +627,31 @@ class PendaftaranController extends Controller
     public function showPermohonan(Pendaftaran $pendaftaran)
     {
         return view('petugas.detail-permohonan', compact('pendaftaran'));
+    }
+
+    public function cetakFormulir(Request $request, Pendaftaran $pendaftaran)
+    {
+        $logoPath = public_path('images/logo-karawang.png');
+        $logoBase64 = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : '';
+
+        if ($request->boolean('pdf') && class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('petugas.formulir-permohonan', [
+                'pendaftaran' => $pendaftaran,
+                'logoBase64' => $logoBase64,
+                'isPdf' => true,
+            ]);
+            $pdf->setPaper('A4', 'portrait');
+            $filename = 'Formulir-PATEN-' . preg_replace('/[^A-Za-z0-9\-]/', '', $pendaftaran->nik) . '-' . $pendaftaran->id . '.pdf';
+            return $pdf->stream($filename);
+        }
+
+        return view('petugas.formulir-permohonan', [
+            'pendaftaran' => $pendaftaran,
+            'logoBase64' => $logoBase64,
+            'isPdf' => false,
+        ]);
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)

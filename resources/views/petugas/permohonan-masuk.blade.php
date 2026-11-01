@@ -159,7 +159,8 @@
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a href="{{ route('petugas.permohonan.show', $item) }}" class="table-action edit">Detail & Update Status</a>
+                                    <a href="{{ route('petugas.permohonan.show', $item) }}" class="table-action edit">Detail & Status</a>
+                                    <a href="{{ route('petugas.permohonan.formulir', $item) }}" target="_blank" class="table-action" style="background:#0284c7;color:#fff;text-decoration:none;font-weight:600;" title="Cetak formulir pengajuan">🖨️ Cetak Formulir</a>
                                 </div>
                             </td>
                         </tr>
