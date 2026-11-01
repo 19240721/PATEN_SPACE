@@ -597,7 +597,7 @@ class PendaftaranController extends Controller
 
     public function permohonanMasuk(Request $request)
     {
-        $query = Pendaftaran::where('intake_source', 'masyarakat')->latest('tanggal_daftar');
+        $query = Pendaftaran::query()->latest('tanggal_daftar')->latest('id');
 
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
@@ -605,13 +605,16 @@ class PendaftaranController extends Controller
         if ($request->filled('jenis_layanan')) {
             $query->where('jenis_layanan', $request->input('jenis_layanan'));
         }
+        if ($request->filled('sumber')) {
+            $query->where('intake_source', $request->input('sumber'));
+        }
 
         $pendaftarans = $query->get();
         $counts = [
-            'baru' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Baru')->count(),
-            'proses' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Proses')->count(),
-            'selesai' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Selesai')->count(),
-            'ditolak' => Pendaftaran::where('intake_source', 'masyarakat')->where('status', 'Ditolak')->count(),
+            'baru' => Pendaftaran::where('status', 'Baru')->count(),
+            'proses' => Pendaftaran::where('status', 'Proses')->count(),
+            'selesai' => Pendaftaran::where('status', 'Selesai')->count(),
+            'ditolak' => Pendaftaran::where('status', 'Ditolak')->count(),
         ];
         $services = collect($this->serviceCatalog())
             ->map(fn (array $service) => [

@@ -34,8 +34,8 @@
     <main class="main-panel">
         <header class="topbar">
             <div>
-                <h1>Permohonan Masuk</h1>
-                <p>Daftar permohonan layanan yang diajukan langsung oleh masyarakat.</p>
+                <h1>Daftar Permohonan</h1>
+                <p>Daftar seluruh permohonan layanan yang diajukan oleh masyarakat maupun dicatat petugas loket.</p>
             </div>
             <div class="date-pill">{{ now()->translatedFormat('l, d F Y') }}</div>
         </header>
@@ -106,6 +106,14 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="field-group" style="margin:0;min-width:180px;">
+                    <label style="font-size:13px;color:#6b7280;margin-bottom:4px;display:block;">Filter Sumber</label>
+                    <select name="sumber" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                        <option value="">Semua Sumber</option>
+                        <option value="masyarakat" {{ request('sumber') === 'masyarakat' ? 'selected' : '' }}>Warga (Online)</option>
+                        <option value="petugas" {{ request('sumber') === 'petugas' ? 'selected' : '' }}>Loket (Petugas)</option>
+                    </select>
+                </div>
                 <div style="display:flex;gap:8px;">
                     <button type="submit" style="padding:8px 18px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;">Filter</button>
                     <a href="{{ route('petugas.permohonan.index') }}" style="padding:8px 18px;background:#f3f4f6;color:#374151;border-radius:6px;font-size:14px;text-decoration:none;">Reset</a>
@@ -132,6 +140,7 @@
                         <th>Nama</th>
                         <th>NIK</th>
                         <th>Jenis Layanan</th>
+                        <th>Sumber</th>
                         <th>Tanggal Daftar</th>
                         <th>Status</th>
                         <th>Aksi</th>
@@ -144,6 +153,13 @@
                             <td>{{ $item->nama_lengkap }}</td>
                             <td>{{ $item->nik }}</td>
                             <td>{{ $item->jenis_layanan }}</td>
+                            <td>
+                                @if(($item->intake_source ?? '') === 'masyarakat')
+                                    <span class="badge" style="background:#e0f2fe;color:#0369a1;font-size:11px;font-weight:600;">Warga (Online)</span>
+                                @else
+                                    <span class="badge" style="background:#f3e8ff;color:#6b21a8;font-size:11px;font-weight:600;">Loket (Petugas)</span>
+                                @endif
+                            </td>
                             <td>{{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d-m-Y') }}</td>
                             <td>
                                 @php $status = $item->status ?? 'Baru'; @endphp
@@ -166,7 +182,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align:center; color:#667085; padding: 24px;">Tidak ada permohonan ditemukan.</td>
+                            <td colspan="8" style="text-align:center; color:#667085; padding: 24px;">Tidak ada permohonan ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>

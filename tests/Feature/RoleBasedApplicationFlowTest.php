@@ -147,6 +147,11 @@ class RoleBasedApplicationFlowTest extends TestCase
             'intake_source' => 'petugas',
             'petugas' => 'Petugas Loket',
         ]);
+
+        $queueResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.index'));
+        $queueResponse->assertOk()
+            ->assertSee('Warga tanpa ponsel')
+            ->assertSee('Loket (Petugas)');
     }
 
     public function test_roles_cannot_open_another_roles_pages(): void
