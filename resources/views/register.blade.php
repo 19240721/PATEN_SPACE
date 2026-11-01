@@ -335,6 +335,7 @@
                 </div>
             </section>
 
+            @if($isCitizen ?? false)
             <section class="form-card">
                 <div class="section-header form-section-header">
                     <h2>Dokumen Persyaratan</h2>
@@ -357,6 +358,7 @@
                     <p class="form-error">{{ $message }}</p>
                 @enderror
             </section>
+            @endif
 
             <div class="action-row">
                 <button type="button" class="btn btn-secondary" onclick="window.location='{{ $isCitizen ? route('masyarakat.dashboard') : route('dashboard') }}'">Batal</button>

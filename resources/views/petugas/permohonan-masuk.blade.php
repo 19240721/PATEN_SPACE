@@ -134,7 +134,6 @@
                         <th>Jenis Layanan</th>
                         <th>Tanggal Daftar</th>
                         <th>Status</th>
-                        <th>Dokumen</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -159,14 +158,6 @@
                                 @endif
                             </td>
                             <td>
-                                @php $docCount = count($item->documents ?? []); @endphp
-                                @if($docCount > 0)
-                                    <span style="color:#2563eb;font-weight:600;">{{ $docCount }} file</span>
-                                @else
-                                    <span style="color:#9ca3af;">—</span>
-                                @endif
-                            </td>
-                            <td>
                                 <div class="table-actions">
                                     <a href="{{ route('petugas.permohonan.show', $item) }}" class="table-action edit">Detail & Update Status</a>
                                 </div>
@@ -174,7 +165,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" style="text-align:center; color:#667085; padding: 24px;">Tidak ada permohonan ditemukan.</td>
+                            <td colspan="7" style="text-align:center; color:#667085; padding: 24px;">Tidak ada permohonan ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>
