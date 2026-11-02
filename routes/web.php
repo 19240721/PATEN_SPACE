@@ -86,6 +86,7 @@ Route::middleware(['auth', 'role:camat'])->prefix('camat')->name('camat.')->grou
     Route::get('/monitoring', [CamatController::class, 'monitoring'])->name('monitoring');
     Route::get('/statistik', [CamatController::class, 'statistik'])->name('statistik');
     Route::get('/laporan', [CamatController::class, 'laporan'])->name('laporan');
+    Route::get('/laporan/cetak', [CamatController::class, 'cetak'])->name('laporan.cetak');
     Route::get('/aktivitas', [CamatController::class, 'aktivitas'])->name('aktivitas');
     Route::get('/notifikasi', [CamatController::class, 'notifikasi'])->name('notifikasi');
     Route::get('/profil', [CamatController::class, 'profil'])->name('profil');

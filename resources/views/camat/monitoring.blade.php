@@ -6,8 +6,8 @@
 <style>
     .camat-filter-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
-        gap: 16px;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+        gap: 14px;
         align-items: flex-end;
     }
 
@@ -144,9 +144,9 @@
         border: 1px solid #bbf7d0;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 960px) {
         .camat-filter-grid {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 14px;
         }
         .camat-filter-action-group {
@@ -221,8 +221,8 @@
         <span class="stat-symbol blue">⚡</span>
         <div>
             <span>Rata-rata Waktu</span>
-            <strong>1 - 2 Hari</strong>
-            <small style="color: #2563eb; font-size: 0.7rem;">SOP Terpenuhi</small>
+            <strong>—</strong>
+            <small style="color: #64748b; font-size: 0.7rem;">Belum Ada Data</small>
         </div>
     </div>
 </section>
@@ -234,13 +234,22 @@
             <h2>Tabel Monitoring Pelayanan</h2>
             <p>Rekapitulasi progres pelayanan administrasi Kecamatan Jatisari</p>
         </div>
-        <span class="chart-year">Tahun {{ $year }}</span>
+        <span class="chart-year">{{ $tahun !== 'semua' ? 'Tahun ' . $tahun : 'Semua Tahun' }}</span>
     </div>
 
-    {{-- FILTER PERIODE & JENIS PELAYANAN --}}
+    {{-- FILTER TAHUN, PERIODE, JENIS PELAYANAN, DAN STATUS --}}
     <form method="GET" action="{{ route('camat.monitoring') }}" class="camat-filter-form" style="background: #ffffff; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
         <div class="camat-filter-grid">
-            {{-- 1. PERIODE --}}
+            {{-- 1. TAHUN --}}
+            <div class="camat-filter-group">
+                <label for="filter-tahun" class="camat-filter-label">Tahun</label>
+                <select id="filter-tahun" name="tahun" class="camat-filter-select" aria-label="Filter Tahun">
+                    <option value="2026" {{ $tahun === '2026' ? 'selected' : '' }}>2026</option>
+                    <option value="2025" {{ $tahun === '2025' ? 'selected' : '' }}>2025</option>
+                </select>
+            </div>
+
+            {{-- 2. PERIODE --}}
             <div class="camat-filter-group">
                 <label for="filter-periode" class="camat-filter-label">Periode</label>
                 <select id="filter-periode" name="periode" class="camat-filter-select" aria-label="Filter Periode">
@@ -253,7 +262,7 @@
                 </select>
             </div>
 
-            {{-- 2. JENIS PELAYANAN --}}
+            {{-- 3. JENIS PELAYANAN --}}
             <div class="camat-filter-group">
                 <label for="filter-jenis" class="camat-filter-label">Jenis Pelayanan</label>
                 <select id="filter-jenis" name="jenis_layanan" class="camat-filter-select" aria-label="Filter Jenis Layanan">
@@ -264,12 +273,22 @@
                 </select>
             </div>
 
-            {{-- 3. TOMBOL TERAPKAN FILTER --}}
+            {{-- 4. STATUS --}}
+            <div class="camat-filter-group">
+                <label for="filter-status" class="camat-filter-label">Status</label>
+                <select id="filter-status" name="status" class="camat-filter-select" aria-label="Filter Status">
+                    <option value="semua" {{ $status === 'semua' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="selesai" {{ strtolower($status) === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                    <option value="dalam_proses" {{ in_array(strtolower($status), ['dalam_proses', 'dalam proses', 'proses']) ? 'selected' : '' }}>Dalam Proses</option>
+                </select>
+            </div>
+
+            {{-- 5. TOMBOL TERAPKAN FILTER --}}
             <div class="camat-filter-group camat-filter-action-group">
                 <span class="camat-filter-label-spacer" aria-hidden="true">&nbsp;</span>
                 <div class="camat-btn-wrapper">
                     <button type="submit" class="report-filter-button">Terapkan Filter</button>
-                    @if ($periode !== 'semua' || $selectedLayanan !== 'semua')
+                    @if ($tahun !== '2026' || $periode !== 'semua' || $selectedLayanan !== 'semua' || $status !== 'semua')
                         <a href="{{ route('camat.monitoring') }}" class="camat-filter-reset">Reset</a>
                     @endif
                 </div>

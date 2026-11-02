@@ -68,6 +68,113 @@ class CamatDashboardTest extends TestCase
     }
 
     /**
+     * Test Monitoring Pelayanan menampilkan 4 filter lengkap dan format periode persis
+     */
+    public function test_camat_monitoring_displays_all_four_filters_and_exact_periods(): void
+    {
+        $response = $this->get('/camat/monitoring');
+        $response->assertStatus(200);
+        $response->assertSee('Tahun');
+        $response->assertSee('Periode');
+        $response->assertSee('Jenis Pelayanan');
+        $response->assertSee('Status');
+        $response->assertSee('Semua Periode');
+        $response->assertSee('Bulan Ini');
+        $response->assertSee('Triwulan I (Jan - Mar)');
+        $response->assertSee('Triwulan II (Apr - Jun)');
+        $response->assertSee('Triwulan III (Jul - Sep)');
+        $response->assertSee('Triwulan IV (Okt - Des)');
+        $response->assertSee('Terapkan Filter');
+        $response->assertSee('Rata-rata Waktu');
+        $response->assertSee('Belum Ada Data');
+    }
+
+    /**
+     * Test Monitoring Pelayanan memfilter berdasarkan tahun dan triwulan
+     */
+    public function test_camat_monitoring_filters_by_year_and_quarter(): void
+    {
+        // 1. Data Q1 2026 (Februari 2026)
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Q1 2026',
+            'nik' => '3201010101010901',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-02-15',
+            'status' => 'Selesai',
+        ]);
+
+        // 2. Data Q2 2026 (Mei 2026)
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Q2 2026',
+            'nik' => '3201010101010902',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-05-15',
+            'status' => 'Selesai',
+        ]);
+
+        // 3. Data Q1 2025 (Februari 2025)
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Q1 2025',
+            'nik' => '3201010101010903',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2025-02-15',
+            'status' => 'Selesai',
+        ]);
+
+        $response = $this->get('/camat/monitoring?tahun=2026&periode=triwulan_1');
+        $response->assertStatus(200);
+        $response->assertViewHas('totalPermohonan', 1);
+        $response->assertViewHas('totalSelesai', 1);
+
+        $responseQ2 = $this->get('/camat/monitoring?tahun=2026&periode=triwulan_2');
+        $responseQ2->assertStatus(200);
+        $responseQ2->assertViewHas('totalPermohonan', 1);
+
+        $responseQ1_2025 = $this->get('/camat/monitoring?tahun=2025&periode=triwulan_1');
+        $responseQ1_2025->assertStatus(200);
+        $responseQ1_2025->assertViewHas('totalPermohonan', 1);
+    }
+
+    /**
+     * Test Monitoring Pelayanan memfilter status Selesai dan Dalam Proses
+     */
+    public function test_camat_monitoring_filters_by_status(): void
+    {
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Mon Selesai',
+            'nik' => '3201010101010911',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-09-15',
+            'status' => 'Selesai',
+        ]);
+
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Mon Proses',
+            'nik' => '3201010101010912',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-09-16',
+            'status' => 'Proses',
+        ]);
+
+        $responseSelesai = $this->get('/camat/monitoring?status=selesai');
+        $responseSelesai->assertStatus(200);
+        $responseSelesai->assertViewHas('totalPermohonan', 1);
+        $responseSelesai->assertViewHas('totalSelesai', 1);
+        $responseSelesai->assertViewHas('totalProses', 0);
+
+        $responseProses = $this->get('/camat/monitoring?status=dalam_proses');
+        $responseProses->assertStatus(200);
+        $responseProses->assertViewHas('totalPermohonan', 1);
+        $responseProses->assertViewHas('totalSelesai', 0);
+        $responseProses->assertViewHas('totalProses', 1);
+    }
+
+    /**
      * Test Statistik Pelayanan
      */
     public function test_camat_statistik_renders_successfully(): void
@@ -88,6 +195,9 @@ class CamatDashboardTest extends TestCase
         $response->assertSee('Laporan Pelayanan');
         $response->assertSee('Cetak Laporan');
         $response->assertSee('Export PDF');
+        $response->assertSee('Ketepatan Waktu');
+        $response->assertSee('Belum Ada Data');
+        $response->assertDontSee('98.4%');
     }
 
     /**
@@ -357,5 +467,87 @@ class CamatDashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Profil Camat');
         $response->assertSee('Camat Jatisari');
+    }
+
+    /**
+     * Test Cetak Laporan Camat merender dokumen resmi Word-style lengkap
+     */
+    public function test_camat_laporan_cetak_renders_official_word_style_document(): void
+    {
+        $response = $this->get('/camat/laporan/cetak');
+        $response->assertStatus(200);
+        $response->assertSee('PEMERINTAH KABUPATEN KARAWANG');
+        $response->assertSee('KECAMATAN JATISARI');
+        $response->assertSee('logo-karawang.png');
+        $response->assertSee('REKAPITULASI LAPORAN PELAYANAN PATEN');
+        $response->assertSee('A. RINGKASAN HASIL PELAYANAN');
+        $response->assertSee('Total Berkas Pelayanan');
+        $response->assertSee('B. RINCIAN REKAPITULASI PELAYANAN');
+        $response->assertSee('PRR / KTP Baru');
+        $response->assertSee('KTP');
+        $response->assertSee('Kartu Keluarga');
+        $response->assertSee('Akta Kelahiran');
+        $response->assertSee('Akta Kematian');
+        $response->assertSee('Kedatangan');
+        $response->assertSee('Pindah');
+        $response->assertSee('CAMAT JATISARI');
+        $response->assertSee('H. SURISNO.SKM.MAP');
+        $response->assertSee('NIP. 19690516 1989903 1 003');
+    }
+
+    /**
+     * Test Cetak Laporan Camat mendukung pemilihan ukuran kertas F4 dan A4 serta orientasi
+     */
+    public function test_camat_laporan_cetak_supports_f4_and_a4_paper_sizes(): void
+    {
+        $responseF4 = $this->get('/camat/laporan/cetak?kertas=F4&orientasi=landscape');
+        $responseF4->assertStatus(200);
+        $responseF4->assertSee('330mm 215mm');
+
+        $responseA4 = $this->get('/camat/laporan/cetak?kertas=A4&orientasi=portrait');
+        $responseA4->assertStatus(200);
+        $responseA4->assertSee('A4 portrait');
+    }
+
+    /**
+     * Test Cetak Laporan Camat otomatis sinkron dengan filter laporan
+     */
+    public function test_camat_laporan_cetak_syncs_with_filters(): void
+    {
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Cetak Selesai',
+            'nik' => '3201010101019901',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-09-15',
+            'status' => 'Selesai',
+        ]);
+
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Cetak Proses',
+            'nik' => '3201010101019902',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-09-16',
+            'status' => 'Proses',
+        ]);
+
+        $response = $this->get('/camat/laporan/cetak?tahun=2026&bulan=september&status=selesai');
+        $response->assertStatus(200);
+        $response->assertViewHas('total', 1);
+        $response->assertViewHas('totalSelesai', 1);
+        $response->assertViewHas('totalProses', 0);
+    }
+
+    /**
+     * Test Halaman Laporan menampilkan identitas Camat baru tanpa tanggal di bawah tabel
+     */
+    public function test_camat_laporan_displays_new_camat_identity(): void
+    {
+        $response = $this->get('/camat/laporan');
+        $response->assertStatus(200);
+        $response->assertSee('CAMAT JATISARI');
+        $response->assertSee('H. SURISNO.SKM.MAP');
+        $response->assertSee('NIP. 19690516 1989903 1 003');
     }
 }

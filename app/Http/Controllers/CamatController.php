@@ -255,26 +255,29 @@ class CamatController extends Controller
      */
     public function monitoring(Request $request)
     {
-        $year = (int)$request->input('tahun', now()->year);
+        $tahun = (string)$request->input('tahun', '2026');
         $periode = (string)$request->input('periode', 'semua');
         $selectedLayanan = (string)$request->input('jenis_layanan', 'semua');
+        $status = (string)$request->input('status', 'semua');
 
         $allRecords = Pendaftaran::latest('tanggal_daftar')->latest('id')->get();
         $allServicesCatalog = $this->getServicesCatalog();
 
         $filtered = $allRecords;
 
-        // 1. Filter Tahun (Tahun berjalan)
-        $filtered = $filtered->filter(function ($item) use ($year) {
-            if (blank($item->tanggal_daftar)) {
-                return false;
-            }
-            try {
-                return (int)Carbon::parse($item->tanggal_daftar)->year === $year;
-            } catch (\Exception $e) {
-                return false;
-            }
-        });
+        // 1. Filter Tahun
+        if ($tahun !== 'semua' && !empty($tahun)) {
+            $filtered = $filtered->filter(function ($item) use ($tahun) {
+                if (blank($item->tanggal_daftar)) {
+                    return false;
+                }
+                try {
+                    return (string)Carbon::parse($item->tanggal_daftar)->year === (string)$tahun;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        }
 
         // 2. Filter Periode
         if ($periode === 'bulan_ini') {
@@ -320,10 +323,26 @@ class CamatController extends Controller
             });
         }
 
+        // 3. Filter Status (Selesai vs Dalam Proses)
+        if ($status !== 'semua' && !empty($status)) {
+            $normalizedStatus = strtolower(trim($status));
+            if ($normalizedStatus === 'selesai') {
+                $filtered = $filtered->filter(function ($item) {
+                    return strtolower(trim($item->status ?? '')) === 'selesai';
+                });
+            } elseif (in_array($normalizedStatus, ['dalam_proses', 'dalam proses', 'proses'])) {
+                $filtered = $filtered->filter(function ($item) {
+                    $st = strtolower(trim($item->status ?? ''));
+                    return in_array($st, ['proses', 'dalam proses', 'baru', 'menunggu']) ||
+                           (!in_array($st, ['selesai', 'ditolak']) && !empty($st));
+                });
+            }
+        }
+
         // Rekapitulasi per layanan berdasarkan data pendaftaran yang telah difilter
         $services = $this->getServicesCatalog($filtered);
 
-        // 3. Filter Jenis Pelayanan
+        // 4. Filter Jenis Pelayanan
         if ($selectedLayanan !== 'semua' && !empty($selectedLayanan)) {
             $services = array_values(array_filter($services, function ($item) use ($selectedLayanan) {
                 return stripos($item['key'], $selectedLayanan) !== false ||
@@ -340,13 +359,15 @@ class CamatController extends Controller
         return view('camat.monitoring', [
             'services' => $services,
             'allServices' => $allServicesCatalog,
+            'tahun' => $tahun,
+            'year' => $tahun,
             'periode' => $periode,
             'selectedLayanan' => $selectedLayanan,
+            'status' => $status,
             'totalPermohonan' => $totalPermohonan,
             'totalSelesai' => $totalSelesai,
             'totalProses' => $totalProses,
             'totalMenunggu' => $totalMenunggu,
-            'year' => $year,
         ]);
     }
 
@@ -425,10 +446,12 @@ class CamatController extends Controller
     }
 
     /**
-     * Halaman Laporan Pelayanan untuk Camat
+     * Helper untuk mengambil data rekapitulasi laporan terfilter
      */
-    public function laporan(Request $request)
+    protected function getLaporanReportData(Request $request): array
     {
+        Carbon::setLocale('id');
+
         $allRecords = Pendaftaran::latest('tanggal_daftar')->latest('id')->get();
         $allServicesCatalog = $this->getServicesCatalog();
 
@@ -436,6 +459,8 @@ class CamatController extends Controller
         $bulan = (string)$request->input('bulan', 'semua');
         $jenisLayanan = (string)$request->input('jenis_layanan', 'semua');
         $status = (string)$request->input('status', 'semua');
+        $kertas = strtoupper((string)$request->input('kertas', 'A4'));
+        $orientasi = strtolower((string)$request->input('orientasi', 'portrait'));
 
         $filtered = $allRecords;
 
@@ -520,7 +545,9 @@ class CamatController extends Controller
             }
         }
 
-        return view('camat.laporan', [
+        $tanggalCetak = Carbon::now()->locale('id')->translatedFormat('d F Y');
+
+        return [
             'services' => $services,
             'allServices' => $allServicesCatalog,
             'tahun' => $tahun,
@@ -531,8 +558,52 @@ class CamatController extends Controller
             'total' => $total,
             'totalSelesai' => $totalSelesai,
             'totalProses' => $totalProses,
-            'tanggalCetak' => now()->format('d/m/Y'),
-        ]);
+            'tanggalCetak' => $tanggalCetak,
+            'kertas' => $kertas,
+            'orientasi' => $orientasi,
+        ];
+    }
+
+    /**
+     * Halaman Laporan Pelayanan untuk Camat
+     */
+    public function laporan(Request $request)
+    {
+        $data = $this->getLaporanReportData($request);
+
+        return view('camat.laporan', $data);
+    }
+
+    /**
+     * Halaman Cetak & Export PDF Laporan Pelayanan untuk Camat
+     */
+    public function cetak(Request $request)
+    {
+        $data = $this->getLaporanReportData($request);
+
+        // Jika dipanggil via export PDF dan class Barryvdh\DomPDF terinstall
+        if (($request->input('export') === 'pdf' || $request->boolean('pdf')) && class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $logoPath = public_path('images/logo-karawang.png');
+            $logoBase64 = file_exists($logoPath)
+                ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+                : '';
+            $data['logoBase64'] = $logoBase64;
+            $data['isPdf'] = true;
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('camat.laporan-cetak', $data);
+
+            if ($data['kertas'] === 'F4') {
+                $paperSize = [0, 0, 609.45, 935.43]; // 215mm x 330mm
+                $pdf->setPaper($paperSize, $data['orientasi']);
+            } else {
+                $pdf->setPaper(strtolower($data['kertas']), $data['orientasi']);
+            }
+
+            $filename = 'Laporan-Pelayanan-PATEN-Jatisari-' . $data['tahun'] . '.pdf';
+            return $pdf->stream($filename);
+        }
+
+        return view('camat.laporan-cetak', $data);
     }
 
     /**
