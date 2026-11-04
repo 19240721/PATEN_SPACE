@@ -979,10 +979,6 @@
                                 <option value="Perubahan Data" {{ old('alasan_pembaruan')=='Perubahan Data'?'selected':'' }}>Perubahan Data</option>
                             </select>
                         </div>
-                        <div class="mob-field">
-                            <label class="mob-label">Keterangan Tambahan</label>
-                            <textarea class="mob-textarea" name="keterangan" rows="3" placeholder="Keterangan tambahan (opsional)">{{ old('keterangan') }}</textarea>
-                        </div>
                     </div>
                 </div>
 
