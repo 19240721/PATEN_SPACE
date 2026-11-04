@@ -655,7 +655,19 @@ class PendaftaranController extends Controller
 
     public function showPermohonan(Pendaftaran $pendaftaran)
     {
-        return view('petugas.detail-permohonan', compact('pendaftaran'));
+        $services = collect($this->serviceCatalog())
+            ->map(fn (array $service) => [
+                'title' => $service['title'],
+                'type' => $service['service'],
+            ])
+            ->values()
+            ->all();
+
+        $newCitizenCount = Pendaftaran::where('intake_source', 'masyarakat')
+            ->where('status', 'Baru')
+            ->count();
+
+        return view('petugas.detail-permohonan', compact('pendaftaran', 'services', 'newCitizenCount'));
     }
 
     public function cetakFormulir(Request $request, Pendaftaran $pendaftaran)

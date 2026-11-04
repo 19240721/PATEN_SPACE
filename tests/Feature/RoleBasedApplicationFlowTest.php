@@ -405,7 +405,10 @@ class RoleBasedApplicationFlowTest extends TestCase
 
         $detailResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.show', $application));
         $detailResponse->assertOk()
-            ->assertSee(route('petugas.permohonan.formulir', $application));
+            ->assertSee(route('petugas.permohonan.formulir', $application))
+            ->assertSee('dashboard-page')
+            ->assertSee('<details class="service-menu" open>', false)
+            ->assertSee('Daftar Permohonan');
 
         // Test PDF streaming if DomPDF installed, otherwise renders printable view
         $pdfResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.formulir', [$application, 'pdf' => 1]));
