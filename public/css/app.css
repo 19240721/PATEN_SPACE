@@ -54,6 +54,9 @@ button, input, select, textarea { font: inherit; }
     display: flex;
     flex-direction: column;
     padding: 20px 18px 18px;
+    position: relative;
+    transition: width 0.3s cubic-bezier(.4,0,.2,1), padding 0.3s cubic-bezier(.4,0,.2,1);
+    overflow: hidden;
 }
 
 .dark-sidebar {
@@ -135,7 +138,11 @@ button, input, select, textarea { font: inherit; }
 .sidebar.collapsed .nav-group-label,
 .sidebar.collapsed .nav-item,
 .sidebar.collapsed .sidebar-button,
-.sidebar.collapsed .filter-bar {
+.sidebar.collapsed .filter-bar,
+.sidebar.collapsed .sidebar-profile,
+.sidebar.collapsed .service-menu,
+.sidebar.collapsed .logout-btn,
+.sidebar.collapsed > form {
     display: none;
 }
 
@@ -145,6 +152,12 @@ button, input, select, textarea { font: inherit; }
 
 .sidebar.collapsed .sidebar-nav {
     margin-top: 0;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+    right: 50%;
+    transform: translateX(50%);
+    top: 18px;
 }
 
 .sidebar-toggle[aria-expanded="false"] span:nth-child(1) {

@@ -13,5 +13,24 @@
     </head>
     <body>
         @yield('content')
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (!sidebar) return;
+            if (localStorage.getItem('sidebar-collapsed') === '1') {
+                sidebar.classList.add('collapsed');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+            }
+            if (toggle) {
+                toggle.addEventListener('click', function () {
+                    const isCollapsed = sidebar.classList.toggle('collapsed');
+                    toggle.setAttribute('aria-expanded', String(!isCollapsed));
+                    localStorage.setItem('sidebar-collapsed', isCollapsed ? '1' : '0');
+                });
+            }
+        });
+        </script>
     </body>
 </html>

@@ -201,15 +201,6 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.querySelector('.sidebar');
-            const toggle = document.querySelector('.sidebar-toggle');
-            if (!sidebar || !toggle) return;
-            toggle.addEventListener('click', function () {
-                const isCollapsed = sidebar.classList.toggle('collapsed');
-                toggle.setAttribute('aria-expanded', String(!isCollapsed));
-            });
-        });
     </script>
 </div>
 @endsection

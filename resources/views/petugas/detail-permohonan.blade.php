@@ -5,6 +5,9 @@
 @section('content')
 <div class="app-shell dashboard-page">
     <aside class="sidebar dark-sidebar">
+        <button class="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar" aria-expanded="true">
+            <span></span><span></span><span></span>
+        </button>
         <a href="{{ route('dashboard') }}" class="brand-wrap">
             <img src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang" class="brand-mark">
             <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
