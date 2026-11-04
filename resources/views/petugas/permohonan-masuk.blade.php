@@ -212,95 +212,87 @@
             </section>
 
             {{-- Tabel Permohonan --}}
-            <section class="dashboard-panel" style="overflow: hidden;">
-                <div class="panel-heading" style="padding: 20px 24px; margin-bottom: 0; border-bottom: 1px solid #f0ede4; display: flex; align-items: center; justify-content: space-between;">
+            <section class="dashboard-panel request-table-panel">
+                <div class="panel-heading request-table-heading">
                     <div>
-                        <h2 style="margin: 0; font-size: 1.15rem; color: #17334c;">
-                            Daftar Permohonan
-                            @if(request('status'))
-                                <span style="font-size: 0.85rem; font-weight: 600; color: #796743;">• Status: {{ request('status') }}</span>
-                            @endif
-                        </h2>
-                        <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">Menampilkan data permohonan terkini</p>
+                            <h2>
+                                Daftar Permohonan
+                                @if(request('status'))
+                                    <span class="request-status-filter">• Status: {{ request('status') }}</span>
+                                @endif
+                            </h2>
+                            <p>Menampilkan data permohonan terkini</p>
                     </div>
-                    <span style="background: #f5f2eb; color: #5b4b2d; font-size: 12.5px; font-weight: 700; padding: 5px 12px; border-radius: 999px; border: 1px solid #e1d8c2;">
-                        {{ $pendaftarans->count() }} Permohonan
-                    </span>
+                    <span class="request-count">{{ $pendaftarans->count() }} permohonan</span>
                 </div>
 
                 <div class="table-scroll">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid #e3ebf2;">
-                                <th style="width: 48px; text-align: center;">No</th>
-                                <th>Nama Pemohon</th>
-                                <th>NIK</th>
-                                <th>Jenis Layanan</th>
-                                <th>Sumber</th>
-                                <th>Tanggal Daftar</th>
-                                <th>Status</th>
-                                <th style="text-align: right; padding-right: 24px;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <table class="request-table">
+                            <thead>
+                                <tr>
+                                    <th class="request-number">No</th>
+                                    <th>Nama Pemohon</th>
+                                    <th>NIK</th>
+                                    <th>Jenis Layanan</th>
+                                    <th>Sumber</th>
+                                    <th>Tanggal Daftar</th>
+                                    <th>Status</th>
+                                    <th class="request-actions-heading">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                             @forelse ($pendaftarans as $index => $item)
-                                <tr style="border-bottom: 1px solid #f3f0e8; {{ ($item->status === 'Baru' && request('status') === 'Baru') ? 'background: #fffdf5;' : '' }}">
-                                    <td style="text-align: center; color: #8898aa; font-weight: 600;">{{ $index + 1 }}</td>
-                                    <td class="person-name" style="font-weight: 700; color: #17334c;">
-                                        {{ $item->nama_lengkap }}
-                                    </td>
-                                    <td style="color: #475569; font-family: monospace; font-size: 0.84rem;">
-                                        {{ $item->nik }}
-                                    </td>
-                                    <td>
-                                        <span style="font-weight: 600; color: #263f55;">{{ $item->jenis_layanan }}</span>
-                                    </td>
-                                    <td>
-                                        @if(($item->intake_source ?? '') === 'masyarakat')
-                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700;">
-                                                <span>📱</span> Warga (Online)
-                                            </span>
-                                        @else
-                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #f5f2eb; color: #5b4b2d; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700;">
-                                                <span>🏛️</span> Loket (Petugas)
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td style="color: #64748b; font-size: 0.82rem;">
-                                        {{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d-m-Y') }}
-                                    </td>
-                                    <td>
+                                    <tr class="{{ $item->status === 'Baru' && request('status') === 'Baru' ? 'is-new-request' : '' }}">
+                                        <td class="request-number">{{ $index + 1 }}</td>
+                                        <td class="request-person">
+                                            {{ $item->nama_lengkap }}
+                                        </td>
+                                        <td class="request-nik">
+                                            {{ $item->nik }}
+                                        </td>
+                                        <td>
+                                            <span class="request-service">{{ $item->jenis_layanan }}</span>
+                                        </td>
+                                        <td>
+                                            @if(($item->intake_source ?? '') === 'masyarakat')
+                                                <span class="request-source online">Warga (Online)</span>
+                                            @else
+                                                <span class="request-source counter">Loket (Petugas)</span>
+                                            @endif
+                                        </td>
+                                        <td class="request-date">
+                                            {{ \Illuminate\Support\Facades\Date::parse($item->tanggal_daftar)->format('d-m-Y') }}
+                                        </td>
+                                        <td>
                                         @php $status = $item->status ?? 'Baru'; @endphp
                                         @if($status === 'Selesai')
                                             <span class="status-pill selesai">{{ $status }}</span>
                                         @elseif($status === 'Proses')
                                             <span class="status-pill proses">{{ $status }}</span>
                                         @elseif($status === 'Ditolak')
-                                            <span class="status-pill" style="background: #fee2e2; color: #991b1b;">{{ $status }}</span>
+                                            <span class="status-pill ditolak">{{ $status }}</span>
                                         @else
-                                            <span class="status-pill" style="background: #e8e2d2; color: #5b4b2d;">{{ $status }}</span>
+                                            <span class="status-pill baru">{{ $status }}</span>
                                         @endif
                                     </td>
-                                    <td style="text-align: right; padding-right: 24px;">
-                                        <div style="display: inline-flex; gap: 8px; align-items: center;">
+                                    <td class="request-actions-cell">
+                                        <div class="request-actions">
                                             <a href="{{ route('petugas.permohonan.show', $item) }}"
-                                               style="display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #796743; color: #fff; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700; transition: background .15s ease;">
-                                                <span>👁️</span> Detail & Status
+                                               class="request-action detail">Detail &amp; Status
                                             </a>
                                             <a href="{{ route('petugas.permohonan.formulir', $item) }}" target="_blank"
-                                               style="display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #b45309; color: #fff; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;"
+                                               class="request-action print"
                                                title="Cetak formulir resmi">
-                                                <span>🖨️</span> Cetak Formulir
+                                                Cetak Formulir
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" style="text-align: center; color: #8898aa; padding: 48px 24px;">
-                                        <div style="font-size: 2.2rem; margin-bottom: 8px;">📂</div>
-                                        <div style="font-size: 1rem; font-weight: 700; color: #17334c; margin-bottom: 4px;">Tidak Ada Permohonan Ditemukan</div>
-                                        <div style="font-size: 0.85rem; color: #718198;">Silakan sesuaikan filter pencarian atau tunggu pengajuan berikutnya.</div>
+                                    <td colspan="8" class="request-empty">
+                                        <strong>Tidak Ada Permohonan Ditemukan</strong>
+                                        <small>Silakan sesuaikan filter pencarian atau tunggu pengajuan berikutnya.</small>
                                     </td>
                                 </tr>
                             @endforelse

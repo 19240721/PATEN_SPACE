@@ -963,6 +963,99 @@ tr:last-child td { border-bottom: none; }
 .report-filter-button { height: 42px; padding: 0 15px; border: 0; border-radius: 6px; background: #0870c9; color: #fff; font-size: .8rem; font-weight: 700; cursor: pointer; }
 .report-reset { color: #5c7188; font-size: .8rem; text-decoration: none; }
 .report-table { min-width: 900px; }
+.request-table-panel { overflow: hidden; }
+.request-table-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 0;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e8edf2;
+}
+.request-table-heading h2 { margin: 0; color: #18344f; font-size: 1rem; }
+.request-table-heading p { margin: 4px 0 0; color: #7a8a9b; font-size: .78rem; }
+.request-status-filter { color: #6a7886; font-size: .78rem; font-weight: 600; }
+.request-count {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f1f5f8;
+    color: #526579;
+    font-size: .72rem;
+    font-weight: 700;
+}
+.request-table { min-width: 1180px; }
+.dashboard-page .request-table th {
+    padding: 12px;
+    background: #f5f8fa;
+    color: #607286;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+.dashboard-page .request-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #edf1f4;
+    color: #43566a;
+    font-size: .79rem;
+    vertical-align: middle;
+}
+.dashboard-page .request-table tbody tr:last-child td { border-bottom: 0; }
+.dashboard-page .request-table tbody tr:hover { background: #f8fafb; }
+.dashboard-page .request-table tbody tr.is-new-request { background: #fffdf6; }
+.dashboard-page .request-table tbody tr.is-new-request:hover { background: #fbf8ed; }
+.request-table .request-number { width: 48px; color: #8795a3; text-align: center; }
+.request-table .request-person { min-width: 140px; color: #203b54; font-weight: 700; }
+.request-table .request-nik { color: #56697c; font-family: Consolas, monospace; font-size: .76rem; white-space: nowrap; }
+.request-service { color: #314b63; font-weight: 600; }
+.request-date { color: #718196 !important; white-space: nowrap; }
+.request-source {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 7px;
+    font-size: .69rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.request-source.online { background: #edf6fb; color: #28678a; }
+.request-source.counter { background: #f3f2ef; color: #6c6048; }
+.status-pill.baru { background: #f2efe7; color: #746748; }
+.status-pill.ditolak { background: #fff0ef; color: #a14842; }
+.request-table .request-actions-heading,
+.request-table .request-actions-cell { text-align: center; }
+.request-actions { display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+.request-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-size: .69rem;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+.request-action.detail { background: #edf3f7; color: #31536d; }
+.request-action.detail:hover { background: #e2ebf1; }
+.request-action.print { background: #f6f2e9; color: #776443; }
+.request-action.print:hover { background: #eee7d8; }
+.request-action:focus-visible { outline: 2px solid #3676a0; outline-offset: 2px; }
+.request-empty {
+    padding: 40px 24px !important;
+    color: #718196 !important;
+    text-align: center;
+}
+.request-empty > * { display: block; }
+.request-empty strong { margin-bottom: 4px; color: #29445d; font-size: .92rem; }
+.request-empty small { font-size: .78rem; }
 .form-page-shell .sidebar { background: linear-gradient(180deg, rgba(255,255,255,.24) 0, rgba(255,255,255,.68) 145px, #f6f5ef 235px), url('/image/kantor-kecamatan.jpg') center top / 100% auto no-repeat; background-color: #f6f5ef; color: #1d354b; }
 .form-page-shell .brand-title { color: #17334c; }
 .form-page-shell .brand-sub { color: #3e586d; opacity: 1; }
