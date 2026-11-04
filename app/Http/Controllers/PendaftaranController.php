@@ -213,12 +213,24 @@ class PendaftaranController extends Controller
             'jenis_kelamin_kk' => ['nullable', 'string', 'max:10'],
             'nik_anak' => ['nullable', 'string', 'max:30'],
             'keterangan_kk' => ['nullable', 'string', 'max:255'],
+            'anggota_kk' => ['nullable', 'array'],
+            'anggota_kk.*.nama' => ['nullable', 'string', 'max:255'],
+            'anggota_kk.*.nik' => ['nullable', 'string', 'max:20'],
+            'anggota_kk.*.shdk' => ['nullable', 'string', 'max:100'],
             'nama_alm' => ['nullable', 'string', 'max:255'],
             'nama_ayah' => ['nullable', 'string', 'max:255'],
             'nama_ibu' => ['nullable', 'string', 'max:255'],
             'tempat_meninggal' => ['nullable', 'string', 'max:255'],
             'tanggal_meninggal' => ['nullable', 'date'],
             'keterangan_kematian' => ['nullable', 'string', 'max:255'],
+            'nik_pelapor' => ['nullable', 'string', 'max:30'],
+            'nama_pelapor' => ['nullable', 'string', 'max:255'],
+            'nik_ayah' => ['nullable', 'string', 'max:30'],
+            'nik_ibu' => ['nullable', 'string', 'max:30'],
+            'nik_saksi1' => ['nullable', 'string', 'max:30'],
+            'nama_saksi1' => ['nullable', 'string', 'max:255'],
+            'nik_saksi2' => ['nullable', 'string', 'max:30'],
+            'nama_saksi2' => ['nullable', 'string', 'max:255'],
             'nama_anak_lahir' => ['nullable', 'string', 'max:255'],
             'nama_ayah_lahir' => ['nullable', 'string', 'max:255'],
             'nama_ibu_lahir' => ['nullable', 'string', 'max:255'],
@@ -270,6 +282,18 @@ class PendaftaranController extends Controller
         }
 
         unset($validated['documents']);
+
+        // Filter baris kosong anggota_kk
+        if (isset($validated['anggota_kk'])) {
+            $validated['anggota_kk'] = array_values(array_filter(
+                $validated['anggota_kk'],
+                fn($r) => !empty($r['nama']) || !empty($r['nik'])
+            ));
+            if (empty($validated['anggota_kk'])) {
+                unset($validated['anggota_kk']);
+            }
+        }
+
         $pendaftaran = Pendaftaran::create($validated);
 
         $documents = $this->storeDocuments($request, $pendaftaran);
@@ -566,12 +590,24 @@ class PendaftaranController extends Controller
             'jenis_kelamin_kk' => ['nullable', 'string', 'max:10'],
             'nik_anak' => ['nullable', 'string', 'max:30'],
             'keterangan_kk' => ['nullable', 'string', 'max:255'],
+            'anggota_kk' => ['nullable', 'array'],
+            'anggota_kk.*.nama' => ['nullable', 'string', 'max:255'],
+            'anggota_kk.*.nik' => ['nullable', 'string', 'max:20'],
+            'anggota_kk.*.shdk' => ['nullable', 'string', 'max:100'],
             'nama_alm' => ['nullable', 'string', 'max:255'],
             'nama_ayah' => ['nullable', 'string', 'max:255'],
             'nama_ibu' => ['nullable', 'string', 'max:255'],
             'tempat_meninggal' => ['nullable', 'string', 'max:255'],
             'tanggal_meninggal' => ['nullable', 'date'],
             'keterangan_kematian' => ['nullable', 'string', 'max:255'],
+            'nik_pelapor' => ['nullable', 'string', 'max:30'],
+            'nama_pelapor' => ['nullable', 'string', 'max:255'],
+            'nik_ayah' => ['nullable', 'string', 'max:30'],
+            'nik_ibu' => ['nullable', 'string', 'max:30'],
+            'nik_saksi1' => ['nullable', 'string', 'max:30'],
+            'nama_saksi1' => ['nullable', 'string', 'max:255'],
+            'nik_saksi2' => ['nullable', 'string', 'max:30'],
+            'nama_saksi2' => ['nullable', 'string', 'max:255'],
             'nama_anak_lahir' => ['nullable', 'string', 'max:255'],
             'nama_ayah_lahir' => ['nullable', 'string', 'max:255'],
             'nama_ibu_lahir' => ['nullable', 'string', 'max:255'],
@@ -612,6 +648,18 @@ class PendaftaranController extends Controller
             ]);
             $validated['alamat'] = !empty($parts) ? implode(', ', $parts) : ($pendaftaran->alamat ?? '-');
         }
+
+        // Filter baris kosong anggota_kk
+        if (isset($validated['anggota_kk'])) {
+            $validated['anggota_kk'] = array_values(array_filter(
+                $validated['anggota_kk'],
+                fn($r) => !empty($r['nama']) || !empty($r['nik'])
+            ));
+            if (empty($validated['anggota_kk'])) {
+                $validated['anggota_kk'] = null;
+            }
+        }
+
         $pendaftaran->update($validated);
 
         return redirect()

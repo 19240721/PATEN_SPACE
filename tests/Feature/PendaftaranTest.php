@@ -341,4 +341,84 @@ class PendaftaranTest extends TestCase
             'id' => $pendaftaran->id,
         ]);
     }
+
+    public function test_register_akta_kelahiran_with_parents_reporter_and_witnesses(): void
+    {
+        $response = $this->post('/pendaftaran', [
+            'nama_lengkap' => 'Ahmad Fauzi',
+            'nik' => '3215000000000011',
+            'tempat_lahir' => 'Karawang',
+            'tanggal_lahir' => '2026-01-01',
+            'alamat' => 'Desa Balonggandu RT 01 RW 02',
+            'jenis_layanan' => 'Akta Lahir',
+            'tanggal_daftar' => '2026-11-04',
+            'nama_anak_lahir' => 'Bayi Ahmad',
+            'nama_ayah_lahir' => 'Fauzi Rohman',
+            'nik_ayah' => '3215000000000012',
+            'nama_ibu_lahir' => 'Siti Aisyah',
+            'nik_ibu' => '3215000000000013',
+            'nama_pelapor' => 'Fauzi Rohman',
+            'nik_pelapor' => '3215000000000012',
+            'nama_saksi1' => 'Budi Utomo',
+            'nik_saksi1' => '3215000000000014',
+            'nama_saksi2' => 'Joko Susilo',
+            'nik_saksi2' => '3215000000000015',
+        ]);
+
+        $response->assertRedirect(route('pendaftaran.success'));
+        $this->assertDatabaseHas('pendaftarans', [
+            'nik' => '3215000000000011',
+            'nama_anak_lahir' => 'Bayi Ahmad',
+            'nik_ayah' => '3215000000000012',
+            'nama_ayah_lahir' => 'Fauzi Rohman',
+            'nik_ibu' => '3215000000000013',
+            'nama_ibu_lahir' => 'Siti Aisyah',
+            'nama_pelapor' => 'Fauzi Rohman',
+            'nik_pelapor' => '3215000000000012',
+            'nama_saksi1' => 'Budi Utomo',
+            'nik_saksi1' => '3215000000000014',
+            'nama_saksi2' => 'Joko Susilo',
+            'nik_saksi2' => '3215000000000015',
+        ]);
+    }
+
+    public function test_register_akta_kematian_with_parents_reporter_and_witnesses(): void
+    {
+        $response = $this->post('/pendaftaran', [
+            'nama_lengkap' => 'Warga Pelapor',
+            'nik' => '3215000000000021',
+            'tempat_lahir' => 'Karawang',
+            'tanggal_lahir' => '1980-01-01',
+            'alamat' => 'Desa Jatisari RT 03 RW 01',
+            'jenis_layanan' => 'Akta Kematian',
+            'tanggal_daftar' => '2026-11-04',
+            'nama_alm' => 'Alm. Sukardi',
+            'nama_ayah' => 'Ayah Alm',
+            'nik_ayah' => '3215000000000022',
+            'nama_ibu' => 'Ibu Alm',
+            'nik_ibu' => '3215000000000023',
+            'nama_pelapor' => 'Warga Pelapor',
+            'nik_pelapor' => '3215000000000021',
+            'nama_saksi1' => 'Saksi Pertama',
+            'nik_saksi1' => '3215000000000024',
+            'nama_saksi2' => 'Saksi Kedua',
+            'nik_saksi2' => '3215000000000025',
+        ]);
+
+        $response->assertRedirect(route('pendaftaran.success'));
+        $this->assertDatabaseHas('pendaftarans', [
+            'nik' => '3215000000000021',
+            'nama_alm' => 'Alm. Sukardi',
+            'nama_ayah' => 'Ayah Alm',
+            'nik_ayah' => '3215000000000022',
+            'nama_ibu' => 'Ibu Alm',
+            'nik_ibu' => '3215000000000023',
+            'nama_pelapor' => 'Warga Pelapor',
+            'nik_pelapor' => '3215000000000021',
+            'nama_saksi1' => 'Saksi Pertama',
+            'nik_saksi1' => '3215000000000024',
+            'nama_saksi2' => 'Saksi Kedua',
+            'nik_saksi2' => '3215000000000025',
+        ]);
+    }
 }

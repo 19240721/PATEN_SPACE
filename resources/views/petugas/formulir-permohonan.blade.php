@@ -546,6 +546,34 @@
         </tr>
         @endif
 
+        @if($pendaftaran->jenis_layanan === 'KK' && !empty($pendaftaran->anggota_kk))
+        <tr>
+            <td colspan="4" style="padding-top: 12px;">
+                <strong style="display:block; margin-bottom: 6px;">Daftar Anggota Keluarga</strong>
+                <table style="width:100%; border-collapse:collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background:#f5f2eb;">
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:center; width:30px;">No</th>
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:left;">Nama Lengkap</th>
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:left;">NIK</th>
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:left;">SHDK</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendaftaran->anggota_kk as $i => $anggota)
+                        <tr>
+                            <td style="border:1px solid #ccc; padding:4px 6px; text-align:center;">{{ $i + 1 }}</td>
+                            <td style="border:1px solid #ccc; padding:4px 6px;">{{ $anggota['nama'] ?? '-' }}</td>
+                            <td style="border:1px solid #ccc; padding:4px 6px;">{{ $anggota['nik'] ?? '-' }}</td>
+                            <td style="border:1px solid #ccc; padding:4px 6px;">{{ $anggota['shdk'] ?? '-' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        @endif
+
         @if($pendaftaran->nama_anak_lahir || $pendaftaran->nama_anak)
         <tr>
             <td class="col-num">&bull;</td>
@@ -578,7 +606,7 @@
             <td class="col-num">&bull;</td>
             <td class="col-label">Nama Ayah</td>
             <td class="col-sep">:</td>
-            <td class="col-val">{{ $pendaftaran->nama_ayah_lahir ?? $pendaftaran->nama_ayah }}</td>
+            <td class="col-val">{{ $pendaftaran->nama_ayah_lahir ?? $pendaftaran->nama_ayah }}{{ $pendaftaran->nik_ayah ? ' (NIK: '.$pendaftaran->nik_ayah.')' : '' }}</td>
         </tr>
         @endif
 
@@ -587,7 +615,34 @@
             <td class="col-num">&bull;</td>
             <td class="col-label">Nama Ibu</td>
             <td class="col-sep">:</td>
-            <td class="col-val">{{ $pendaftaran->nama_ibu_lahir ?? $pendaftaran->nama_ibu }}</td>
+            <td class="col-val">{{ $pendaftaran->nama_ibu_lahir ?? $pendaftaran->nama_ibu }}{{ $pendaftaran->nik_ibu ? ' (NIK: '.$pendaftaran->nik_ibu.')' : '' }}</td>
+        </tr>
+        @endif
+
+        @if($pendaftaran->nama_pelapor || $pendaftaran->nik_pelapor)
+        <tr>
+            <td class="col-num">&bull;</td>
+            <td class="col-label">Identitas Pelapor</td>
+            <td class="col-sep">:</td>
+            <td class="col-val">{{ $pendaftaran->nama_pelapor ?? '-' }}{{ $pendaftaran->nik_pelapor ? ' (NIK: '.$pendaftaran->nik_pelapor.')' : '' }}</td>
+        </tr>
+        @endif
+
+        @if($pendaftaran->nama_saksi1 || $pendaftaran->nik_saksi1)
+        <tr>
+            <td class="col-num">&bull;</td>
+            <td class="col-label">Saksi I</td>
+            <td class="col-sep">:</td>
+            <td class="col-val">{{ $pendaftaran->nama_saksi1 ?? '-' }}{{ $pendaftaran->nik_saksi1 ? ' (NIK: '.$pendaftaran->nik_saksi1.')' : '' }}</td>
+        </tr>
+        @endif
+
+        @if($pendaftaran->nama_saksi2 || $pendaftaran->nik_saksi2)
+        <tr>
+            <td class="col-num">&bull;</td>
+            <td class="col-label">Saksi II</td>
+            <td class="col-sep">:</td>
+            <td class="col-val">{{ $pendaftaran->nama_saksi2 ?? '-' }}{{ $pendaftaran->nik_saksi2 ? ' (NIK: '.$pendaftaran->nik_saksi2.')' : '' }}</td>
         </tr>
         @endif
 

@@ -43,12 +43,21 @@ class Pendaftaran extends Model
         'jenis_kelamin_kk',
         'nik_anak',
         'keterangan_kk',
+        'anggota_kk',
         'nama_alm',
         'nama_ayah',
         'nama_ibu',
         'tempat_meninggal',
         'tanggal_meninggal',
         'keterangan_kematian',
+        'nik_pelapor',
+        'nama_pelapor',
+        'nik_ayah',
+        'nik_ibu',
+        'nik_saksi1',
+        'nama_saksi1',
+        'nik_saksi2',
+        'nama_saksi2',
         'nama_anak_lahir',
         'nama_ayah_lahir',
         'nama_ibu_lahir',
@@ -80,6 +89,7 @@ class Pendaftaran extends Model
     {
         return [
             'documents' => 'array',
+            'anggota_kk' => 'array',
             'tanggal_daftar' => 'date',
         ];
     }

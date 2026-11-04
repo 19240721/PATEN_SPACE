@@ -1037,6 +1037,49 @@
                             <label class="mob-label">Keterangan</label>
                             <textarea class="mob-textarea" name="keterangan_kk" rows="2" placeholder="Keterangan permohonan KK">{{ old('keterangan_kk') }}</textarea>
                         </div>
+
+                        {{-- Daftar Anggota Keluarga --}}
+                        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
+                            <div class="mob-card-head" style="margin-bottom:10px;">Daftar Anggota Keluarga</div>
+                            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                                <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:420px;">
+                                    <thead>
+                                        <tr style="background:#f5f2eb;">
+                                            <th style="width:36px;padding:7px 8px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">No</th>
+                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Nama</th>
+                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">NIK</th>
+                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">SHDK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for($i = 0; $i < 7; $i++)
+                                        <tr>
+                                            <td style="padding:3px 6px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;font-size:12px;">{{ $i + 1 }}</td>
+                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
+                                                <input type="text" name="anggota_kk[{{ $i }}][nama]"
+                                                       value="{{ old('anggota_kk.'.$i.'.nama') }}"
+                                                       placeholder="Nama"
+                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
+                                            </td>
+                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
+                                                <input type="text" name="anggota_kk[{{ $i }}][nik]"
+                                                       value="{{ old('anggota_kk.'.$i.'.nik') }}"
+                                                       placeholder="NIK" maxlength="16" inputmode="numeric"
+                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
+                                            </td>
+                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
+                                                <input type="text" name="anggota_kk[{{ $i }}][shdk]"
+                                                       value="{{ old('anggota_kk.'.$i.'.shdk') }}"
+                                                       placeholder="Hub. Keluarga"
+                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
+                                            </td>
+                                        </tr>
+                                        @endfor
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi nama, NIK, dan hubungan dalam keluarga</p>
+                        </div>
                     </div>
                 </div>
 
@@ -1047,16 +1090,6 @@
                         <div class="mob-field">
                             <label class="mob-label">Nama Anak</label>
                             <input class="mob-input" name="nama_anak_lahir" type="text" placeholder="Nama lengkap anak" value="{{ old('nama_anak_lahir') }}">
-                        </div>
-                        <div class="mob-grid-2">
-                            <div class="mob-field">
-                                <label class="mob-label">Nama Ayah</label>
-                                <input class="mob-input" name="nama_ayah_lahir" type="text" placeholder="Nama ayah" value="{{ old('nama_ayah_lahir') }}">
-                            </div>
-                            <div class="mob-field">
-                                <label class="mob-label">Nama Ibu</label>
-                                <input class="mob-input" name="nama_ibu_lahir" type="text" placeholder="Nama ibu" value="{{ old('nama_ibu_lahir') }}">
-                            </div>
                         </div>
                         <div class="mob-grid-2">
                             <div class="mob-field">
@@ -1072,6 +1105,65 @@
                             <label class="mob-label">Tempat Lahir Detail</label>
                             <input class="mob-input" name="tempat_lahir_detail" type="text" placeholder="Klinik / RS / Bidan" value="{{ old('tempat_lahir_detail') }}">
                         </div>
+
+                        {{-- Identitas Orang Tua --}}
+                        <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Orang Tua</div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Ayah</label>
+                                <input class="mob-input" name="nama_ayah_lahir" type="text" placeholder="Nama ayah" value="{{ old('nama_ayah_lahir') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Ayah</label>
+                                <input class="mob-input" name="nik_ayah" type="text" placeholder="16 digit NIK ayah" maxlength="16" inputmode="numeric" value="{{ old('nik_ayah') }}">
+                            </div>
+                        </div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Ibu</label>
+                                <input class="mob-input" name="nama_ibu_lahir" type="text" placeholder="Nama ibu" value="{{ old('nama_ibu_lahir') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Ibu</label>
+                                <input class="mob-input" name="nik_ibu" type="text" placeholder="16 digit NIK ibu" maxlength="16" inputmode="numeric" value="{{ old('nik_ibu') }}">
+                            </div>
+                        </div>
+
+                        {{-- Identitas Pelapor --}}
+                        <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Pelapor</div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Pelapor</label>
+                                <input class="mob-input" name="nama_pelapor" type="text" placeholder="Nama lengkap pelapor" value="{{ old('nama_pelapor') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Pelapor</label>
+                                <input class="mob-input" name="nik_pelapor" type="text" placeholder="16 digit NIK pelapor" maxlength="16" inputmode="numeric" value="{{ old('nik_pelapor') }}">
+                            </div>
+                        </div>
+
+                        {{-- Identitas Saksi (2 Orang) --}}
+                        <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Saksi (2 Orang)</div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Saksi I</label>
+                                <input class="mob-input" name="nama_saksi1" type="text" placeholder="Nama saksi 1" value="{{ old('nama_saksi1') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Saksi I</label>
+                                <input class="mob-input" name="nik_saksi1" type="text" placeholder="16 digit NIK saksi 1" maxlength="16" inputmode="numeric" value="{{ old('nik_saksi1') }}">
+                            </div>
+                        </div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Saksi II</label>
+                                <input class="mob-input" name="nama_saksi2" type="text" placeholder="Nama saksi 2" value="{{ old('nama_saksi2') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Saksi II</label>
+                                <input class="mob-input" name="nik_saksi2" type="text" placeholder="16 digit NIK saksi 2" maxlength="16" inputmode="numeric" value="{{ old('nik_saksi2') }}">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1082,16 +1174,6 @@
                         <div class="mob-field">
                             <label class="mob-label">Nama Almarhum/ah</label>
                             <input class="mob-input" name="nama_alm" type="text" placeholder="Nama lengkap" value="{{ old('nama_alm') }}">
-                        </div>
-                        <div class="mob-grid-2">
-                            <div class="mob-field">
-                                <label class="mob-label">Nama Ayah</label>
-                                <input class="mob-input" name="nama_ayah" type="text" placeholder="Nama ayah" value="{{ old('nama_ayah') }}">
-                            </div>
-                            <div class="mob-field">
-                                <label class="mob-label">Nama Ibu</label>
-                                <input class="mob-input" name="nama_ibu" type="text" placeholder="Nama ibu" value="{{ old('nama_ibu') }}">
-                            </div>
                         </div>
                         <div class="mob-field">
                             <label class="mob-label">Tempat Meninggal</label>
@@ -1104,6 +1186,65 @@
                         <div class="mob-field">
                             <label class="mob-label">Keterangan</label>
                             <textarea class="mob-textarea" name="keterangan_kematian" rows="2" placeholder="Penyebab / keterangan">{{ old('keterangan_kematian') }}</textarea>
+                        </div>
+
+                        {{-- Identitas Kedua Orang Tua --}}
+                        <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Kedua Orang Tua</div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Ayah</label>
+                                <input class="mob-input" name="nama_ayah" type="text" placeholder="Nama ayah" value="{{ old('nama_ayah') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Ayah</label>
+                                <input class="mob-input" name="nik_ayah" type="text" placeholder="16 digit NIK ayah" maxlength="16" inputmode="numeric" value="{{ old('nik_ayah') }}">
+                            </div>
+                        </div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Ibu</label>
+                                <input class="mob-input" name="nama_ibu" type="text" placeholder="Nama ibu" value="{{ old('nama_ibu') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Ibu</label>
+                                <input class="mob-input" name="nik_ibu" type="text" placeholder="16 digit NIK ibu" maxlength="16" inputmode="numeric" value="{{ old('nik_ibu') }}">
+                            </div>
+                        </div>
+
+                        {{-- Identitas Pelapor --}}
+                        <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Pelapor</div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Pelapor</label>
+                                <input class="mob-input" name="nama_pelapor" type="text" placeholder="Nama lengkap pelapor" value="{{ old('nama_pelapor') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Pelapor</label>
+                                <input class="mob-input" name="nik_pelapor" type="text" placeholder="16 digit NIK pelapor" maxlength="16" inputmode="numeric" value="{{ old('nik_pelapor') }}">
+                            </div>
+                        </div>
+
+                        {{-- Identitas Saksi (2 Orang) --}}
+                        <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Saksi (2 Orang)</div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Saksi I</label>
+                                <input class="mob-input" name="nama_saksi1" type="text" placeholder="Nama saksi 1" value="{{ old('nama_saksi1') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Saksi I</label>
+                                <input class="mob-input" name="nik_saksi1" type="text" placeholder="16 digit NIK saksi 1" maxlength="16" inputmode="numeric" value="{{ old('nik_saksi1') }}">
+                            </div>
+                        </div>
+                        <div class="mob-grid-2">
+                            <div class="mob-field">
+                                <label class="mob-label">Nama Saksi II</label>
+                                <input class="mob-input" name="nama_saksi2" type="text" placeholder="Nama saksi 2" value="{{ old('nama_saksi2') }}">
+                            </div>
+                            <div class="mob-field">
+                                <label class="mob-label">NIK Saksi II</label>
+                                <input class="mob-input" name="nik_saksi2" type="text" placeholder="16 digit NIK saksi 2" maxlength="16" inputmode="numeric" value="{{ old('nik_saksi2') }}">
+                            </div>
                         </div>
                     </div>
                 </div>

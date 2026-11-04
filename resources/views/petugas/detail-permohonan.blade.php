@@ -246,13 +246,21 @@
                                 'Keterangan KK'   => $pendaftaran->keterangan_kk,
                                 'Nama Almarhum'   => $pendaftaran->nama_alm,
                                 'Nama Ayah'       => $pendaftaran->nama_ayah,
+                                'NIK Ayah'        => $pendaftaran->nik_ayah,
                                 'Nama Ibu'        => $pendaftaran->nama_ibu,
+                                'NIK Ibu'         => $pendaftaran->nik_ibu,
                                 'Tempat Meninggal'=> $pendaftaran->tempat_meninggal,
                                 'Tgl Meninggal'   => $pendaftaran->tanggal_meninggal ? \Illuminate\Support\Facades\Date::parse($pendaftaran->tanggal_meninggal)->format('d-m-Y') : null,
                                 'Keterangan Kematian' => $pendaftaran->keterangan_kematian,
                                 'Nama Anak Lahir' => $pendaftaran->nama_anak_lahir,
                                 'Nama Ayah Lahir' => $pendaftaran->nama_ayah_lahir,
                                 'Nama Ibu Lahir'  => $pendaftaran->nama_ibu_lahir,
+                                'Nama Pelapor'    => $pendaftaran->nama_pelapor,
+                                'NIK Pelapor'     => $pendaftaran->nik_pelapor,
+                                'Nama Saksi 1'    => $pendaftaran->nama_saksi1,
+                                'NIK Saksi 1'     => $pendaftaran->nik_saksi1,
+                                'Nama Saksi 2'    => $pendaftaran->nama_saksi2,
+                                'NIK Saksi 2'     => $pendaftaran->nik_saksi2,
                                 'Berat Badan'     => $pendaftaran->berat_badan,
                                 'Panjang Badan'   => $pendaftaran->panjang_badan,
                                 'Tempat Lahir Detail' => $pendaftaran->tempat_lahir_detail,
@@ -295,6 +303,41 @@
                             </table>
                         </div>
                     </section>
+
+                    {{-- Daftar Anggota Keluarga (Khusus KK) --}}
+                    @if($pendaftaran->jenis_layanan === 'KK' && !empty($pendaftaran->anggota_kk))
+                        <section class="dashboard-panel" style="padding: 24px;">
+                            <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.1rem;">👨‍👩‍👧‍👦</span>
+                                <div>
+                                    <h2 style="margin: 0; font-size: 1.1rem; color: #17334c;">Daftar Anggota Keluarga</h2>
+                                    <p style="margin: 2px 0 0; font-size: 0.8rem; color: #6b7c93;">{{ count($pendaftaran->anggota_kk) }} anggota tercatat</p>
+                                </div>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+                                    <thead>
+                                        <tr style="background: #f5f2eb;">
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: center; width: 44px;">No</th>
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: left;">Nama Lengkap</th>
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: left;">NIK</th>
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: left;">SHDK</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($pendaftaran->anggota_kk as $i => $anggota)
+                                        <tr style="border-bottom: 1px solid #f0ede4;">
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; text-align: center; color: #8898aa; font-weight: 600;">{{ $i + 1 }}</td>
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; font-weight: 600; color: #17334c;">{{ $anggota['nama'] ?? '-' }}</td>
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #2d3748; font-family: monospace;">{{ $anggota['nik'] ?? '-' }}</td>
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #2d3748;">{{ $anggota['shdk'] ?? '-' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    @endif
 
                     {{-- Alasan Penolakan (Jika ada) --}}
                     @if($pendaftaran->status === 'Ditolak' && $pendaftaran->alasan_penolakan)

@@ -280,6 +280,49 @@
                         <div class="field-group"><label>Desa</label><input type="text" name="desa" value="{{ old('desa', $pendaftaran->desa ?? '') }}" placeholder="Desa"></div>
                         <div class="field-group"><label>Alasan</label><input type="text" name="keterangan_kk" value="{{ old('keterangan_kk', $pendaftaran->keterangan_kk ?? '') }}" placeholder="Alasan"></div>
                     </div>
+
+                    {{-- Daftar Anggota Keluarga --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Daftar Anggota Keluarga</span>
+                        <div style="overflow-x:auto;">
+                            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                                <thead>
+                                    <tr style="background:#f5f2eb;">
+                                        <th style="width:40px;padding:8px 10px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;">No</th>
+                                        <th style="padding:8px 10px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;min-width:160px;">Nama Lengkap</th>
+                                        <th style="padding:8px 10px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;min-width:140px;">NIK</th>
+                                        <th style="padding:8px 10px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;min-width:180px;">SHDK</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for($i = 0; $i < 7; $i++)
+                                    <tr>
+                                        <td style="padding:4px 8px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;">{{ $i + 1 }}</td>
+                                        <td style="padding:3px 6px;border:1px solid #e1d8c2;">
+                                            <input type="text" name="anggota_kk[{{ $i }}][nama]"
+                                                   value="{{ old('anggota_kk.'.$i.'.nama', ($pendaftaran->anggota_kk[$i]['nama'] ?? '')) }}"
+                                                   placeholder="Nama anggota"
+                                                   style="width:100%;border:none;padding:5px 7px;font-size:13px;background:transparent;outline:none;color:#2d2416;">
+                                        </td>
+                                        <td style="padding:3px 6px;border:1px solid #e1d8c2;">
+                                            <input type="text" name="anggota_kk[{{ $i }}][nik]"
+                                                   value="{{ old('anggota_kk.'.$i.'.nik', ($pendaftaran->anggota_kk[$i]['nik'] ?? '')) }}"
+                                                   placeholder="16 digit NIK" maxlength="16" inputmode="numeric"
+                                                   style="width:100%;border:none;padding:5px 7px;font-size:13px;background:transparent;outline:none;color:#2d2416;">
+                                        </td>
+                                        <td style="padding:3px 6px;border:1px solid #e1d8c2;">
+                                            <input type="text" name="anggota_kk[{{ $i }}][shdk]"
+                                                   value="{{ old('anggota_kk.'.$i.'.shdk', ($pendaftaran->anggota_kk[$i]['shdk'] ?? '')) }}"
+                                                   placeholder="Kepala Keluarga / Istri / Anak / dll"
+                                                   style="width:100%;border:none;padding:5px 7px;font-size:13px;background:transparent;outline:none;color:#2d2416;">
+                                        </td>
+                                    </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
+                        <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi sesuai anggota keluarga yang akan dimasukkan ke KK</p>
+                    </div>
                 </div>
 
                 <div class="service-section" data-service="Akta Kematian" {{ $selectedService == 'Akta Kematian' ? '' : 'hidden' }}>
@@ -287,12 +330,41 @@
                         <div class="field-group"><label>Bulan</label><input type="text" name="bulan" value="{{ old('bulan', $pendaftaran->bulan ?? '') }}" placeholder="Contoh: JAN"></div>
                         <div class="field-group"><label>Minggu Ke</label><input type="text" name="minggu_ke" value="{{ old('minggu_ke', $pendaftaran->minggu_ke ?? '') }}" placeholder="Contoh: 1"></div>
                         <div class="field-group"><label>Nama Almarhum</label><input type="text" name="nama_alm" value="{{ old('nama_alm', $pendaftaran->nama_alm ?? '') }}" placeholder="Nama almarhum"></div>
-                        <div class="field-group"><label>Nama Ayah</label><input type="text" name="nama_ayah" value="{{ old('nama_ayah', $pendaftaran->nama_ayah ?? '') }}" placeholder="Nama ayah"></div>
-                        <div class="field-group"><label>Nama Ibu</label><input type="text" name="nama_ibu" value="{{ old('nama_ibu', $pendaftaran->nama_ibu ?? '') }}" placeholder="Nama ibu"></div>
                         <div class="field-group"><label>Tempat Meninggal</label><input type="text" name="tempat_meninggal" value="{{ old('tempat_meninggal', $pendaftaran->tempat_meninggal ?? '') }}" placeholder="Tempat meninggal"></div>
                         <div class="field-group"><label>Tanggal Meninggal</label><input type="date" name="tanggal_meninggal" value="{{ old('tanggal_meninggal', $pendaftaran->tanggal_meninggal ?? '') }}"></div>
                         <div class="field-group"><label>Alamat</label><input type="text" name="alamat" value="{{ old('alamat', $pendaftaran->alamat ?? '') }}" placeholder="Alamat lengkap"></div>
                         <div class="field-group"><label>Keterangan</label><input type="text" name="keterangan_kematian" value="{{ old('keterangan_kematian', $pendaftaran->keterangan_kematian ?? '') }}" placeholder="Keterangan"></div>
+                    </div>
+
+                    {{-- Identitas Kedua Orang Tua --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Kedua Orang Tua</span>
+                        <div class="form-grid compact-grid">
+                            <div class="field-group"><label>Nama Ayah</label><input type="text" name="nama_ayah" value="{{ old('nama_ayah', $pendaftaran->nama_ayah ?? '') }}" placeholder="Nama ayah"></div>
+                            <div class="field-group"><label>NIK Ayah</label><input type="text" name="nik_ayah" value="{{ old('nik_ayah', $pendaftaran->nik_ayah ?? '') }}" placeholder="16 digit NIK ayah" maxlength="16" inputmode="numeric"></div>
+                            <div class="field-group"><label>Nama Ibu</label><input type="text" name="nama_ibu" value="{{ old('nama_ibu', $pendaftaran->nama_ibu ?? '') }}" placeholder="Nama ibu"></div>
+                            <div class="field-group"><label>NIK Ibu</label><input type="text" name="nik_ibu" value="{{ old('nik_ibu', $pendaftaran->nik_ibu ?? '') }}" placeholder="16 digit NIK ibu" maxlength="16" inputmode="numeric"></div>
+                        </div>
+                    </div>
+
+                    {{-- Identitas Pelapor --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Pelapor</span>
+                        <div class="form-grid compact-grid">
+                            <div class="field-group"><label>Nama Pelapor</label><input type="text" name="nama_pelapor" value="{{ old('nama_pelapor', $pendaftaran->nama_pelapor ?? '') }}" placeholder="Nama lengkap pelapor"></div>
+                            <div class="field-group"><label>NIK Pelapor</label><input type="text" name="nik_pelapor" value="{{ old('nik_pelapor', $pendaftaran->nik_pelapor ?? '') }}" placeholder="16 digit NIK pelapor" maxlength="16" inputmode="numeric"></div>
+                        </div>
+                    </div>
+
+                    {{-- Identitas Saksi (2 Orang) --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Saksi (2 Orang)</span>
+                        <div class="form-grid compact-grid">
+                            <div class="field-group"><label>Nama Saksi I</label><input type="text" name="nama_saksi1" value="{{ old('nama_saksi1', $pendaftaran->nama_saksi1 ?? '') }}" placeholder="Nama saksi 1"></div>
+                            <div class="field-group"><label>NIK Saksi I</label><input type="text" name="nik_saksi1" value="{{ old('nik_saksi1', $pendaftaran->nik_saksi1 ?? '') }}" placeholder="16 digit NIK saksi 1" maxlength="16" inputmode="numeric"></div>
+                            <div class="field-group"><label>Nama Saksi II</label><input type="text" name="nama_saksi2" value="{{ old('nama_saksi2', $pendaftaran->nama_saksi2 ?? '') }}" placeholder="Nama saksi 2"></div>
+                            <div class="field-group"><label>NIK Saksi II</label><input type="text" name="nik_saksi2" value="{{ old('nik_saksi2', $pendaftaran->nik_saksi2 ?? '') }}" placeholder="16 digit NIK saksi 2" maxlength="16" inputmode="numeric"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -301,12 +373,41 @@
                         <div class="field-group"><label>Bulan</label><input type="text" name="bulan" value="{{ old('bulan', $pendaftaran->bulan ?? '') }}" placeholder="Contoh: JAN"></div>
                         <div class="field-group"><label>Minggu Ke</label><input type="text" name="minggu_ke" value="{{ old('minggu_ke', $pendaftaran->minggu_ke ?? '') }}" placeholder="Contoh: 1"></div>
                         <div class="field-group"><label>Nama Anak</label><input type="text" name="nama_anak_lahir" value="{{ old('nama_anak_lahir', $pendaftaran->nama_anak_lahir ?? '') }}" placeholder="Nama anak"></div>
-                        <div class="field-group"><label>Nama Ayah</label><input type="text" name="nama_ayah_lahir" value="{{ old('nama_ayah_lahir', $pendaftaran->nama_ayah_lahir ?? '') }}" placeholder="Nama ayah"></div>
-                        <div class="field-group"><label>Nama Ibu</label><input type="text" name="nama_ibu_lahir" value="{{ old('nama_ibu_lahir', $pendaftaran->nama_ibu_lahir ?? '') }}" placeholder="Nama ibu"></div>
                         <div class="field-group"><label>Berat Badan</label><input type="text" name="berat_badan" value="{{ old('berat_badan', $pendaftaran->berat_badan ?? '') }}" placeholder="Contoh: 3kg"></div>
                         <div class="field-group"><label>Panjang Badan</label><input type="text" name="panjang_badan" value="{{ old('panjang_badan', $pendaftaran->panjang_badan ?? '') }}" placeholder="Contoh: 49cm"></div>
                         <div class="field-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir_detail" value="{{ old('tempat_lahir_detail', $pendaftaran->tempat_lahir_detail ?? '') }}" placeholder="Tempat lahir"></div>
                         <div class="field-group"><label>Alamat</label><input type="text" name="alamat" value="{{ old('alamat', $pendaftaran->alamat ?? '') }}" placeholder="Alamat lengkap"></div>
+                    </div>
+
+                    {{-- Identitas Orang Tua --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Orang Tua</span>
+                        <div class="form-grid compact-grid">
+                            <div class="field-group"><label>Nama Ayah</label><input type="text" name="nama_ayah_lahir" value="{{ old('nama_ayah_lahir', $pendaftaran->nama_ayah_lahir ?? '') }}" placeholder="Nama ayah"></div>
+                            <div class="field-group"><label>NIK Ayah</label><input type="text" name="nik_ayah" value="{{ old('nik_ayah', $pendaftaran->nik_ayah ?? '') }}" placeholder="16 digit NIK ayah" maxlength="16" inputmode="numeric"></div>
+                            <div class="field-group"><label>Nama Ibu</label><input type="text" name="nama_ibu_lahir" value="{{ old('nama_ibu_lahir', $pendaftaran->nama_ibu_lahir ?? '') }}" placeholder="Nama ibu"></div>
+                            <div class="field-group"><label>NIK Ibu</label><input type="text" name="nik_ibu" value="{{ old('nik_ibu', $pendaftaran->nik_ibu ?? '') }}" placeholder="16 digit NIK ibu" maxlength="16" inputmode="numeric"></div>
+                        </div>
+                    </div>
+
+                    {{-- Identitas Pelapor --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Pelapor</span>
+                        <div class="form-grid compact-grid">
+                            <div class="field-group"><label>Nama Pelapor</label><input type="text" name="nama_pelapor" value="{{ old('nama_pelapor', $pendaftaran->nama_pelapor ?? '') }}" placeholder="Nama lengkap pelapor"></div>
+                            <div class="field-group"><label>NIK Pelapor</label><input type="text" name="nik_pelapor" value="{{ old('nik_pelapor', $pendaftaran->nik_pelapor ?? '') }}" placeholder="16 digit NIK pelapor" maxlength="16" inputmode="numeric"></div>
+                        </div>
+                    </div>
+
+                    {{-- Identitas Saksi (2 Orang) --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Saksi (2 Orang)</span>
+                        <div class="form-grid compact-grid">
+                            <div class="field-group"><label>Nama Saksi I</label><input type="text" name="nama_saksi1" value="{{ old('nama_saksi1', $pendaftaran->nama_saksi1 ?? '') }}" placeholder="Nama saksi 1"></div>
+                            <div class="field-group"><label>NIK Saksi I</label><input type="text" name="nik_saksi1" value="{{ old('nik_saksi1', $pendaftaran->nik_saksi1 ?? '') }}" placeholder="16 digit NIK saksi 1" maxlength="16" inputmode="numeric"></div>
+                            <div class="field-group"><label>Nama Saksi II</label><input type="text" name="nama_saksi2" value="{{ old('nama_saksi2', $pendaftaran->nama_saksi2 ?? '') }}" placeholder="Nama saksi 2"></div>
+                            <div class="field-group"><label>NIK Saksi II</label><input type="text" name="nik_saksi2" value="{{ old('nik_saksi2', $pendaftaran->nik_saksi2 ?? '') }}" placeholder="16 digit NIK saksi 2" maxlength="16" inputmode="numeric"></div>
+                        </div>
                     </div>
                 </div>
 
