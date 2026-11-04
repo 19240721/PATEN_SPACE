@@ -293,11 +293,21 @@ class PendaftaranController extends Controller
 
     public function document(Request $request, Pendaftaran $pendaftaran, int $index)
     {
-        $isStaff = $request->user()->role === 'petugas';
+        $isStaff = in_array($request->user()->role, ['petugas', 'operator', 'admin', 'camat'], true);
         abort_unless($isStaff || $pendaftaran->user_id === $request->user()->id, 404);
 
         $document = $pendaftaran->documents[$index] ?? null;
         abort_unless($document && Storage::disk('local')->exists($document['path']), 404);
+
+        if ($request->boolean('preview')) {
+            $fullPath = Storage::disk('local')->path($document['path']);
+            $mime = Storage::disk('local')->mimeType($document['path']) ?: 'application/octet-stream';
+
+            return response()->file($fullPath, [
+                'Content-Type' => $mime,
+                'Content-Disposition' => 'inline; filename="'.($document['original_name'] ?? 'dokumen').'"',
+            ]);
+        }
 
         return Storage::disk('local')->download(
             $document['path'],

@@ -86,14 +86,125 @@
 
             <div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start;">
 
-                {{-- Panel Kiri: Detail Data --}}
+                {{-- Panel Kiri: Detail Data & Lampiran Dokumen --}}
                 <div style="display: flex; flex-direction: column; gap: 20px;">
-                    {{-- Info Umum --}}
+
+                    {{-- Lampiran Berkas & Foto Dokumen Persyaratan (Khusus untuk memeriksa kelengkapan online) --}}
+                    <section class="dashboard-panel" style="padding: 24px;">
+                        <div class="panel-heading" style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 1.15rem; color: #17334c; display: flex; align-items: center; gap: 8px;">
+                                    <span>📸</span> Lampiran Berkas & Foto Dokumen
+                                </h2>
+                                <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">
+                                    Foto berkas persyaratan yang diunggah pemohon secara online (KTP, KK, Surat Pengantar, dsb.)
+                                </p>
+                            </div>
+                            @if(!empty($pendaftaran->documents))
+                                <span style="background: #e8e2d2; color: #5b4b2d; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">
+                                    {{ count($pendaftaran->documents) }} Berkas Diunggah
+                                </span>
+                            @endif
+                        </div>
+
+                        @if(!empty($pendaftaran->documents))
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px;">
+                                @foreach($pendaftaran->documents as $idx => $doc)
+                                    @php
+                                        $ext = strtolower(pathinfo($doc['original_name'] ?? $doc['path'], PATHINFO_EXTENSION));
+                                        $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'], true);
+                                        $previewUrl = route('pendaftaran.document', [$pendaftaran, $idx, 'preview' => 1]);
+                                        $downloadUrl = route('pendaftaran.document', [$pendaftaran, $idx]);
+                                        $fileName = $doc['original_name'] ?? ('Dokumen '.($idx+1));
+                                    @endphp
+
+                                    <div class="doc-card" style="border: 1px solid #e2dac7; border-radius: 10px; overflow: hidden; background: #faf9f6; display: flex; flex-direction: column; transition: all .15s ease;">
+                                        {{-- Area Gambar / Dokumen --}}
+                                        <div style="height: 160px; background: #1c1917; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer;"
+                                             onclick="{{ $isImage ? "openImageModal('{$previewUrl}', '{$fileName}')" : "window.open('{$previewUrl}', '_blank')" }}"
+                                             title="{{ $isImage ? 'Klik untuk memperbesar foto' : 'Klik untuk membuka dokumen PDF' }}">
+                                            @if($isImage)
+                                                <img src="{{ $previewUrl }}"
+                                                     alt="{{ $fileName }}"
+                                                     style="width: 100%; height: 100%; object-fit: cover; transition: transform .25s ease;"
+                                                     loading="lazy"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div style="display: none; position: absolute; inset: 0; align-items: center; justify-content: center; color: #d6d3d1; font-size: 12px;">
+                                                    Foto gagal dimuat
+                                                </div>
+                                                <div class="hover-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.45); opacity: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; gap: 6px; transition: opacity .18s ease;">
+                                                    <span>🔍</span> Perbesar Foto
+                                                </div>
+                                            @else
+                                                <div style="text-align: center; color: #fff; padding: 12px;">
+                                                    <div style="font-size: 38px; line-height: 1; margin-bottom: 6px;">📄</div>
+                                                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; background: #e11d48; padding: 2px 8px; border-radius: 4px; display: inline-block;">
+                                                        Berkas PDF
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Informasi & Tombol --}}
+                                        <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between;">
+                                            <div>
+                                                <div style="font-size: 13px; font-weight: 700; color: #17334c; word-break: break-word; line-height: 1.3;" title="{{ $fileName }}">
+                                                    {{ $fileName }}
+                                                </div>
+                                                <div style="font-size: 11px; color: #6b7c93; margin-top: 3px;">
+                                                    Berkas #{{ $idx + 1 }} • {{ strtoupper($ext) }}
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex; gap: 6px; margin-top: 4px;">
+                                                @if($isImage)
+                                                    <button type="button"
+                                                            onclick="openImageModal('{{ $previewUrl }}', '{{ $fileName }}')"
+                                                            style="flex: 1; padding: 6px 8px; background: #796743; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                        <span>🔍</span> Lihat
+                                                    </button>
+                                                @else
+                                                    <a href="{{ $previewUrl }}" target="_blank"
+                                                       style="flex: 1; padding: 6px 8px; background: #796743; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                        <span>↗</span> Buka
+                                                    </a>
+                                                @endif
+                                                <a href="{{ $downloadUrl }}"
+                                                   style="padding: 6px 10px; background: #e1d8c2; color: #3f3523; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;"
+                                                   title="Unduh berkas asli">
+                                                    ⬇
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            @if($pendaftaran->intake_source === 'masyarakat')
+                                <div style="background: #fffbeb; border: 1px dashed #f59e0b; border-radius: 8px; padding: 22px; text-align: center;">
+                                    <div style="font-size: 2.2rem; margin-bottom: 6px;">⚠️</div>
+                                    <h3 style="margin: 0 0 4px; font-size: 1rem; color: #92400e; font-weight: 700;">Tidak Ada Lampiran Foto / Dokumen</h3>
+                                    <p style="margin: 0 auto; max-width: 520px; font-size: 0.85rem; color: #b45309; line-height: 1.4;">
+                                        Pemohon mendaftar secara daring (online) namun tidak melampirkan foto dokumen persyaratan. Petugas dapat menolak permohonan atau meminta pemohon melengkapi berkas jika diperlukan.
+                                    </p>
+                                </div>
+                            @else
+                                <div style="background: #faf9f6; border: 1px dashed #d1c9b6; border-radius: 8px; padding: 18px; text-align: center; color: #78716c;">
+                                    <span style="font-size: 1.5rem; display: block; margin-bottom: 4px;">📋</span>
+                                    <p style="margin: 0; font-size: 0.85rem;">
+                                        Pendaftaran langsung di loket (tatap muka / berkas fisik diperiksa manual oleh petugas loket).
+                                    </p>
+                                </div>
+                            @endif
+                        @endif
+                    </section>
+
+                    {{-- Informasi Permohonan --}}
                     <section class="dashboard-panel" style="padding: 24px;">
                         <div class="panel-heading" style="margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
                             <div>
-                                <h2 style="margin: 0; font-size: 1.15rem; color: #17334c;">Informasi Permohonan</h2>
-                                <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">Rincian data permohonan yang diajukan</p>
+                                <h2 style="margin: 0; font-size: 1.15rem; color: #17334c;">Informasi Pemohon & Data Formulir</h2>
+                                <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">Rincian data permohonan yang tercatat di sistem</p>
                             </div>
                             @php $status = $pendaftaran->status ?? 'Baru'; @endphp
                             @if($status === 'Selesai')
@@ -111,7 +222,7 @@
                             $fields = [
                                 'Jenis Layanan'   => $pendaftaran->jenis_layanan,
                                 'Tanggal Daftar'  => $pendaftaran->tanggal_daftar ? \Illuminate\Support\Facades\Date::parse($pendaftaran->tanggal_daftar)->format('d-m-Y') : null,
-                                'Sumber'          => $pendaftaran->intake_source === 'masyarakat' ? 'Mandiri (Masyarakat)' : 'Input Petugas',
+                                'Sumber Pendaftaran' => $pendaftaran->intake_source === 'masyarakat' ? 'Online / Mandiri (Masyarakat)' : 'Input Langsung Petugas Loket',
                                 'Nama Lengkap'    => $pendaftaran->nama_lengkap,
                                 'NIK'             => $pendaftaran->nik,
                                 'Jenis Kelamin'   => $pendaftaran->jenis_kelamin,
@@ -185,30 +296,7 @@
                         </div>
                     </section>
 
-                    {{-- Dokumen --}}
-                    @if(!empty($pendaftaran->documents))
-                        <section class="dashboard-panel" style="padding: 24px;">
-                            <div class="panel-heading" style="margin-bottom: 16px;">
-                                <h2 style="margin: 0; font-size: 1.15rem; color: #17334c;">Dokumen Persyaratan</h2>
-                                <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">{{ count($pendaftaran->documents) }} file terlampir</p>
-                            </div>
-                            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
-                                @foreach($pendaftaran->documents as $idx => $doc)
-                                    <li style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #faf9f6; border-radius: 8px; border: 1px solid #e8e2d2;">
-                                        <span style="font-size: 22px;">📄</span>
-                                        <span style="flex: 1; font-size: 14px; font-weight: 500; color: #263f55;">{{ $doc['original_name'] ?? 'Dokumen '.($idx+1) }}</span>
-                                        <a href="{{ route('pendaftaran.document', [$pendaftaran, $idx]) }}"
-                                           style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #e1d8c2; color: #3f3523; border-radius: 6px; font-size: 13px; text-decoration: none; font-weight: 700; transition: background .15s ease;"
-                                           target="_blank">
-                                            ⬇ Unduh
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </section>
-                    @endif
-
-                    {{-- Alasan Penolakan --}}
+                    {{-- Alasan Penolakan (Jika ada) --}}
                     @if($pendaftaran->status === 'Ditolak' && $pendaftaran->alasan_penolakan)
                         <section class="dashboard-panel" style="padding: 20px; background: #fef2f2; border: 1px solid #fecaca;">
                             <div style="font-weight: 700; color: #991b1b; margin-bottom: 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -218,7 +306,7 @@
                         </section>
                     @endif
 
-                    {{-- Catatan Petugas --}}
+                    {{-- Catatan Petugas (Jika ada) --}}
                     @if($pendaftaran->catatan_petugas)
                         <section class="dashboard-panel" style="padding: 20px; background: #f5f2eb; border: 1px solid #dfd7c5;">
                             <div style="font-weight: 700; color: #5b4b2d; margin-bottom: 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -229,12 +317,12 @@
                     @endif
                 </div>
 
-                {{-- Panel Kanan: Form Update Status --}}
+                {{-- Panel Kanan: Form Update Status & Verifikasi Berkas --}}
                 <div>
                     <section class="dashboard-panel" style="padding: 24px; position: sticky; top: 84px;">
                         <div class="panel-heading" style="margin-bottom: 18px;">
-                            <h2 style="margin: 0; font-size: 1.15rem; color: #17334c;">Update Status</h2>
-                            <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">Perbarui progres pengerjaan berkas</p>
+                            <h2 style="margin: 0; font-size: 1.15rem; color: #17334c;">Update & Tindak Lanjut</h2>
+                            <p style="margin: 3px 0 0; font-size: 0.8rem; color: #6b7c93;">Verifikasi kelengkapan foto/berkas pemohon</p>
                         </div>
 
                         <form action="{{ route('petugas.permohonan.status', $pendaftaran) }}" method="POST">
@@ -249,9 +337,9 @@
                                         style="width: 100%; padding: 10px 12px; border: 1px solid #d1c9b6; border-radius: 6px; font-size: 14px; background: #fff; color: #17334c;"
                                         onchange="toggleAlasan(this.value)">
                                     <option value="Baru"    {{ old('status', $pendaftaran->status) === 'Baru'    ? 'selected' : '' }}>Baru</option>
-                                    <option value="Proses"  {{ old('status', $pendaftaran->status) === 'Proses'  ? 'selected' : '' }}>Proses</option>
-                                    <option value="Selesai" {{ old('status', $pendaftaran->status) === 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                    <option value="Ditolak" {{ old('status', $pendaftaran->status) === 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                    <option value="Proses"  {{ old('status', $pendaftaran->status) === 'Proses'  ? 'selected' : '' }}>Proses (Berkas Lengkap & Valid)</option>
+                                    <option value="Selesai" {{ old('status', $pendaftaran->status) === 'Selesai' ? 'selected' : '' }}>Selesai (Sudah Diterbitkan)</option>
+                                    <option value="Ditolak" {{ old('status', $pendaftaran->status) === 'Ditolak' ? 'selected' : '' }}>Ditolak (Berkas Kurang / Tidak Sesuai)</option>
                                 </select>
                             </div>
 
@@ -259,9 +347,26 @@
                                 <label for="alasan_penolakan" style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px; color: #263f55;">
                                     Alasan Penolakan <span style="color: #ef4444;">*</span>
                                 </label>
+
+                                {{-- Preset tombol cepat untuk alasan penolakan berkas online --}}
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                                    <button type="button" class="preset-alasan-btn" onclick="pilihAlasan('Foto dokumen buram / tidak terbaca dengan jelas')">
+                                        📷 Foto Buram
+                                    </button>
+                                    <button type="button" class="preset-alasan-btn" onclick="pilihAlasan('Dokumen persyaratan belum lengkap (kurang KTP / Kartu Keluarga)')">
+                                        📄 Berkas Kurang
+                                    </button>
+                                    <button type="button" class="preset-alasan-btn" onclick="pilihAlasan('NIK atau data pemohon tidak sesuai dengan lampiran')">
+                                        🆔 Data Tidak Sesuai
+                                    </button>
+                                    <button type="button" class="preset-alasan-btn" onclick="pilihAlasan('Surat Pengantar dari Desa / RT / RW belum dilampirkan')">
+                                        🏠 Kurang Surat Desa
+                                    </button>
+                                </div>
+
                                 <textarea id="alasan_penolakan" name="alasan_penolakan" rows="4"
                                           style="width: 100%; padding: 10px 12px; border: 1px solid #d1c9b6; border-radius: 6px; font-size: 14px; resize: vertical; box-sizing: border-box;"
-                                          placeholder="Jelaskan alasan penolakan permohonan ini...">{{ old('alasan_penolakan', $pendaftaran->alasan_penolakan) }}</textarea>
+                                          placeholder="Tuliskan kekurangan berkas atau alasan penolakan...">{{ old('alasan_penolakan', $pendaftaran->alasan_penolakan) }}</textarea>
                                 @error('alasan_penolakan')
                                     <p style="color: #ef4444; font-size: 12px; margin: 4px 0 0;">{{ $message }}</p>
                                 @enderror
@@ -269,11 +374,11 @@
 
                             <div style="margin-bottom: 18px;">
                                 <label for="catatan_petugas" style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px; color: #263f55;">
-                                    Catatan Petugas
+                                    Catatan Tambahan Petugas
                                 </label>
                                 <textarea id="catatan_petugas" name="catatan_petugas" rows="3"
                                           style="width: 100%; padding: 10px 12px; border: 1px solid #d1c9b6; border-radius: 6px; font-size: 14px; resize: vertical; box-sizing: border-box;"
-                                          placeholder="Catatan atau komentar tambahan (opsional)...">{{ old('catatan_petugas', $pendaftaran->catatan_petugas) }}</textarea>
+                                          placeholder="Catatan tambahan untuk pemohon atau arsip (opsional)...">{{ old('catatan_petugas', $pendaftaran->catatan_petugas) }}</textarea>
                                 @error('catatan_petugas')
                                     <p style="color: #ef4444; font-size: 12px; margin: 4px 0 0;">{{ $message }}</p>
                                 @enderror
@@ -303,6 +408,49 @@
         </div>
     </main>
 
+    {{-- Lightbox Modal untuk Preview Foto Dokumen --}}
+    <div id="image-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;" onclick="closeModalOnBackdrop(event)">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center;">
+            <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px;">
+                <span id="modal-caption" style="color: #f5f5f5; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <a id="modal-newtab-btn" href="#" target="_blank" style="color: #fff; background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; font-size: 12px; text-decoration: none; font-weight: 600;">
+                        ↗ Buka di Tab Baru
+                    </a>
+                    <button type="button" onclick="closeImageModal()" style="background: #e11d48; color: #fff; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            <img id="modal-img" src="" alt="Preview Dokumen" style="max-width: 90vw; max-height: 80vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); object-fit: contain; background: #111;">
+        </div>
+    </div>
+
+    <style>
+        .doc-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .doc-card:hover .hover-overlay {
+            opacity: 1 !important;
+        }
+        .preset-alasan-btn {
+            background: #f5f2eb;
+            border: 1px solid #c7b991;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #5b4b2d;
+            cursor: pointer;
+            transition: all .15s ease;
+        }
+        .preset-alasan-btn:hover {
+            background: #e1d8c2;
+            color: #3f3523;
+        }
+    </style>
+
     <script>
         function toggleAlasan(value) {
             const section = document.getElementById('alasan-section');
@@ -315,6 +463,49 @@
                 textarea.required = false;
             }
         }
+
+        function pilihAlasan(teks) {
+            const textarea = document.getElementById('alasan_penolakan');
+            if (textarea.value.trim() === '') {
+                textarea.value = teks;
+            } else {
+                textarea.value = textarea.value + '; ' + teks;
+            }
+            textarea.focus();
+        }
+
+        function openImageModal(url, caption) {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('modal-img');
+            const cap = document.getElementById('modal-caption');
+            const newTabBtn = document.getElementById('modal-newtab-btn');
+
+            img.src = url;
+            cap.textContent = caption;
+            newTabBtn.href = url;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('modal-img');
+            img.src = '';
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'image-modal') {
+                closeImageModal();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
     </script>
 </div>
 @endsection

@@ -417,4 +417,38 @@ class RoleBasedApplicationFlowTest extends TestCase
             $pdfResponse->assertHeader('content-type', 'application/pdf');
         }
     }
+
+    public function test_detail_permohonan_renders_uploaded_documents_and_supports_photo_preview(): void
+    {
+        Storage::fake('local');
+        $file = UploadedFile::fake()->image('ktp-asli.jpg');
+        $storedPath = $file->store('pendaftaran/test', 'local');
+
+        $petugas = User::factory()->create(['role' => 'petugas']);
+        $application = Pendaftaran::create([
+            'nama_lengkap' => 'Siti Rukoyah',
+            'nik' => '3215000000000099',
+            'alamat' => 'Desa Cirejag',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-11-04',
+            'status' => 'Baru',
+            'intake_source' => 'masyarakat',
+            'documents' => [
+                [
+                    'path' => $storedPath,
+                    'original_name' => 'ktp-asli.jpg',
+                ],
+            ],
+        ]);
+
+        $detail = $this->actingAs($petugas)->get(route('petugas.permohonan.show', $application));
+        $detail->assertOk()
+            ->assertSee('Lampiran Berkas & Foto Dokumen', false)
+            ->assertSee('ktp-asli.jpg')
+            ->assertSee(route('pendaftaran.document', [$application, 0, 'preview' => 1]));
+
+        $previewResponse = $this->actingAs($petugas)->get(route('pendaftaran.document', [$application, 0, 'preview' => 1]));
+        $previewResponse->assertOk()
+            ->assertHeader('content-disposition', 'inline; filename="ktp-asli.jpg"');
+    }
 }
