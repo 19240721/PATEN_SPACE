@@ -242,12 +242,15 @@ class PendaftaranController extends Controller
         ]);
 
         if ($isCitizen) {
-            $validated['nik'] = $request->user()->nik;
+            $validated['nik'] = $request->input('nik') ?: ($request->user()->nik ?? $validated['nik']);
             $validated['status'] = 'Baru';
             $validated['user_id'] = $request->user()->id;
             $validated['intake_source'] = 'masyarakat';
             $validated['petugas'] = null;
             $validated['tanggal_daftar'] = now()->toDateString();
+            if (empty($request->user()->nik) && !empty($validated['nik'])) {
+                $request->user()->update(['nik' => $validated['nik']]);
+            }
         } else {
             $validated['status'] = $validated['status'] ?? 'Baru';
             $validated['intake_source'] = 'petugas';

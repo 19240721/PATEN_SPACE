@@ -887,9 +887,11 @@
 
                     <div class="mob-field">
                         <label class="mob-label">Nomor Induk Kependudukan (NIK) <span>*</span></label>
-                        <input class="mob-input" name="nik" type="text"
+                        <input class="mob-input {{ $errors->has('nik') ? 'error' : '' }}" name="nik" type="text"
+                            inputmode="numeric" maxlength="16"
                             placeholder="16 digit NIK"
-                            value="{{ old('nik', $citizen->nik ?? '') }}" readonly required>
+                            value="{{ old('nik', $citizen->nik ?? '') }}" required>
+                        @error('nik')<p class="mob-error">{{ $message }}</p>@enderror
                     </div>
 
                     <div class="mob-grid-2">
