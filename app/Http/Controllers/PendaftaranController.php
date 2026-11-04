@@ -430,6 +430,7 @@ class PendaftaranController extends Controller
                 ['label' => 'Nama', 'field' => 'nama_lengkap'],
                 ['label' => 'NIK', 'field' => 'nik'],
                 ['label' => 'Alasan Pembaruan', 'field' => 'alasan_pembaruan'],
+                ['label' => 'Keterangan', 'field' => 'keterangan'],
                 ['label' => 'Tanggal Daftar', 'field' => 'tanggal_daftar', 'date' => true],
             ],
             'kartu-keluarga' => [

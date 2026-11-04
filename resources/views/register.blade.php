@@ -237,6 +237,7 @@
                         </div>
                         @endunless
                         <div class="field-group"><label>No HP</label><input type="text" name="no_telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}" placeholder="Nomor HP"></div>
+                        <div class="field-group full-width"><label>Keterangan</label><input type="text" name="keterangan" value="{{ old('keterangan', $pendaftaran->keterangan ?? '') }}" placeholder="Keterangan tambahan (opsional)"></div>
                     </div>
                 </div>
 
@@ -265,6 +266,7 @@
                             </select>
                         </div>
                         <div class="field-group"><label>No HP</label><input type="text" name="no_telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}" placeholder="Nomor HP"></div>
+                        <div class="field-group full-width"><label>Keterangan</label><input type="text" name="keterangan" value="{{ old('keterangan', $pendaftaran->keterangan ?? '') }}" placeholder="Keterangan tambahan (opsional)"></div>
                     </div>
                 </div>
 
