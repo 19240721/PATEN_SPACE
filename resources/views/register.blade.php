@@ -174,15 +174,7 @@
                         <label for="tanggal_daftar">Tanggal Pendaftaran</label>
                         <input id="tanggal_daftar" name="tanggal_daftar" type="date" value="{{ old('tanggal_daftar', $pendaftaran->tanggal_daftar ?? now()->format('Y-m-d')) }}" required>
                     </div>
-                    <div class="field-group">
-                        <label for="status">Status</label>
-                        <select id="status" name="status">
-                            <option value="Baru" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Baru' ? 'selected' : '' }}>Baru</option>
-                            <option value="Proses" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Proses' ? 'selected' : '' }}>Proses</option>
-                            <option value="Selesai" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                            <option value="Ditolak" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
-                        </select>
-                    </div>
+
                     @else
                         <input type="hidden" name="tanggal_daftar" value="{{ now()->format('Y-m-d') }}">
                     @endunless
@@ -226,16 +218,7 @@
                                 <option value="Pacing" {{ old('desa', $pendaftaran->desa ?? '') == 'Pacing' ? 'selected' : '' }}>Pacing</option>
                             </select>
                         </div>
-                        @unless($isCitizen)
-                        <div class="field-group"><label>Status</label>
-                            <select name="status">
-                                <option value="Baru" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Baru' ? 'selected' : '' }}>Baru</option>
-                                <option value="Proses" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Proses' ? 'selected' : '' }}>Proses</option>
-                                <option value="Selesai" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                <option value="Ditolak" {{ old('status', $pendaftaran->status ?? 'Baru') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
-                            </select>
-                        </div>
-                        @endunless
+
                         <div class="field-group"><label>No HP</label><input type="text" name="no_telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}" placeholder="Nomor HP"></div>
                     </div>
                 </div>
