@@ -12,63 +12,45 @@
         @endif
 
         <style>
-            /* Tombol Toggle Sidebar (Buka/Tutup) di Header & Sidebar */
+            /* Tombol Toggle Sidebar (Buka/Tutup) Rapi & Sejajar */
             .btn-sidebar-toggle {
                 display: inline-flex !important;
-                align-items: center;
-                justify-content: center;
-                width: 42px;
-                height: 42px;
-                border-radius: 9px;
-                background: #ffffff;
-                border: 1.5px solid #d6dde5;
-                color: #1e293b;
-                cursor: pointer;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                flex-shrink: 0;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 8px !important;
+                background: #ffffff !important;
+                border: 1px solid #d5cebf !important;
+                color: #5b4b2d !important;
+                cursor: pointer !important;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+                transition: all 0.18s ease !important;
+                flex-shrink: 0 !important;
+                padding: 0 !important;
             }
             .btn-sidebar-toggle:hover {
-                background: #f1f5f9;
-                border-color: #94a3b8;
-                color: #0f172a;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+                background: #f7f4ed !important;
+                border-color: #a89878 !important;
+                color: #3b2f19 !important;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
             }
             .btn-sidebar-toggle:active {
-                transform: scale(0.95);
+                transform: scale(0.95) !important;
             }
             .btn-sidebar-toggle svg {
                 display: block;
-                width: 22px;
-                height: 22px;
+                width: 20px;
+                height: 20px;
                 stroke: currentColor;
             }
 
-            /* Tombol Tutup di dalam Sidebar */
-            .sidebar-close-btn {
-                display: inline-flex !important;
-                align-items: center;
-                justify-content: center;
-                width: 34px;
-                height: 34px;
-                border-radius: 8px;
-                background: rgba(255, 255, 255, 0.12);
-                border: 1px solid rgba(255, 255, 255, 0.25);
-                color: #ffffff;
-                cursor: pointer;
-                margin-left: auto;
-                transition: all 0.2s ease;
-                flex-shrink: 0;
-            }
-            .sidebar-close-btn:hover {
-                background: rgba(255, 255, 255, 0.25);
-                transform: scale(1.05);
-            }
-            .sidebar-close-btn svg {
-                display: block;
-                width: 18px;
-                height: 18px;
-                stroke: currentColor;
+            /* Perbaikan tata letak topbar agar selalu sejajar horizontal */
+            .dashboard-topbar > div:first-child {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 12px !important;
             }
 
             /* Transisi Halus Buka-Tutup Sidebar */
@@ -119,13 +101,12 @@
 
             if (!sidebar) return;
 
-            // Pulihkan posisi sidebar sebelumnya dari localStorage
+            // Pulihkan status sidebar dari localStorage
             if (localStorage.getItem('paten-sidebar-collapsed') === '1') {
                 sidebar.classList.add('collapsed');
                 if (appShell) appShell.classList.add('sidebar-collapsed');
             }
 
-            // Pasang event listener ke semua tombol toggle buka/tutup
             toggles.forEach(function (btn) {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
