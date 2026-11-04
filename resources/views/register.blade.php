@@ -8,19 +8,21 @@
 @endphp
 <div class="app-shell form-page-shell">
     <aside class="sidebar">
-        <div class="brand-wrap">
-            <div class="brand-mark">P</div>
-            <div class="brand-text">
-                <div class="brand-title">PATEN SPACE</div>
-                <div class="brand-sub">Kecamatan Jatisari</div>
+        <div class="brand-wrap" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="brand-mark">P</div>
+                <div class="brand-text">
+                    <div class="brand-title">PATEN SPACE</div>
+                    <div class="brand-sub">Kecamatan Jatisari</div>
+                </div>
             </div>
+            <button class="sidebar-toggle" type="button" aria-label="Tutup menu samping" aria-expanded="true" title="Tutup Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
-
-        <button class="sidebar-toggle" type="button" aria-label="Tutup menu samping" aria-expanded="true">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
 
         <nav class="sidebar-nav">
             <div class="nav-group-label">Dashboard</div>
@@ -49,9 +51,18 @@
 
     <main class="main-panel form-page-main">
         <header class="topbar form-topbar">
-            <div>
-                <h1>{{ $isCitizen ? 'Ajukan Permohonan' : 'Registrasi / Pendaftaran' }}</h1>
-                <p>{{ $isCitizen ? 'Isi formulir layanan dan unggah dokumen persyaratan.' : 'Form ini juga dapat digunakan untuk membantu warga yang belum memiliki ponsel atau belum terbiasa menggunakan gawai.' }}</p>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button type="button" class="btn-sidebar-toggle" title="Buka / Tutup Sidebar" aria-label="Buka atau tutup sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div>
+                    <h1>{{ $isCitizen ? 'Ajukan Permohonan' : 'Registrasi / Pendaftaran' }}</h1>
+                    <p>{{ $isCitizen ? 'Isi formulir layanan dan unggah dokumen persyaratan.' : 'Form ini juga dapat digunakan untuk membantu warga yang belum memiliki ponsel atau belum terbiasa menggunakan gawai.' }}</p>
+                </div>
             </div>
             <div class="date-pill">{{ now()->translatedFormat('d F Y') }}</div>
         </header>

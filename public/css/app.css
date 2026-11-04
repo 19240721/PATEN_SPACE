@@ -1284,3 +1284,93 @@ tr:last-child td { border-bottom: none; }
     .profile-preference-row { align-items: flex-start; flex-wrap: wrap; }
     .profile-preference-value { margin-left: 46px; }
 }
+
+/* ==========================================================================
+   SIDEBAR TOGGLE (OPEN / CLOSE)
+   ========================================================================== */
+.btn-sidebar-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+    background: #ffffff;
+    border: 1.5px solid #d6dde5;
+    color: #1e293b;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+.btn-sidebar-toggle:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.btn-sidebar-toggle:active {
+    transform: scale(0.95);
+}
+.btn-sidebar-toggle svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+}
+.sidebar-close-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    cursor: pointer;
+    margin-left: auto;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+.sidebar-close-btn svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+}
+.sidebar {
+    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                margin 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.22s ease !important;
+}
+.app-shell.sidebar-collapsed .sidebar,
+.sidebar.collapsed,
+.dashboard-page .sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    flex: 0 0 0px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    border: none !important;
+}
+.app-shell.sidebar-collapsed .main-panel,
+.sidebar.collapsed ~ .main-panel {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}

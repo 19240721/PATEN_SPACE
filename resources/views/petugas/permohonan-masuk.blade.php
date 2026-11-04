@@ -5,13 +5,18 @@
 @section('content')
 <div class="app-shell dashboard-page">
     <aside class="sidebar dark-sidebar">
-        <button class="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar" aria-expanded="true">
-            <span></span><span></span><span></span>
-        </button>
-        <a href="{{ route('dashboard') }}" class="brand-wrap">
-            <img src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang" class="brand-mark">
-            <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
-        </a>
+        <div class="brand-wrap" style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; min-width: 0;">
+                <img src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang" class="brand-mark">
+                <span class="brand-text"><span class="brand-title">PATEN SPACE</span><span class="brand-sub">Pelayanan Kecamatan</span></span>
+            </a>
+            <button class="sidebar-close-btn" type="button" aria-label="Tutup sidebar" title="Tutup Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
@@ -36,7 +41,16 @@
 
     <main class="main-panel">
         <header class="dashboard-topbar">
-            <div><strong>Kecamatan Jatisari</strong><span>Kabupaten Karawang</span></div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button type="button" class="btn-sidebar-toggle" title="Buka / Tutup Sidebar" aria-label="Buka atau tutup sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div><strong>Kecamatan Jatisari</strong><span>Kabupaten Karawang</span></div>
+            </div>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="report-filter-button">Keluar</button>
