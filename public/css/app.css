@@ -1022,7 +1022,7 @@ tr:last-child td { border-bottom: none; }
 }
 .request-source.online { background: #edf6fb; color: #28678a; }
 .request-source.counter { background: #f3f2ef; color: #6c6048; }
-.status-pill.baru { background: #f2efe7; color: #746748; }
+.status-pill.baru { background: #eaf3ff; color: #285b9a; }
 .status-pill.ditolak { background: #fff0ef; color: #a14842; }
 .request-table .request-actions-heading,
 .request-table .request-actions-cell { text-align: center; }
@@ -1165,7 +1165,7 @@ tr:last-child td { border-bottom: none; }
 .dashboard-page .trend-chart circle { stroke: #9b875d; }
 .dashboard-page .trend-chart circle { fill: #9b875d; }
 .dashboard-page .panel-link { color: #796743; }
-.dashboard-page .status-pill:not(.proses):not(.selesai) { background: #eee8d7; color: #665536; }
+.dashboard-page .status-pill:not(.proses):not(.selesai):not(.ditolak):not(.baru) { background: #eee8d7; color: #665536; }
 .dashboard-page.report-page .stat-symbol { background: #eee8d7; color: #796743; }
 
 .form-page-shell {
