@@ -1080,6 +1080,49 @@
                             </div>
                             <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi nama, NIK, dan hubungan dalam keluarga</p>
                         </div>
+
+                        {{-- Perubahan Data (Pendidikan, Pekerjaan, Agama, dll) --}}
+                        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
+                            <div class="mob-card-head" style="margin-bottom:10px;">Perubahan Data</div>
+                            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                                <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:420px;">
+                                    <thead>
+                                        <tr style="background:#f5f2eb;">
+                                            <th style="width:36px;padding:7px 8px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">No</th>
+                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Semula</th>
+                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Menjadi</th>
+                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Dasar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for($i = 0; $i < 5; $i++)
+                                        <tr>
+                                            <td style="padding:3px 6px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;font-size:12px;">{{ $i + 1 }}</td>
+                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
+                                                <input type="text" name="perubahan_kk[{{ $i }}][semula]"
+                                                       value="{{ old('perubahan_kk.'.$i.'.semula') }}"
+                                                       placeholder="Sebelumnya"
+                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
+                                            </td>
+                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
+                                                <input type="text" name="perubahan_kk[{{ $i }}][menjadi]"
+                                                       value="{{ old('perubahan_kk.'.$i.'.menjadi') }}"
+                                                       placeholder="Data baru"
+                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
+                                            </td>
+                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
+                                                <input type="text" name="perubahan_kk[{{ $i }}][dasar]"
+                                                       value="{{ old('perubahan_kk.'.$i.'.dasar') }}"
+                                                       placeholder="Dasar"
+                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
+                                            </td>
+                                        </tr>
+                                        @endfor
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi jika ada perubahan pendidikan, pekerjaan, agama, dll</p>
+                        </div>
                     </div>
                 </div>
 

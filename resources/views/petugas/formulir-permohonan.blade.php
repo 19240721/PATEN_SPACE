@@ -574,6 +574,34 @@
         </tr>
         @endif
 
+        @if($pendaftaran->jenis_layanan === 'KK' && !empty($pendaftaran->perubahan_kk))
+        <tr>
+            <td colspan="4" style="padding-top: 12px;">
+                <strong style="display:block; margin-bottom: 6px;">Perubahan Data (Pendidikan, Pekerjaan, Agama, dll)</strong>
+                <table style="width:100%; border-collapse:collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background:#f5f2eb;">
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:center; width:30px;">No</th>
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:left;">Semula</th>
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:left;">Menjadi</th>
+                            <th style="border:1px solid #ccc; padding:4px 6px; text-align:left;">Dasar Perubahan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendaftaran->perubahan_kk as $i => $perubahan)
+                        <tr>
+                            <td style="border:1px solid #ccc; padding:4px 6px; text-align:center;">{{ $i + 1 }}</td>
+                            <td style="border:1px solid #ccc; padding:4px 6px;">{{ $perubahan['semula'] ?? '-' }}</td>
+                            <td style="border:1px solid #ccc; padding:4px 6px;">{{ $perubahan['menjadi'] ?? '-' }}</td>
+                            <td style="border:1px solid #ccc; padding:4px 6px;">{{ $perubahan['dasar'] ?? '-' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        @endif
+
         @if($pendaftaran->nama_anak_lahir || $pendaftaran->nama_anak)
         <tr>
             <td class="col-num">&bull;</td>

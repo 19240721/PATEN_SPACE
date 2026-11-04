@@ -339,6 +339,41 @@
                         </section>
                     @endif
 
+                    {{-- Perubahan Data KK (Pendidikan, Pekerjaan, Agama, dll) --}}
+                    @if($pendaftaran->jenis_layanan === 'KK' && !empty($pendaftaran->perubahan_kk))
+                        <section class="dashboard-panel" style="padding: 24px;">
+                            <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.1rem;">📝</span>
+                                <div>
+                                    <h2 style="margin: 0; font-size: 1.1rem; color: #17334c;">Perubahan Data</h2>
+                                    <p style="margin: 2px 0 0; font-size: 0.8rem; color: #6b7c93;">Pendidikan, pekerjaan, agama, status perkawinan, dll</p>
+                                </div>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+                                    <thead>
+                                        <tr style="background: #f5f2eb;">
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: center; width: 44px;">No</th>
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: left;">Semula</th>
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: left;">Menjadi</th>
+                                            <th style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #5b4b2d; font-weight: 700; text-align: left;">Dasar Perubahan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($pendaftaran->perubahan_kk as $i => $perubahan)
+                                        <tr style="border-bottom: 1px solid #f0ede4;">
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; text-align: center; color: #8898aa; font-weight: 600;">{{ $i + 1 }}</td>
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #17334c;">{{ $perubahan['semula'] ?? '-' }}</td>
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; font-weight: 600; color: #17334c;">{{ $perubahan['menjadi'] ?? '-' }}</td>
+                                            <td style="padding: 9px 12px; border: 1px solid #e1d8c2; color: #2d3748;">{{ $perubahan['dasar'] ?? '-' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    @endif
+
                     {{-- Alasan Penolakan (Jika ada) --}}
                     @if($pendaftaran->status === 'Ditolak' && $pendaftaran->alasan_penolakan)
                         <section class="dashboard-panel" style="padding: 20px; background: #fef2f2; border: 1px solid #fecaca;">

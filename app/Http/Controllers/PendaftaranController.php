@@ -217,6 +217,10 @@ class PendaftaranController extends Controller
             'anggota_kk.*.nama' => ['nullable', 'string', 'max:255'],
             'anggota_kk.*.nik' => ['nullable', 'string', 'max:20'],
             'anggota_kk.*.shdk' => ['nullable', 'string', 'max:100'],
+            'perubahan_kk' => ['nullable', 'array'],
+            'perubahan_kk.*.semula' => ['nullable', 'string', 'max:255'],
+            'perubahan_kk.*.menjadi' => ['nullable', 'string', 'max:255'],
+            'perubahan_kk.*.dasar' => ['nullable', 'string', 'max:255'],
             'nama_alm' => ['nullable', 'string', 'max:255'],
             'nama_ayah' => ['nullable', 'string', 'max:255'],
             'nama_ibu' => ['nullable', 'string', 'max:255'],
@@ -291,6 +295,17 @@ class PendaftaranController extends Controller
             ));
             if (empty($validated['anggota_kk'])) {
                 unset($validated['anggota_kk']);
+            }
+        }
+
+        // Filter baris kosong perubahan_kk
+        if (isset($validated['perubahan_kk'])) {
+            $validated['perubahan_kk'] = array_values(array_filter(
+                $validated['perubahan_kk'],
+                fn($r) => !empty($r['semula']) || !empty($r['menjadi'])
+            ));
+            if (empty($validated['perubahan_kk'])) {
+                unset($validated['perubahan_kk']);
             }
         }
 
@@ -594,6 +609,10 @@ class PendaftaranController extends Controller
             'anggota_kk.*.nama' => ['nullable', 'string', 'max:255'],
             'anggota_kk.*.nik' => ['nullable', 'string', 'max:20'],
             'anggota_kk.*.shdk' => ['nullable', 'string', 'max:100'],
+            'perubahan_kk' => ['nullable', 'array'],
+            'perubahan_kk.*.semula' => ['nullable', 'string', 'max:255'],
+            'perubahan_kk.*.menjadi' => ['nullable', 'string', 'max:255'],
+            'perubahan_kk.*.dasar' => ['nullable', 'string', 'max:255'],
             'nama_alm' => ['nullable', 'string', 'max:255'],
             'nama_ayah' => ['nullable', 'string', 'max:255'],
             'nama_ibu' => ['nullable', 'string', 'max:255'],
@@ -657,6 +676,17 @@ class PendaftaranController extends Controller
             ));
             if (empty($validated['anggota_kk'])) {
                 $validated['anggota_kk'] = null;
+            }
+        }
+
+        // Filter baris kosong perubahan_kk
+        if (isset($validated['perubahan_kk'])) {
+            $validated['perubahan_kk'] = array_values(array_filter(
+                $validated['perubahan_kk'],
+                fn($r) => !empty($r['semula']) || !empty($r['menjadi'])
+            ));
+            if (empty($validated['perubahan_kk'])) {
+                $validated['perubahan_kk'] = null;
             }
         }
 

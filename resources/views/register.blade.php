@@ -306,6 +306,49 @@
                         </div>
                         <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi sesuai anggota keluarga yang akan dimasukkan ke KK</p>
                     </div>
+
+                    {{-- Perubahan Data (Pendidikan, Pekerjaan, Agama, dll) --}}
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
+                        <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Perubahan Data (Pendidikan, Pekerjaan, Agama, dll)</span>
+                        <div style="overflow-x:auto;">
+                            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                                <thead>
+                                    <tr style="background:#f5f2eb;">
+                                        <th style="width:40px;padding:8px 10px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;">No</th>
+                                        <th style="padding:8px 10px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;min-width:160px;">Semula</th>
+                                        <th style="padding:8px 10px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;min-width:160px;">Menjadi</th>
+                                        <th style="padding:8px 10px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;min-width:160px;">Dasar Perubahan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for($i = 0; $i < 5; $i++)
+                                    <tr>
+                                        <td style="padding:4px 8px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;">{{ $i + 1 }}</td>
+                                        <td style="padding:3px 6px;border:1px solid #e1d8c2;">
+                                            <input type="text" name="perubahan_kk[{{ $i }}][semula]"
+                                                   value="{{ old('perubahan_kk.'.$i.'.semula', ($pendaftaran->perubahan_kk[$i]['semula'] ?? '')) }}"
+                                                   placeholder="Data sebelumnya"
+                                                   style="width:100%;border:none;padding:5px 7px;font-size:13px;background:transparent;outline:none;color:#2d2416;">
+                                        </td>
+                                        <td style="padding:3px 6px;border:1px solid #e1d8c2;">
+                                            <input type="text" name="perubahan_kk[{{ $i }}][menjadi]"
+                                                   value="{{ old('perubahan_kk.'.$i.'.menjadi', ($pendaftaran->perubahan_kk[$i]['menjadi'] ?? '')) }}"
+                                                   placeholder="Data baru"
+                                                   style="width:100%;border:none;padding:5px 7px;font-size:13px;background:transparent;outline:none;color:#2d2416;">
+                                        </td>
+                                        <td style="padding:3px 6px;border:1px solid #e1d8c2;">
+                                            <input type="text" name="perubahan_kk[{{ $i }}][dasar]"
+                                                   value="{{ old('perubahan_kk.'.$i.'.dasar', ($pendaftaran->perubahan_kk[$i]['dasar'] ?? '')) }}"
+                                                   placeholder="Contoh: Ijazah / SK / Surat Nikah"
+                                                   style="width:100%;border:none;padding:5px 7px;font-size:13px;background:transparent;outline:none;color:#2d2416;">
+                                        </td>
+                                    </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
+                        <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi jika ada perubahan data pendidikan, pekerjaan, agama, status perkawinan, dll</p>
+                    </div>
                 </div>
 
                 <div class="service-section" data-service="Akta Kematian" {{ $selectedService == 'Akta Kematian' ? '' : 'hidden' }}>

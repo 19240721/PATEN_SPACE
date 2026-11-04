@@ -515,6 +515,37 @@
             </div>
             @endif
 
+            {{-- Perubahan Data KK --}}
+            @if($pendaftaran->jenis_layanan === 'KK' && !empty($pendaftaran->perubahan_kk))
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--khaki-border, #e5e0d3);">
+                <div style="font-size:0.72rem;font-weight:800;color:#78716c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
+                    📝 Perubahan Data
+                </div>
+                <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:320px;">
+                        <thead>
+                            <tr style="background:#f5f2eb;">
+                                <th style="width:32px;padding:6px 8px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;">No</th>
+                                <th style="padding:6px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;text-align:left;">Semula</th>
+                                <th style="padding:6px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;text-align:left;">Menjadi</th>
+                                <th style="padding:6px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;text-align:left;">Dasar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($pendaftaran->perubahan_kk as $i => $perubahan)
+                            <tr>
+                                <td style="padding:6px 8px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;">{{ $i + 1 }}</td>
+                                <td style="padding:6px 8px;border:1px solid #e1d8c2;color:#292524;">{{ $perubahan['semula'] ?? '-' }}</td>
+                                <td style="padding:6px 8px;border:1px solid #e1d8c2;color:#292524;font-weight:600;">{{ $perubahan['menjadi'] ?? '-' }}</td>
+                                <td style="padding:6px 8px;border:1px solid #e1d8c2;color:#44403c;">{{ $perubahan['dasar'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @endif
+
             <div class="notice-box">
                 <strong>ℹ️ Pelacakan Status & Pengambilan Berkas:</strong>
                 Pantau perkembangan permohonan melalui menu <strong>Beranda</strong>. Jika status sudah <strong>Selesai</strong>, silakan datang ke kantor Kecamatan Jatisari dengan menunjukkan nomor registrasi ini.

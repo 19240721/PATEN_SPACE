@@ -44,6 +44,7 @@ class Pendaftaran extends Model
         'nik_anak',
         'keterangan_kk',
         'anggota_kk',
+        'perubahan_kk',
         'nama_alm',
         'nama_ayah',
         'nama_ibu',
@@ -90,6 +91,7 @@ class Pendaftaran extends Model
         return [
             'documents' => 'array',
             'anggota_kk' => 'array',
+            'perubahan_kk' => 'array',
             'tanggal_daftar' => 'date',
         ];
     }
