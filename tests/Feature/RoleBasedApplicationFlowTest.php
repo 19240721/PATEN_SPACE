@@ -128,6 +128,36 @@ class RoleBasedApplicationFlowTest extends TestCase
             ->assertSee('kartu-keluarga.pdf');
     }
 
+    public function test_masyarakat_can_submit_permohonan_without_explicit_alamat_field(): void
+    {
+        $citizen = User::factory()->create([
+            'name' => 'Sarinah',
+            'role' => 'masyarakat',
+            'nik' => null,
+        ]);
+
+        $response = $this->actingAs($citizen)->post(route('masyarakat.permohonan.store'), [
+            'nama_lengkap' => 'Sarinah',
+            'nik' => '3214116909020002',
+            'jenis_kelamin' => 'P',
+            'tempat_lahir' => 'Karawang',
+            'tanggal_lahir' => '2005-07-19',
+            'jalan' => 'Dusun Kertajaya',
+            'rt' => '001',
+            'rw' => '001',
+            'desa' => 'Balonggandu',
+            'jenis_layanan' => 'KTP',
+            'alasan_pembaruan' => 'Rusak',
+            'tanggal_daftar' => '2026-11-04',
+        ]);
+
+        $pendaftaran = Pendaftaran::where('nik', '3214116909020002')->firstOrFail();
+        $response->assertRedirect(route('masyarakat.permohonan.success', $pendaftaran));
+        $this->assertStringContainsString('Dusun Kertajaya', $pendaftaran->alamat);
+        $this->assertStringContainsString('Balonggandu', $pendaftaran->alamat);
+        $this->assertSame('3214116909020002', $citizen->fresh()->nik);
+    }
+
     public function test_petugas_can_register_a_walk_in_application(): void
     {
         $petugas = User::factory()->create(['name' => 'Petugas Loket', 'role' => 'petugas']);

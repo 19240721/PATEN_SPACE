@@ -257,6 +257,18 @@ class PendaftaranController extends Controller
             $validated['petugas'] = $request->user()->name;
         }
 
+        if (blank($validated['alamat'] ?? null)) {
+            $parts = array_filter([
+                $validated['jalan'] ?? null,
+                (filled($validated['rt'] ?? null) || filled($validated['rw'] ?? null))
+                    ? 'RT ' . ($validated['rt'] ?? '-') . ' / RW ' . ($validated['rw'] ?? '-')
+                    : null,
+                filled($validated['desa'] ?? null) ? 'Desa ' . $validated['desa'] : null,
+                filled($validated['kecamatan'] ?? null) ? 'Kec. ' . $validated['kecamatan'] : 'Kec. Jatisari',
+            ]);
+            $validated['alamat'] = !empty($parts) ? implode(', ', $parts) : '-';
+        }
+
         unset($validated['documents']);
         $pendaftaran = Pendaftaran::create($validated);
 
@@ -578,6 +590,17 @@ class PendaftaranController extends Controller
         unset($validated['documents']);
         if ($newDocuments !== []) {
             $validated['documents'] = array_merge($pendaftaran->documents ?? [], $newDocuments);
+        }
+        if (blank($validated['alamat'] ?? null)) {
+            $parts = array_filter([
+                $validated['jalan'] ?? null,
+                (filled($validated['rt'] ?? null) || filled($validated['rw'] ?? null))
+                    ? 'RT ' . ($validated['rt'] ?? '-') . ' / RW ' . ($validated['rw'] ?? '-')
+                    : null,
+                filled($validated['desa'] ?? null) ? 'Desa ' . $validated['desa'] : null,
+                filled($validated['kecamatan'] ?? null) ? 'Kec. ' . $validated['kecamatan'] : 'Kec. Jatisari',
+            ]);
+            $validated['alamat'] = !empty($parts) ? implode(', ', $parts) : ($pendaftaran->alamat ?? '-');
         }
         $pendaftaran->update($validated);
 
