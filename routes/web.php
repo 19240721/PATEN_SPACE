@@ -90,4 +90,6 @@ Route::middleware(['auth', 'role:camat'])->prefix('camat')->name('camat.')->grou
     Route::get('/aktivitas', [CamatController::class, 'aktivitas'])->name('aktivitas');
     Route::get('/notifikasi', [CamatController::class, 'notifikasi'])->name('notifikasi');
     Route::get('/profil', [CamatController::class, 'profil'])->name('profil');
+    Route::put('/profil', [CamatController::class, 'updateProfil'])->name('profil.update');
+    Route::get('/profil/foto', [CamatController::class, 'fotoProfil'])->name('profil.foto');
 });

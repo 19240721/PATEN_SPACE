@@ -24,11 +24,13 @@ class DatabaseSeeder extends Seeder
                 'phone' => '081200000004',
             ],
             [
-                'name' => 'Camat Jatisari',
+                'name' => 'H. Surisno, SKM., MAP.',
                 'email' => 'camat@patenspace.test',
                 'role' => 'camat',
                 'nik' => '3200000000000001',
+                'nip' => '19690516 198903 1 003',
                 'phone' => '081200000001',
+                'alamat_kantor' => 'Jl. Raya Jatisari No. 1, Jatisari, Kec. Jatisari, Kabupaten Karawang, Jawa Barat 41374',
             ],
             [
                 'name' => 'Masyarakat PATEN',

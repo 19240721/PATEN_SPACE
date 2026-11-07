@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class CamatController extends Controller
 {
@@ -1129,24 +1130,124 @@ class CamatController extends Controller
     /**
      * Halaman Profil Camat Jatisari
      */
-    public function profil()
+    public function profil(Request $request)
     {
+        $user = $request->user();
+
+        // Data default resmi Kecamatan Jatisari
+        $defaultNip = '19690516 198903 1 003';
+        $defaultAlamat = 'Jl. Raya Jatisari No. 1, Jatisari, Kec. Jatisari, Kabupaten Karawang, Jawa Barat 41374';
+
+        $nama = $user ? ($user->name ?: 'H. Surisno, SKM., MAP.') : 'H. Surisno, SKM., MAP.';
+        $nip = ($user && !empty($user->nip)) ? $user->nip : $defaultNip;
+        $alamat = ($user && !empty($user->alamat_kantor)) ? $user->alamat_kantor : $defaultAlamat;
+        $telepon = ($user && !empty($user->phone)) ? $user->phone : '(0267) 861234';
+        $email = $user ? ($user->email ?: 'camat@patenspace.test') : 'camat@patenspace.test';
+
+        // Hitung inisial dari nama
+        $inisial = 'HS';
+        if (!empty($nama)) {
+            $words = preg_split('/[\s,\.]+/', trim($nama), -1, PREG_SPLIT_NO_EMPTY);
+            if (!empty($words)) {
+                $inisial = count($words) === 1
+                    ? strtoupper(substr($words[0], 0, 2))
+                    : strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            }
+        }
+
+        // Cek URL Foto Profil jika tersedia
+        $fotoUrl = null;
+        if ($user && !empty($user->foto_profil) && Storage::disk('public')->exists($user->foto_profil)) {
+            $fotoUrl = route('camat.profil.foto');
+        }
+
         $profile = [
-            'nama' => 'Camat Jatisari',
-            'inisial' => 'CJ',
+            'user' => $user,
+            'nama' => $nama,
+            'inisial' => $inisial,
             'jabatan' => 'Pimpinan / Camat',
             'kecamatan' => 'Jatisari',
             'kabupaten' => 'Karawang',
             'instansi' => 'Pemerintah Kabupaten Karawang',
             'role' => 'Pimpinan / Camat (Monitoring & Pengawasan)',
-            'nip' => '19740512 199803 1 004',
-            'email' => 'camat.jatisari@karawangkab.go.id',
-            'telepon' => '(0267) 861234',
-            'alamat_kantor' => 'Jl. Raya Jatisari No. 1, Jatisari, Kec. Jatisari, Kabupaten Karawang, Jawa Barat 41374',
+            'nip' => $nip,
+            'email' => $email,
+            'telepon' => $telepon,
+            'alamat_kantor' => $alamat,
+            'foto_url' => $fotoUrl,
         ];
 
         return view('camat.profil', [
+            'user' => $user,
             'profile' => $profile,
+        ]);
+    }
+
+    /**
+     * Memperbarui Data Profil Camat
+     */
+    public function updateProfil(Request $request)
+    {
+        $user = $request->user();
+        abort_unless($user && $user->role === 'camat', 403, 'Akses tidak diizinkan.');
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:30', 'regex:/^[0-9\+\-\s\(\)\.\/]+$/'],
+            'alamat_kantor' => ['nullable', 'string', 'max:500'],
+            'foto_profil' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ], [
+            'name.required' => 'Nama lengkap Camat tidak boleh kosong.',
+            'name.string' => 'Nama lengkap harus berupa teks.',
+            'name.max' => 'Nama lengkap maksimal 255 karakter.',
+            'phone.required' => 'Nomor telepon tidak boleh kosong.',
+            'phone.regex' => 'Format nomor telepon tidak valid. Gunakan format angka dan tanda baca yang wajar.',
+            'phone.max' => 'Nomor telepon maksimal 30 karakter.',
+            'alamat_kantor.max' => 'Alamat kantor maksimal 500 karakter.',
+            'foto_profil.image' => 'File yang diunggah harus berupa gambar.',
+            'foto_profil.mimes' => 'Format foto profil yang diizinkan hanya JPG, JPEG, dan PNG.',
+            'foto_profil.max' => 'Ukuran foto profil maksimal adalah 2 MB.',
+        ]);
+
+        // Simpan foto profil baru jika ada file yang diunggah
+        if ($request->hasFile('foto_profil') && $request->file('foto_profil')->isValid()) {
+            $oldPhoto = $user->foto_profil;
+            $newPhotoPath = $request->file('foto_profil')->store('profile-photos', 'public');
+            $user->foto_profil = $newPhotoPath;
+
+            // Hapus foto lama hanya setelah foto baru berhasil disimpan di storage
+            if ($oldPhoto && Storage::disk('public')->exists($oldPhoto)) {
+                Storage::disk('public')->delete($oldPhoto);
+            }
+        }
+
+        $user->name = $validated['name'];
+        $user->phone = $validated['phone'];
+        if (array_key_exists('alamat_kantor', $validated)) {
+            $user->alamat_kantor = $validated['alamat_kantor'];
+        }
+
+        $user->save();
+
+        return redirect()
+            ->route('camat.profil')
+            ->with('success', 'Profil Camat berhasil diperbarui.');
+    }
+
+    /**
+     * Menampilkan Foto Profil Camat yang tersimpan di storage
+     */
+    public function fotoProfil(Request $request)
+    {
+        $user = $request->user();
+        abort_unless($user && !empty($user->foto_profil) && Storage::disk('public')->exists($user->foto_profil), 404);
+
+        $path = Storage::disk('public')->path($user->foto_profil);
+        $mime = Storage::disk('public')->mimeType($user->foto_profil) ?: 'image/jpeg';
+
+        return response()->file($path, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'no-cache, private',
         ]);
     }
 }
