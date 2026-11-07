@@ -95,4 +95,46 @@ class Pendaftaran extends Model
             'tanggal_daftar' => 'date',
         ];
     }
+
+    public function aktivitasPelayanans()
+    {
+        return $this->hasMany(AktivitasPelayanan::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (Pendaftaran $pendaftaran) {
+            try {
+                if (auth()->check()) {
+                    $user = auth()->user();
+                    $rawRole = strtolower($user->getRawOriginal('role') ?? '');
+                    $role = strtolower($user->role ?? '');
+                    if (!in_array($rawRole, ['masyarakat', 'camat'], true) && !in_array($role, ['masyarakat', 'camat'], true)) {
+                        AktivitasPelayanan::catat(
+                            aktivitas: 'Pendaftaran ' . ($pendaftaran->jenis_layanan ?? 'Pelayanan'),
+                            jenisLayanan: $pendaftaran->jenis_layanan ?? 'Pelayanan',
+                            deskripsi: 'Menambahkan berkas pendaftaran baru pemohon ' . ($pendaftaran->nama_lengkap ?? '-'),
+                            pendaftaran: $pendaftaran,
+                            status: 'Berhasil',
+                            user: $user
+                        );
+                        return;
+                    }
+                }
+
+                if (!empty($pendaftaran->petugas) && ($pendaftaran->intake_source === 'petugas' || empty($pendaftaran->intake_source))) {
+                    AktivitasPelayanan::catatFallback(
+                        namaPetugas: $pendaftaran->petugas,
+                        aktivitas: 'Pendaftaran ' . ($pendaftaran->jenis_layanan ?? 'Pelayanan'),
+                        jenisLayanan: $pendaftaran->jenis_layanan ?? 'Pelayanan',
+                        deskripsi: 'Menambahkan berkas pendaftaran baru pemohon ' . ($pendaftaran->nama_lengkap ?? '-'),
+                        pendaftaran: $pendaftaran,
+                        status: 'Berhasil'
+                    );
+                }
+            } catch (\Throwable $e) {
+                // Cegah kegagalan flow utama jika tabel belum dimigrasi
+            }
+        });
+    }
 }

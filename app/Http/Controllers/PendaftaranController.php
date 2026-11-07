@@ -692,6 +692,19 @@ class PendaftaranController extends Controller
 
         $pendaftaran->update($validated);
 
+        try {
+            if ($request->user() && in_array(strtolower($request->user()->role ?? ''), ['petugas', 'operator', 'admin'])) {
+                \App\Models\AktivitasPelayanan::catat(
+                    aktivitas: 'Pembaruan Data ' . ($pendaftaran->jenis_layanan ?? 'Pelayanan'),
+                    jenisLayanan: $pendaftaran->jenis_layanan ?? 'Pelayanan',
+                    deskripsi: 'Memperbarui data permohonan ' . ($pendaftaran->nama_lengkap ?? '-'),
+                    pendaftaran: $pendaftaran,
+                    status: 'Berhasil',
+                    user: $request->user()
+                );
+            }
+        } catch (\Throwable $e) {}
+
         return redirect()
             ->route('dashboard')
             ->with('success', 'Data pendaftaran berhasil diperbarui.');
@@ -699,7 +712,23 @@ class PendaftaranController extends Controller
 
     public function destroy(Pendaftaran $pendaftaran)
     {
+        $jenis = $pendaftaran->jenis_layanan ?? 'Pelayanan';
+        $nama = $pendaftaran->nama_lengkap ?? '-';
+
         $pendaftaran->delete();
+
+        try {
+            if (auth()->check() && in_array(strtolower(auth()->user()->role ?? ''), ['petugas', 'operator', 'admin'])) {
+                \App\Models\AktivitasPelayanan::catat(
+                    aktivitas: 'Penghapusan Data ' . $jenis,
+                    jenisLayanan: $jenis,
+                    deskripsi: 'Menghapus data permohonan ' . $nama,
+                    pendaftaran: null,
+                    status: 'Berhasil',
+                    user: auth()->user()
+                );
+            }
+        } catch (\Throwable $e) {}
 
         return Redirect::route('dashboard')->with('success', 'Data pendaftaran berhasil dihapus.');
     }
@@ -791,11 +820,29 @@ class PendaftaranController extends Controller
             'catatan_petugas' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $pendaftaran->update([
+        $updateData = [
             'status' => $validated['status'],
             'alasan_penolakan' => $validated['alasan_penolakan'] ?? null,
             'catatan_petugas' => $validated['catatan_petugas'] ?? null,
-        ]);
+        ];
+
+        if (empty($pendaftaran->petugas) && $request->user()) {
+            $updateData['petugas'] = $request->user()->name;
+        }
+
+        $pendaftaran->update($updateData);
+
+        try {
+            $logStatus = $validated['status'] === 'Ditolak' ? 'Ditolak' : 'Berhasil';
+            \App\Models\AktivitasPelayanan::catat(
+                aktivitas: 'Pembaruan Status ' . ($pendaftaran->jenis_layanan ?? 'Pelayanan'),
+                jenisLayanan: $pendaftaran->jenis_layanan ?? 'Pelayanan',
+                deskripsi: 'Mengubah status permohonan ' . ($pendaftaran->nama_lengkap ?? '-') . ' menjadi ' . $validated['status'],
+                pendaftaran: $pendaftaran,
+                status: $logStatus,
+                user: $request->user()
+            );
+        } catch (\Throwable $e) {}
 
         return redirect()
             ->route('petugas.permohonan.show', $pendaftaran)

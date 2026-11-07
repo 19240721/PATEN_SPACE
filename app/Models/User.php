@@ -59,4 +59,20 @@ class User extends Authenticatable
             get: fn (string $value): string => in_array($value, ['operator', 'admin'], true) ? 'petugas' : $value,
         );
     }
+
+    public function getPeranLayananAttribute(): ?string
+    {
+        $rawRole = strtolower($this->getRawOriginal('role') ?? '');
+        $role = strtolower($this->role ?? '');
+
+        if (in_array($rawRole, ['camat', 'masyarakat'], true) || in_array($role, ['camat', 'masyarakat'], true)) {
+            return null;
+        }
+
+        if ($rawRole === 'operator' || stripos($this->name, 'operator') !== false || stripos($this->email, 'operator') !== false) {
+            return 'Operator';
+        }
+
+        return 'Petugas';
+    }
 }

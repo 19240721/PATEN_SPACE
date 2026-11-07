@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AktivitasPelayanan;
 use App\Models\Pendaftaran;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class CamatController extends Controller
 {
@@ -919,41 +922,147 @@ class CamatController extends Controller
     }
 
     /**
-     * Halaman Aktivitas Pelayanan oleh Operator
+     * Halaman Aktivitas Pelayanan oleh Operator & Petugas
      */
     public function aktivitas(Request $request)
     {
-        $pendaftarans = Pendaftaran::latest()->get();
-        $allLogs = [];
-        $id = 1;
+        Carbon::setLocale('id');
 
-        foreach ($pendaftarans as $p) {
-            $allLogs[] = [
-                'id' => $id++,
-                'operator' => !empty($p->petugas) ? $p->petugas : 'Petugas Operator',
-                'aktivitas' => "Pendaftaran " . ($p->jenis_layanan ?? 'Pelayanan'),
-                'jenis' => $p->jenis_layanan ?? 'Pelayanan',
-                'waktu' => $p->created_at ? $p->created_at->format('H:i') : ($p->tanggal_daftar ? Carbon::parse($p->tanggal_daftar)->format('H:i') : '—'),
-                'status' => 'Berhasil',
-            ];
+        // 1. Ambil data log aktivitas dari database (AktivitasPelayanan)
+        $hasAktivitasTable = false;
+        try {
+            $hasAktivitasTable = Schema::hasTable('aktivitas_pelayanans');
+        } catch (\Throwable $e) {
+            $hasAktivitasTable = false;
         }
 
-        $filterOperator = $request->input('operator', 'semua');
-        $filteredLogs = $allLogs;
+        $allLogsCollection = collect();
+        if ($hasAktivitasTable) {
+            $allLogsCollection = AktivitasPelayanan::latest('id')->get();
+        }
+
+        // 2. Total Catatan Aktivitas nyata
+        $totalAktivitas = $allLogsCollection->count();
+
+        // 3. Hitung akun Petugas Layanan Aktif (Operator + Petugas, tanpa Camat & Masyarakat)
+        $serviceUsers = User::all()->filter(function ($user) {
+            $rawRole = strtolower($user->getRawOriginal('role') ?? '');
+            $role = strtolower($user->role ?? '');
+            if (in_array($rawRole, ['camat', 'masyarakat'], true) || in_array($role, ['camat', 'masyarakat'], true)) {
+                return false;
+            }
+            return in_array($rawRole, ['petugas', 'operator', 'admin'], true) || $role === 'petugas';
+        });
+
+        $operatorCount = 0;
+        $petugasCount = 0;
+        foreach ($serviceUsers as $u) {
+            $rawRole = strtolower($u->getRawOriginal('role') ?? '');
+            if ($rawRole === 'operator' || stripos($u->name, 'operator') !== false || stripos($u->email, 'operator') !== false) {
+                $operatorCount++;
+            } else {
+                $petugasCount++;
+            }
+        }
+
+        $totalPetugasLayanan = $operatorCount + $petugasCount;
+        $breakdownPetugas = $totalPetugasLayanan > 0
+            ? "{$operatorCount} Operator · {$petugasCount} Petugas"
+            : "0 Operator · 0 Petugas";
+
+        // 4. Hitung Status Pelayanan berdasarkan transaksi nyata di database
+        $totalTransaksi = Pendaftaran::count();
+        if ($totalTransaksi === 0) {
+            $statusPelayananText = '—';
+            $statusPelayananSub = 'Belum Ada Data';
+            $statusPelayananColor = '#64748b';
+            $persenBerhasil = null;
+        } else {
+            $transaksiSelesai = Pendaftaran::whereRaw('LOWER(status) = ?', ['selesai'])->count();
+            $persenBerhasil = round(($transaksiSelesai / $totalTransaksi) * 100, 1);
+            $statusPelayananText = "{$persenBerhasil}% Berhasil";
+            $statusPelayananSub = "{$transaksiSelesai} dari {$totalTransaksi} Transaksi Tervalidasi";
+            $statusPelayananColor = $persenBerhasil >= 80 ? '#15803d' : ($persenBerhasil >= 50 ? '#0870c9' : '#ea580c');
+        }
+
+        // 5. Daftar Akun untuk Pilihan Filter Operator / Petugas
+        $availableOperators = [];
+        $seenNames = [];
+        foreach ($serviceUsers as $su) {
+            $peran = ($su->peran_layanan ?? 'Petugas');
+            $seenNames[$su->name] = true;
+            $availableOperators[] = [
+                'name' => $su->name,
+                'peran' => $peran,
+            ];
+        }
+        foreach ($allLogsCollection->pluck('nama_petugas')->unique() as $nama) {
+            if (!empty($nama) && !isset($seenNames[$nama])) {
+                $seenNames[$nama] = true;
+                $peran = stripos($nama, 'operator') !== false ? 'Operator' : 'Petugas';
+                $availableOperators[] = [
+                    'name' => $nama,
+                    'peran' => $peran,
+                ];
+            }
+        }
+
+        // 6. Filter Log berdasarkan Operator / Petugas yang dipilih
+        $filterOperator = (string)$request->input('operator', 'semua');
+        $filteredLogs = $allLogsCollection;
 
         if ($filterOperator !== 'semua' && !empty($filterOperator)) {
-            $filteredLogs = array_filter($filteredLogs, function ($item) use ($filterOperator) {
-                return stripos($item['operator'], $filterOperator) !== false;
+            $filteredLogs = $filteredLogs->filter(function ($item) use ($filterOperator) {
+                return (strcasecmp($item->nama_petugas, $filterOperator) === 0)
+                    || (strcasecmp($item->peran, $filterOperator) === 0)
+                    || (stripos($item->nama_petugas, $filterOperator) !== false);
             });
         }
 
-        $operatorsCount = $pendaftarans->pluck('petugas')->filter()->unique()->count();
+        $formattedLogs = $filteredLogs->values()->map(function ($item, $index) {
+            $date = $item->created_at ? Carbon::parse($item->created_at) : null;
+            return [
+                'id' => $item->id,
+                'number' => str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT),
+                'operator' => $item->nama_petugas,
+                'peran' => $item->peran ?? 'Petugas',
+                'aktivitas' => $item->aktivitas,
+                'jenis' => $item->jenis_layanan ?? 'Pelayanan',
+                'deskripsi' => $item->deskripsi,
+                'waktu' => $date ? $date->locale('id')->diffForHumans() . ' (' . $date->format('H:i') . ' WIB)' : '—',
+                'waktu_detail' => $date ? $date->format('d/m/Y H:i') . ' WIB' : '—',
+                'status' => $item->status ?? 'Berhasil',
+            ];
+        })->all();
+
+        // 7. Dukungan Polling Real-time via JSON
+        if ($request->expectsJson() || $request->ajax() || $request->query('format') === 'json') {
+            return response()->json([
+                'success' => true,
+                'timestamp' => now()->toIso8601String(),
+                'totalAktivitas' => $totalAktivitas,
+                'totalAktivitasFormatted' => "{$totalAktivitas} Aktivitas",
+                'subAktivitas' => $totalAktivitas > 0 ? 'Sesi Operasional Terdata' : 'Belum Ada Aktivitas',
+                'totalPetugasLayanan' => $totalPetugasLayanan,
+                'totalPetugasLayananFormatted' => "{$totalPetugasLayanan} Petugas Layanan",
+                'breakdownPetugas' => $breakdownPetugas,
+                'statusPelayananText' => $statusPelayananText,
+                'statusPelayananSub' => $statusPelayananSub,
+                'statusPelayananColor' => $statusPelayananColor,
+                'logs' => $formattedLogs,
+            ]);
+        }
 
         return view('camat.aktivitas', [
-            'logs' => $filteredLogs,
+            'logs' => $formattedLogs,
             'filterOperator' => $filterOperator,
-            'totalAktivitas' => count($allLogs),
-            'operatorAktifCount' => max($operatorsCount, $pendaftarans->count() > 0 ? 1 : 0),
+            'availableOperators' => $availableOperators,
+            'totalAktivitas' => $totalAktivitas,
+            'totalPetugasLayanan' => $totalPetugasLayanan,
+            'breakdownPetugas' => $breakdownPetugas,
+            'statusPelayananText' => $statusPelayananText,
+            'statusPelayananSub' => $statusPelayananSub,
+            'statusPelayananColor' => $statusPelayananColor,
         ]);
     }
 
