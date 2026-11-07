@@ -355,9 +355,17 @@ class CamatDashboardTest extends TestCase
         $response->assertSee('14 Desa Kecamatan Jatisari');
         $response->assertSee('desa-chart-scroll-box');
         $response->assertSee('desa-plot-area');
-        $response->assertSee('status-charts-grid');
         $response->assertSee('desa-bar-tooltip');
         $response->assertDontSee('desa-row-item');
+
+        // Verifikasi urutan tata letak: 1. Status Pelayanan -> 2. Distribusi Status -> 3. Statistik per Desa
+        $content = $response->getContent();
+        $posStatusPelayanan = strpos($content, 'Status Pelayanan');
+        $posDistribusiStatus = strpos($content, 'Distribusi Status');
+        $posStatistikDesa = strpos($content, 'Statistik per Desa');
+        $this->assertTrue($posStatusPelayanan !== false && $posDistribusiStatus !== false && $posStatistikDesa !== false);
+        $this->assertTrue($posStatusPelayanan < $posDistribusiStatus, 'Status Pelayanan harus berada sebelum Distribusi Status');
+        $this->assertTrue($posDistribusiStatus < $posStatistikDesa, 'Distribusi Status harus berada sebelum Statistik per Desa');
 
         $expectedDesa = [
             'Balonggandu',
@@ -381,8 +389,10 @@ class CamatDashboardTest extends TestCase
         }
 
         $response->assertViewHas('totalDesaPelayanan', 0);
-        $response->assertViewHas('desaChartMax', 0);
-        $response->assertViewHas('desaChartTicks', [0]);
+        $response->assertViewHas('desaChartMax', 10);
+        $response->assertViewHas('desaChartTicks', [0, 2, 4, 6, 8, 10]);
+        $response->assertSee('Belum ada data pelayanan untuk periode yang dipilih.');
+        $response->assertDontSee('Sinkron Otomatis');
         $response->assertViewHas('desaStats', function ($stats) use ($expectedDesa) {
             if (count($stats) !== 14) {
                 return false;
@@ -484,6 +494,121 @@ class CamatDashboardTest extends TestCase
         });
         $responseAfter->assertSee('Pacing');
         $responseAfter->assertSee('1 pelayanan');
+    }
+
+    /**
+     * Test Camat Statistik sinkron otomatis saat operator mengubah atau menghapus data pelayanan
+     */
+    public function test_camat_statistik_syncs_automatically_when_operator_updates_or_deletes_registration(): void
+    {
+        // 1. Operator membuat data baru untuk desa Cikalongsari
+        $pendaftaran = Pendaftaran::create([
+            'nama_lengkap' => 'Warga Cikalongsari',
+            'nik' => '3201010101010888',
+            'alamat' => 'Kp. Babakan',
+            'desa' => 'Cikalongsari',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-07-01',
+            'status' => 'Proses',
+        ]);
+
+        $res1 = $this->get('/camat/statistik');
+        $res1->assertViewHas('desaStats', function ($stats) {
+            $cikalong = collect($stats)->firstWhere('nama', 'Cikalongsari');
+            return $cikalong && $cikalong['jumlah'] === 1;
+        });
+
+        // 2. Operator mengedit data: ganti desa menjadi Mekarsari
+        $pendaftaran->update(['desa' => 'Mekarsari']);
+
+        $res2 = $this->get('/camat/statistik');
+        $res2->assertViewHas('desaStats', function ($stats) {
+            $cikalong = collect($stats)->firstWhere('nama', 'Cikalongsari');
+            $mekar = collect($stats)->firstWhere('nama', 'Mekarsari');
+            return $cikalong && $cikalong['jumlah'] === 0
+                && $mekar && $mekar['jumlah'] === 1;
+        });
+
+        // 3. Operator menghapus data
+        $pendaftaran->delete();
+
+        $res3 = $this->get('/camat/statistik');
+        $res3->assertViewHas('desaStats', function ($stats) {
+            $mekar = collect($stats)->firstWhere('nama', 'Mekarsari');
+            return $mekar && $mekar['jumlah'] === 0;
+        });
+        $res3->assertViewHas('totalDesaPelayanan', 0);
+    }
+
+    /**
+     * Test Camat Statistik JSON endpoint mengembalikan format valid untuk live polling
+     */
+    public function test_camat_statistik_json_endpoint_returns_data_for_live_polling(): void
+    {
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Jatibaru',
+            'nik' => '3201010101010777',
+            'alamat' => 'Jl. Jatibaru No 1',
+            'desa' => 'Jatibaru',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-08-10',
+            'status' => 'Selesai',
+        ]);
+
+        $response = $this->getJson('/camat/statistik?format=json');
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'timestamp',
+            'totalDesaPelayanan',
+            'totalDesaPelayananFormatted',
+            'maxDesaCount',
+            'desaChartMax',
+            'desaChartTicks',
+            'desaStats' => [
+                '*' => [
+                    'nama',
+                    'desa',
+                    'jumlah',
+                    'jumlah_formatted',
+                    'persentase',
+                    'bar_width',
+                ]
+            ],
+            'distribusiStatus',
+            'statusPelayanan',
+        ]);
+
+        $data = $response->json();
+        $this->assertTrue($data['success']);
+        $this->assertEquals(1, $data['totalDesaPelayanan']);
+        $this->assertEquals('Jatibaru', $data['desaStats'][0]['nama']);
+        $this->assertEquals(1, $data['desaStats'][0]['jumlah']);
+    }
+
+    /**
+     * Test Camat Statistik skala menyesuaikan data volume tinggi seperti contoh 238
+     */
+    public function test_camat_statistik_scale_adapts_to_high_service_volume_like_238(): void
+    {
+        // Masukkan data 238 berkas untuk Jatisari
+        for ($i = 0; $i < 238; $i++) {
+            Pendaftaran::create([
+                'nama_lengkap' => "Warga Jatisari $i",
+                'nik' => '320101010101' . str_pad((string)$i, 4, '0', STR_PAD_LEFT),
+                'alamat' => 'Dusun Jatisari',
+                'desa' => 'Jatisari',
+                'jenis_layanan' => 'KTP',
+                'tanggal_daftar' => '2026-04-10',
+                'status' => 'Selesai',
+            ]);
+        }
+
+        $response = $this->get('/camat/statistik');
+        $response->assertStatus(200);
+        $response->assertViewHas('totalDesaPelayanan', 238);
+        $response->assertViewHas('desaChartMax', 240);
+        $response->assertViewHas('desaChartTicks', [0, 60, 120, 180, 240]);
     }
 
     /**

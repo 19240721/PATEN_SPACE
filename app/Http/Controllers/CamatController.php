@@ -647,35 +647,9 @@ class CamatController extends Controller
         }
 
         // Skala sumbu X horizontal otomatis berdasarkan data aktual pelayanan tertinggi
-        if ($maxDesaCount <= 0) {
-            $desaChartMax = 0;
-            $desaChartTicks = [0];
-        } elseif ($maxDesaCount <= 4) {
-            $desaChartMax = $maxDesaCount;
-            $desaChartTicks = range(0, $maxDesaCount);
-        } else {
-            $roughStep = $maxDesaCount / 4;
-            $magnitude = pow(10, floor(log10($roughStep)));
-            $fraction = $roughStep / $magnitude;
-
-            if ($fraction <= 1.5) {
-                $step = 1 * $magnitude;
-            } elseif ($fraction <= 3) {
-                $step = 2 * $magnitude;
-            } elseif ($fraction <= 7) {
-                $step = 5 * $magnitude;
-            } else {
-                $step = 10 * $magnitude;
-            }
-
-            $step = max(1, (int)$step);
-            $desaChartMax = (int)ceil($maxDesaCount / $step) * $step;
-
-            $desaChartTicks = [];
-            for ($val = 0; $val <= $desaChartMax; $val += $step) {
-                $desaChartTicks[] = $val;
-            }
-        }
+        $ticksInfo = $this->calculateNiceDesaTicks($maxDesaCount);
+        $desaChartMax = $ticksInfo['max'];
+        $desaChartTicks = $ticksInfo['ticks'];
 
         // Hitung persentase lebar batang terhadap skala sumbu X
         foreach ($desaStats as &$d) {
@@ -684,6 +658,22 @@ class CamatController extends Controller
                 : 0;
         }
         unset($d);
+
+        // Dukungan respons JSON untuk sinkronisasi polling otomatis real-time akun Camat
+        if ($request->expectsJson() || $request->ajax() || $request->query('format') === 'json') {
+            return response()->json([
+                'success' => true,
+                'timestamp' => now()->toIso8601String(),
+                'totalDesaPelayanan' => $totalDesaPelayanan,
+                'totalDesaPelayananFormatted' => number_format($totalDesaPelayanan, 0, ',', '.'),
+                'maxDesaCount' => $maxDesaCount,
+                'desaChartMax' => $desaChartMax,
+                'desaChartTicks' => $desaChartTicks,
+                'desaStats' => $desaStats,
+                'distribusiStatus' => $distribusiStatus,
+                'statusPelayanan' => $statusPelayanan,
+            ]);
+        }
 
         return view('camat.statistik', [
             'services' => $services,
@@ -709,6 +699,62 @@ class CamatController extends Controller
             'statusPelayanan' => $statusPelayanan,
             'distribusiStatus' => $distribusiStatus,
         ]);
+    }
+
+    /**
+     * Hitung skala sumbu X horizontal yang proporsional, rapi, dan mudah dibaca.
+     * - Jika data masih 0, gunakan skala cadangan: 0, 2, 4, 6, 8, 10.
+     * - Jika data > 0, skala menyesuaikan nilai tertinggi secara otomatis.
+     *   Contoh jika nilai tertinggi 238 -> 0, 60, 120, 180, 240.
+     */
+    protected function calculateNiceDesaTicks(int $max): array
+    {
+        if ($max <= 0) {
+            return [
+                'max' => 10,
+                'ticks' => [0, 2, 4, 6, 8, 10],
+            ];
+        }
+
+        if ($max <= 4) {
+            return [
+                'max' => $max,
+                'ticks' => range(0, $max),
+            ];
+        }
+
+        $targetIntervals = 4;
+        $roughStep = $max / $targetIntervals;
+        $magnitude = pow(10, floor(log10($roughStep)));
+        $fraction = $roughStep / $magnitude;
+
+        if ($magnitude >= 10) {
+            $niceFractions = [1, 2, 2.5, 4, 5, 6, 8, 10];
+        } else {
+            $niceFractions = [1, 2, 4, 5, 6, 8, 10];
+        }
+
+        $selectedStep = 10 * $magnitude;
+        foreach ($niceFractions as $nf) {
+            $candidate = $nf * $magnitude;
+            if ($candidate >= $roughStep) {
+                $selectedStep = $candidate;
+                break;
+            }
+        }
+
+        $step = (int)ceil($selectedStep);
+        if ($max === 10) {
+            $step = 2;
+        }
+
+        $maxTick = (int)ceil($max / $step) * $step;
+        $ticks = range(0, $maxTick, $step);
+
+        return [
+            'max' => $maxTick,
+            'ticks' => $ticks,
+        ];
     }
 
     /**
