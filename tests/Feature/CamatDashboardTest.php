@@ -344,6 +344,149 @@ class CamatDashboardTest extends TestCase
     }
 
     /**
+     * Test Camat Statistik menampilkan seluruh 14 desa Kecamatan Jatisari saat database kosong
+     */
+    public function test_camat_statistik_displays_all_14_villages_in_empty_state(): void
+    {
+        $response = $this->get('/camat/statistik');
+        $response->assertStatus(200);
+        $response->assertSee('Statistik per Desa');
+        $response->assertSee('Jumlah pelayanan berdasarkan desa');
+        $response->assertSee('14 Desa Kecamatan Jatisari');
+        $response->assertSee('desa-chart-scroll-box');
+        $response->assertSee('desa-plot-area');
+        $response->assertSee('status-charts-grid');
+        $response->assertSee('desa-bar-tooltip');
+        $response->assertDontSee('desa-row-item');
+
+        $expectedDesa = [
+            'Balonggandu',
+            'Barugbug',
+            'Cikalongsari',
+            'Cirejag',
+            'Jatibaru',
+            'Jatiragas',
+            'Jatisari',
+            'Jatiwangi',
+            'Kalijati',
+            'Mekarsari',
+            'Pacing',
+            'Situdam',
+            'Sukamekar',
+            'Telarsari',
+        ];
+
+        foreach ($expectedDesa as $desa) {
+            $response->assertSee($desa);
+        }
+
+        $response->assertViewHas('totalDesaPelayanan', 0);
+        $response->assertViewHas('desaChartMax', 0);
+        $response->assertViewHas('desaChartTicks', [0]);
+        $response->assertViewHas('desaStats', function ($stats) use ($expectedDesa) {
+            if (count($stats) !== 14) {
+                return false;
+            }
+            foreach ($stats as $idx => $s) {
+                if ($s['jumlah'] !== 0 || $s['nama'] !== $expectedDesa[$idx]) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    /**
+     * Test Camat Statistik mengurutkan desa terbanyak ke tersedikit dan mempertahankan seluruh 14 desa
+     */
+    public function test_camat_statistik_sorts_villages_by_service_count_descending(): void
+    {
+        // 3 pendaftaran desa Jatisari
+        for ($i = 0; $i < 3; $i++) {
+            Pendaftaran::create([
+                'nama_lengkap' => "Warga Jatisari $i",
+                'nik' => "320101010101020$i",
+                'alamat' => 'Jl. Jatisari',
+                'desa' => 'Jatisari',
+                'jenis_layanan' => 'KK',
+                'tanggal_daftar' => '2026-05-10',
+                'status' => 'Selesai',
+            ]);
+        }
+
+        // 1 pendaftaran desa Cirejag
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Cirejag',
+            'nik' => '3201010101010210',
+            'alamat' => 'Jl. Cirejag',
+            'desa' => 'Cirejag',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-05-11',
+            'status' => 'Proses',
+        ]);
+
+        $response = $this->get('/camat/statistik');
+        $response->assertStatus(200);
+        $response->assertViewHas('totalDesaPelayanan', 4);
+        $response->assertViewHas('desaStats', function ($stats) {
+            // Pertama harus Jatisari (3)
+            if ($stats[0]['nama'] !== 'Jatisari' || $stats[0]['jumlah'] !== 3) {
+                return false;
+            }
+            // Kedua harus Cirejag (1)
+            if ($stats[1]['nama'] !== 'Cirejag' || $stats[1]['jumlah'] !== 1) {
+                return false;
+            }
+            // Total tetap harus 14 desa
+            if (count($stats) !== 14) {
+                return false;
+            }
+            // Sisa 12 desa harus bernilai 0
+            for ($k = 2; $k < 14; $k++) {
+                if ($stats[$k]['jumlah'] !== 0) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        // Verifikasi tooltip data attributes
+        $response->assertSee('data-desa="Jatisari"', false);
+        $response->assertSee('data-jumlah="3"', false);
+    }
+
+    /**
+     * Test Camat Statistik sinkron otomatis saat operator menambah pelayanan baru
+     */
+    public function test_camat_statistik_syncs_automatically_when_operator_creates_registration(): void
+    {
+        $responseBefore = $this->get('/camat/statistik');
+        $responseBefore->assertViewHas('desaStats', function ($stats) {
+            $pacing = collect($stats)->firstWhere('nama', 'Pacing');
+            return $pacing && $pacing['jumlah'] === 0;
+        });
+
+        // Operator mendaftarkan pelayanan baru dari desa Pacing
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Pacing',
+            'nik' => '3201010101010299',
+            'alamat' => 'Dusun Babakan',
+            'desa' => 'Pacing',
+            'jenis_layanan' => 'Pindah',
+            'tanggal_daftar' => '2026-06-01',
+            'status' => 'Baru',
+        ]);
+
+        $responseAfter = $this->get('/camat/statistik');
+        $responseAfter->assertViewHas('desaStats', function ($stats) {
+            $pacing = collect($stats)->firstWhere('nama', 'Pacing');
+            return $pacing && $pacing['jumlah'] === 1;
+        });
+        $responseAfter->assertSee('Pacing');
+        $responseAfter->assertSee('1 pelayanan');
+    }
+
+    /**
      * Test Laporan Pelayanan
      */
     public function test_camat_laporan_renders_successfully(): void

@@ -397,17 +397,6 @@ class CamatController extends Controller
         }
         $chartPointsString = implode(' ', $chartPoints);
 
-        // Data sebaran per desa di Kecamatan Jatisari
-        $desaGrouped = $pendaftarans->groupBy(fn($i) => !empty($i->desa) ? trim($i->desa) : 'Lainnya');
-        $desaStats = [];
-        foreach ($desaGrouped as $namaDesa => $items) {
-            $desaStats[] = [
-                'desa' => $namaDesa,
-                'jumlah' => $items->count(),
-                'selesai' => $items->filter(fn($i) => strtolower($i->status ?? '') === 'selesai')->count(),
-            ];
-        }
-
         $totalPelayanan = $pendaftarans->count();
         $selesaiCount = $pendaftarans->filter(fn($i) => strtolower($i->status ?? '') === 'selesai')->count();
         $persenSelesai = $totalPelayanan > 0 ? round(($selesaiCount / $totalPelayanan) * 100, 1) : 0;
@@ -591,6 +580,111 @@ class CamatController extends Controller
             'perlu_revisi' => ['count' => $countRevisi, 'percentage' => $pctRevisi],
         ];
 
+        // Daftar 14 Desa Resmi Kecamatan Jatisari, Kabupaten Karawang
+        $daftarDesaJatisari = [
+            'Balonggandu',
+            'Barugbug',
+            'Cikalongsari',
+            'Cirejag',
+            'Jatibaru',
+            'Jatiragas',
+            'Jatisari',
+            'Jatiwangi',
+            'Kalijati',
+            'Mekarsari',
+            'Pacing',
+            'Situdam',
+            'Sukamekar',
+            'Telarsari',
+        ];
+
+        // Inisialisasi seluruh 14 desa dengan jumlah 0
+        $desaCounts = [];
+        foreach ($daftarDesaJatisari as $namaDesa) {
+            $desaCounts[$namaDesa] = 0;
+        }
+
+        // Hitung agregasi pelayanan per desa berdasarkan data pendaftaran pemohon
+        foreach ($filtered as $item) {
+            $itemDesa = trim((string)($item->desa ?? ''));
+            if ($itemDesa !== '') {
+                foreach ($daftarDesaJatisari as $namaDesa) {
+                    if (strcasecmp($itemDesa, $namaDesa) === 0) {
+                        $desaCounts[$namaDesa]++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $totalDesaPelayanan = array_sum($desaCounts);
+        $maxDesaCount = !empty($desaCounts) ? max($desaCounts) : 0;
+
+        $desaStats = [];
+        $orderIndex = 0;
+        foreach ($daftarDesaJatisari as $namaDesa) {
+            $count = $desaCounts[$namaDesa];
+            $desaStats[] = [
+                'nama' => $namaDesa,
+                'desa' => $namaDesa,
+                'jumlah' => $count,
+                'jumlah_formatted' => number_format($count, 0, ',', '.'),
+                'persentase' => $totalDesaPelayanan > 0 ? round(($count / $totalDesaPelayanan) * 100, 1) : 0,
+                'bar_width' => $maxDesaCount > 0 ? max(2, round(($count / $maxDesaCount) * 100, 1)) : 0,
+                'master_order' => $orderIndex++,
+            ];
+        }
+
+        // Pengurutan: Jika sudah ada data pelayanan, urutkan dari terbanyak ke tersedikit (descending).
+        // Jika seluruh desa bernilai 0, pertahankan urutan master desa.
+        if ($maxDesaCount > 0) {
+            usort($desaStats, function ($a, $b) {
+                if ($b['jumlah'] !== $a['jumlah']) {
+                    return $b['jumlah'] <=> $a['jumlah'];
+                }
+                return $a['master_order'] <=> $b['master_order'];
+            });
+        }
+
+        // Skala sumbu X horizontal otomatis berdasarkan data aktual pelayanan tertinggi
+        if ($maxDesaCount <= 0) {
+            $desaChartMax = 0;
+            $desaChartTicks = [0];
+        } elseif ($maxDesaCount <= 4) {
+            $desaChartMax = $maxDesaCount;
+            $desaChartTicks = range(0, $maxDesaCount);
+        } else {
+            $roughStep = $maxDesaCount / 4;
+            $magnitude = pow(10, floor(log10($roughStep)));
+            $fraction = $roughStep / $magnitude;
+
+            if ($fraction <= 1.5) {
+                $step = 1 * $magnitude;
+            } elseif ($fraction <= 3) {
+                $step = 2 * $magnitude;
+            } elseif ($fraction <= 7) {
+                $step = 5 * $magnitude;
+            } else {
+                $step = 10 * $magnitude;
+            }
+
+            $step = max(1, (int)$step);
+            $desaChartMax = (int)ceil($maxDesaCount / $step) * $step;
+
+            $desaChartTicks = [];
+            for ($val = 0; $val <= $desaChartMax; $val += $step) {
+                $desaChartTicks[] = $val;
+            }
+        }
+
+        // Hitung persentase lebar batang terhadap skala sumbu X
+        foreach ($desaStats as &$d) {
+            $d['bar_width'] = ($d['jumlah'] > 0 && $desaChartMax > 0)
+                ? round(($d['jumlah'] / $desaChartMax) * 100, 2)
+                : 0;
+        }
+        unset($d);
+
         return view('camat.statistik', [
             'services' => $services,
             'monthlyTrend' => $monthlyTrend,
@@ -598,6 +692,11 @@ class CamatController extends Controller
             'monthlyMax' => $monthlyMax,
             'chartPoints' => $chartPointsString,
             'desaStats' => $desaStats,
+            'totalDesaPelayanan' => $totalDesaPelayanan,
+            'maxDesaCount' => $maxDesaCount,
+            'desaChartMax' => $desaChartMax,
+            'desaChartTicks' => $desaChartTicks,
+            'daftarDesaJatisari' => $daftarDesaJatisari,
             'periode' => $periode,
             'year' => $year,
             'tahun' => (string)$year,
