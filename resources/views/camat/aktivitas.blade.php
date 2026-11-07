@@ -54,15 +54,15 @@
         <span class="badge-camat info" id="live-activity-badge">Live Activity</span>
     </div>
 
-    {{-- Filter Operator --}}
+    {{-- Filter Pelaksana --}}
     <form method="GET" action="{{ route('camat.aktivitas') }}" class="report-filters" style="background: #f8fafc; padding: 14px 20px; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <label for="filter-operator-select" style="font-size: 0.8rem; font-weight: 700; color: #475569;">Filter Petugas / Operator:</label>
-            <select name="operator" id="filter-operator-select" aria-label="Filter Operator" onchange="this.form.submit()">
-                <option value="semua" {{ $filterOperator === 'semua' ? 'selected' : '' }}>Semua Operator & Petugas</option>
+            <label for="filter-pelaksana-select" style="font-size: 0.82rem; font-weight: 700; color: #475569;">Filter Pelaksana:</label>
+            <select name="pelaksana" id="filter-pelaksana-select" aria-label="Filter Pelaksana" onchange="this.form.submit()">
+                <option value="semua" {{ ($filterPelaksana ?? $filterOperator) === 'semua' ? 'selected' : '' }}>Semua Pelaksana</option>
                 @if(!empty($availableOperators))
                     @foreach ($availableOperators as $op)
-                        <option value="{{ $op['name'] }}" {{ $filterOperator === $op['name'] ? 'selected' : '' }}>
+                        <option value="{{ $op['name'] }}" {{ (($filterPelaksana ?? $filterOperator) === $op['name'] || strtolower($filterPelaksana ?? $filterOperator) === strtolower($op['peran'])) ? 'selected' : '' }}>
                             {{ $op['name'] }} ({{ $op['peran'] }})
                         </option>
                     @endforeach
@@ -71,7 +71,7 @@
         </div>
         <button type="submit" class="report-filter-button">Filter</button>
 
-        @if ($filterOperator !== 'semua')
+        @if (($filterPelaksana ?? $filterOperator) !== 'semua' && !empty($filterPelaksana ?? $filterOperator))
             <a href="{{ route('camat.aktivitas') }}" class="report-reset">Reset</a>
         @endif
     </form>
@@ -90,27 +90,20 @@
             <tbody id="log-table-body">
                 @forelse ($logs as $index => $item)
                     <tr>
-                        <td><strong>{{ $item['number'] }}</strong></td>
+                        <td style="font-weight: 600; color: #475569;">{{ $item['number'] }}</td>
                         <td>
-                            <strong style="color: #1e3a5f; font-size: 0.86rem;">{{ $item['aktivitas'] }}</strong>
+                            <strong style="color: #1e3a5f; font-size: 0.86rem; display: block; margin-bottom: 2px;">{{ $item['aktivitas'] }}</strong>
                             <div style="font-size: 0.72rem; color: #64748b;">
                                 Layanan: {{ $item['jenis'] }}
                                 @if(!empty($item['deskripsi'])) &bull; {{ $item['deskripsi'] }} @endif
                             </div>
                         </td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 28px; height: 28px; border-radius: 50%; background: {{ ($item['peran'] ?? '') === 'Operator' ? '#0870c9' : '#796743' }}; color: #fff; font-size: 0.65rem; font-weight: 700; display: grid; place-items: center;">
-                                    {{ ($item['peran'] ?? '') === 'Operator' ? 'OP' : 'PT' }}
-                                </div>
-                                <div>
-                                    <span style="font-weight: 600; color: #334155; display: block; line-height: 1.2;">{{ $item['operator'] }}</span>
-                                    <small style="font-size: 0.68rem; color: #64748b; font-weight: 600;">{{ $item['peran'] }}</small>
-                                </div>
-                            </div>
+                            <div style="font-weight: 600; color: #334155; font-size: 0.84rem;">{{ $item['operator'] }}</div>
+                            <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">{{ $item['peran'] }}</div>
                         </td>
                         <td>
-                            <span style="font-weight: 600; color: #475569; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem;" title="{{ $item['waktu_detail'] ?? '' }}">
+                            <span style="font-weight: 500; color: #475569; font-size: 0.82rem;" title="{{ $item['waktu_detail'] ?? '' }}">
                                 {{ $item['waktu'] }}
                             </span>
                         </td>
@@ -118,23 +111,16 @@
                             @php
                                 $st = strtolower($item['status'] ?? 'berhasil');
                                 $pillClass = $st === 'berhasil' ? 'selesai' : ($st === 'ditolak' ? 'ditolak' : 'proses');
-                                $pillIcon = $st === 'berhasil' ? '✓' : ($st === 'ditolak' ? '✕' : '⏱');
                             @endphp
                             <span class="status-pill {{ $pillClass }}">
-                                {{ $pillIcon }} {{ $item['status'] }}
+                                {{ $item['status'] }}
                             </span>
                         </td>
                     </tr>
                 @empty
                     <tr id="empty-state-row">
-                        <td colspan="5" class="empty-state" style="text-align: center; padding: 32px 16px; color: #64748b;">
-                            <div style="font-size: 1.8rem; margin-bottom: 6px;">📋</div>
-                            <div style="font-weight: 600; font-size: 0.9rem; color: #334155;">
-                                {{ $filterOperator !== 'semua' ? 'Tidak ada catatan aktivitas untuk petugas/operator yang dipilih.' : 'Belum ada catatan aktivitas pelayanan yang tersimpan di sistem.' }}
-                            </div>
-                            <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 4px;">
-                                Aktivitas operasional yang dilakukan Operator dan Petugas akan tercatat secara otomatis di sini.
-                            </div>
+                        <td colspan="5" class="empty-state" style="text-align: center; padding: 28px 16px; color: #64748b; font-size: 0.86rem;">
+                            {{ ($filterPelaksana ?? $filterOperator) !== 'semua' ? 'Tidak ada catatan aktivitas untuk pelaksana yang dipilih.' : 'Belum ada catatan aktivitas pelayanan yang tersimpan di sistem.' }}
                         </td>
                     </tr>
                 @endforelse
@@ -156,11 +142,12 @@
 
             try {
                 isPolling = true;
-                const filterSelect = document.getElementById('filter-operator-select');
+                const filterSelect = document.getElementById('filter-pelaksana-select') || document.getElementById('filter-operator-select');
                 const currentFilter = filterSelect ? filterSelect.value : 'semua';
                 const url = new URL("{{ route('camat.aktivitas') }}", window.location.origin);
                 url.searchParams.set('format', 'json');
                 if (currentFilter !== 'semua') {
+                    url.searchParams.set('pelaksana', currentFilter);
                     url.searchParams.set('operator', currentFilter);
                 }
 
@@ -197,59 +184,47 @@
                     elSubStatus.style.color = data.statusPelayananText === '—' ? '#64748b' : '#2563eb';
                 }
 
-                // 2. Perbarui Tabel Log Aktivitas
+                // 2. Perbarui Tabel Log Aktivitas (tampilan bersih tanpa ikon/emoji dekoratif)
                 const tbody = document.getElementById('log-table-body');
                 if (!tbody) return;
 
                 if (!data.logs || data.logs.length === 0) {
                     const emptyMsg = currentFilter !== 'semua'
-                        ? 'Tidak ada catatan aktivitas untuk petugas/operator yang dipilih.'
+                        ? 'Tidak ada catatan aktivitas untuk pelaksana yang dipilih.'
                         : 'Belum ada catatan aktivitas pelayanan yang tersimpan di sistem.';
                     tbody.innerHTML = `
                         <tr id="empty-state-row">
-                            <td colspan="5" class="empty-state" style="text-align: center; padding: 32px 16px; color: #64748b;">
-                                <div style="font-size: 1.8rem; margin-bottom: 6px;">📋</div>
-                                <div style="font-weight: 600; font-size: 0.9rem; color: #334155;">${emptyMsg}</div>
-                                <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 4px;">Aktivitas operasional yang dilakukan Operator dan Petugas akan tercatat secara otomatis di sini.</div>
+                            <td colspan="5" class="empty-state" style="text-align: center; padding: 28px 16px; color: #64748b; font-size: 0.86rem;">
+                                ${emptyMsg}
                             </td>
                         </tr>
                     `;
                 } else {
                     let rowsHtml = '';
                     data.logs.forEach(item => {
-                        const avatarBg = item.peran === 'Operator' ? '#0870c9' : '#796743';
-                        const avatarText = item.peran === 'Operator' ? 'OP' : 'PT';
                         const st = (item.status || 'Berhasil').toLowerCase();
                         const pillClass = st === 'berhasil' ? 'selesai' : (st === 'ditolak' ? 'ditolak' : 'proses');
-                        const pillIcon = st === 'berhasil' ? '✓' : (st === 'ditolak' ? '✕' : '⏱');
                         const desc = item.deskripsi ? ` &bull; ${escapeHtml(item.deskripsi)}` : '';
 
                         rowsHtml += `
                             <tr>
-                                <td><strong>${item.number}</strong></td>
+                                <td style="font-weight: 600; color: #475569;">${escapeHtml(item.number)}</td>
                                 <td>
-                                    <strong style="color: #1e3a5f; font-size: 0.86rem;">${escapeHtml(item.aktivitas)}</strong>
+                                    <strong style="color: #1e3a5f; font-size: 0.86rem; display: block; margin-bottom: 2px;">${escapeHtml(item.aktivitas)}</strong>
                                     <div style="font-size: 0.72rem; color: #64748b;">Layanan: ${escapeHtml(item.jenis)}${desc}</div>
                                 </td>
                                 <td>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div style="width: 28px; height: 28px; border-radius: 50%; background: ${avatarBg}; color: #fff; font-size: 0.65rem; font-weight: 700; display: grid; place-items: center;">
-                                            ${avatarText}
-                                        </div>
-                                        <div>
-                                            <span style="font-weight: 600; color: #334155; display: block; line-height: 1.2;">${escapeHtml(item.operator)}</span>
-                                            <small style="font-size: 0.68rem; color: #64748b; font-weight: 600;">${escapeHtml(item.peran)}</small>
-                                        </div>
-                                    </div>
+                                    <div style="font-weight: 600; color: #334155; font-size: 0.84rem;">${escapeHtml(item.operator)}</div>
+                                    <div style="font-size: 0.72rem; color: #64748b; font-weight: 500;">${escapeHtml(item.peran)}</div>
                                 </td>
                                 <td>
-                                    <span style="font-weight: 600; color: #475569; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-size: 0.78rem;" title="${escapeHtml(item.waktu_detail || '')}">
+                                    <span style="font-weight: 500; color: #475569; font-size: 0.82rem;" title="${escapeHtml(item.waktu_detail || '')}">
                                         ${escapeHtml(item.waktu)}
                                     </span>
                                 </td>
                                 <td style="text-align: center;">
                                     <span class="status-pill ${pillClass}">
-                                        ${pillIcon} ${escapeHtml(item.status)}
+                                        ${escapeHtml(item.status)}
                                     </span>
                                 </td>
                             </tr>

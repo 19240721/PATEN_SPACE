@@ -938,27 +938,47 @@ class CamatController extends Controller
 
         $allLogsCollection = collect();
         if ($hasAktivitasTable) {
-            $allLogsCollection = AktivitasPelayanan::latest('id')->get();
+            $allLogsCollection = AktivitasPelayanan::latest('id')->get()->filter(function ($item) {
+                $nama = strtolower($item->nama_petugas ?? '');
+                $peran = strtolower($item->peran ?? '');
+                // Kecualikan akun atau tindakan dari admin
+                return stripos($nama, 'admin') === false && $peran !== 'admin';
+            })->values();
         }
 
-        // 2. Total Catatan Aktivitas nyata
+        // 2. Total Catatan Aktivitas nyata (hanya Operator & Petugas)
         $totalAktivitas = $allLogsCollection->count();
 
-        // 3. Hitung akun Petugas Layanan Aktif (Operator + Petugas, tanpa Camat & Masyarakat)
+        // 3. Hitung akun Petugas Layanan Aktif (Hanya Operator + Petugas, kecualikan Admin, Camat, dan Masyarakat)
         $serviceUsers = User::all()->filter(function ($user) {
             $rawRole = strtolower($user->getRawOriginal('role') ?? '');
             $role = strtolower($user->role ?? '');
-            if (in_array($rawRole, ['camat', 'masyarakat'], true) || in_array($role, ['camat', 'masyarakat'], true)) {
+            $name = strtolower($user->name ?? '');
+            $email = strtolower($user->email ?? '');
+
+            // Dikecualikan secara mutlak: Admin, Camat, dan Masyarakat
+            if ($rawRole === 'admin' || stripos($name, 'admin') !== false || stripos($email, 'admin') !== false) {
                 return false;
             }
-            return in_array($rawRole, ['petugas', 'operator', 'admin'], true) || $role === 'petugas';
+            if ($rawRole === 'camat' || $role === 'camat' || stripos($name, 'camat') !== false || stripos($email, 'camat') !== false) {
+                return false;
+            }
+            if ($rawRole === 'masyarakat' || $role === 'masyarakat') {
+                return false;
+            }
+
+            // Hanya kelompok operator atau petugas yang valid
+            return in_array($rawRole, ['petugas', 'operator'], true) || $role === 'petugas';
         });
 
         $operatorCount = 0;
         $petugasCount = 0;
         foreach ($serviceUsers as $u) {
             $rawRole = strtolower($u->getRawOriginal('role') ?? '');
-            if ($rawRole === 'operator' || stripos($u->name, 'operator') !== false || stripos($u->email, 'operator') !== false) {
+            $name = strtolower($u->name ?? '');
+            $email = strtolower($u->email ?? '');
+
+            if ($rawRole === 'operator' || stripos($name, 'operator') !== false || stripos($email, 'operator') !== false) {
                 $operatorCount++;
             } else {
                 $petugasCount++;
@@ -985,45 +1005,40 @@ class CamatController extends Controller
             $statusPelayananColor = $persenBerhasil >= 80 ? '#15803d' : ($persenBerhasil >= 50 ? '#0870c9' : '#ea580c');
         }
 
-        // 5. Daftar Akun untuk Pilihan Filter Operator / Petugas
+        // 5. Daftar Akun untuk Pilihan Filter Pelaksana (Hanya Operator dan Petugas, tanpa Admin)
         $availableOperators = [];
         $seenNames = [];
         foreach ($serviceUsers as $su) {
-            $peran = ($su->peran_layanan ?? 'Petugas');
-            $seenNames[$su->name] = true;
+            $name = $su->name;
+            $rawRole = strtolower($su->getRawOriginal('role') ?? '');
+            $peran = ($rawRole === 'operator' || stripos($name, 'operator') !== false || stripos($su->email, 'operator') !== false)
+                ? 'Operator'
+                : 'Petugas';
+
+            $seenNames[$name] = true;
             $availableOperators[] = [
-                'name' => $su->name,
+                'name' => $name,
                 'peran' => $peran,
             ];
         }
-        foreach ($allLogsCollection->pluck('nama_petugas')->unique() as $nama) {
-            if (!empty($nama) && !isset($seenNames[$nama])) {
-                $seenNames[$nama] = true;
-                $peran = stripos($nama, 'operator') !== false ? 'Operator' : 'Petugas';
-                $availableOperators[] = [
-                    'name' => $nama,
-                    'peran' => $peran,
-                ];
-            }
-        }
 
-        // 6. Filter Log berdasarkan Operator / Petugas yang dipilih
-        $filterOperator = (string)$request->input('operator', 'semua');
+        // 6. Filter Log berdasarkan Pelaksana yang dipilih
+        $filterPelaksana = (string)($request->input('pelaksana', $request->input('operator', 'semua')));
         $filteredLogs = $allLogsCollection;
 
-        if ($filterOperator !== 'semua' && !empty($filterOperator)) {
-            $filteredLogs = $filteredLogs->filter(function ($item) use ($filterOperator) {
-                return (strcasecmp($item->nama_petugas, $filterOperator) === 0)
-                    || (strcasecmp($item->peran, $filterOperator) === 0)
-                    || (stripos($item->nama_petugas, $filterOperator) !== false);
-            });
+        if ($filterPelaksana !== 'semua' && !empty($filterPelaksana)) {
+            $filteredLogs = $filteredLogs->filter(function ($item) use ($filterPelaksana) {
+                return (strcasecmp($item->nama_petugas, $filterPelaksana) === 0)
+                    || (strcasecmp($item->peran, $filterPelaksana) === 0)
+                    || (stripos($item->nama_petugas, $filterPelaksana) !== false);
+            })->values();
         }
 
-        $formattedLogs = $filteredLogs->values()->map(function ($item, $index) {
+        $formattedLogs = $filteredLogs->map(function ($item, $index) {
             $date = $item->created_at ? Carbon::parse($item->created_at) : null;
             return [
                 'id' => $item->id,
-                'number' => str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT),
+                'number' => (string)($index + 1),
                 'operator' => $item->nama_petugas,
                 'peran' => $item->peran ?? 'Petugas',
                 'aktivitas' => $item->aktivitas,
@@ -1055,7 +1070,8 @@ class CamatController extends Controller
 
         return view('camat.aktivitas', [
             'logs' => $formattedLogs,
-            'filterOperator' => $filterOperator,
+            'filterPelaksana' => $filterPelaksana,
+            'filterOperator' => $filterPelaksana,
             'availableOperators' => $availableOperators,
             'totalAktivitas' => $totalAktivitas,
             'totalPetugasLayanan' => $totalPetugasLayanan,

@@ -874,6 +874,103 @@ class CamatDashboardTest extends TestCase
         $response->assertSee('Log Aktivitas Pelayanan');
     }
 
+    public function test_camat_aktivitas_filter_pelaksana_and_excludes_admin(): void
+    {
+        // Setup user: 1 Operator, 1 Admin, 1 Petugas
+        User::factory()->create([
+            'name' => 'Operator PATEN',
+            'email' => 'operator@patenspace.test',
+            'role' => 'petugas',
+        ]);
+        User::factory()->create([
+            'name' => 'Admin PATEN',
+            'email' => 'admin@patenspace.test',
+            'role' => 'admin',
+        ]);
+        User::factory()->create([
+            'name' => 'Petugas PATEN',
+            'email' => 'petugas@patenspace.test',
+            'role' => 'petugas',
+        ]);
+
+        $response = $this->get('/camat/aktivitas');
+        $response->assertStatus(200);
+
+        // Filter label dan opsi
+        $response->assertSee('Filter Pelaksana:');
+        $response->assertSee('Semua Pelaksana');
+        $response->assertSee('Operator PATEN (Operator)');
+        $response->assertSee('Petugas PATEN (Petugas)');
+
+        // Admin PATEN harus dikecualikan dari dropdown
+        $response->assertDontSee('Admin PATEN (Petugas)');
+        $response->assertDontSee('Admin PATEN (Operator)');
+        $response->assertDontSee('Admin PATEN (Admin)');
+
+        // Kartu Petugas Layanan Aktif mengecualikan Admin (2 Petugas Layanan = 1 Operator · 1 Petugas)
+        $response->assertSee('2 Petugas Layanan');
+        $response->assertSee('1 Operator · 1 Petugas');
+
+        // Tampilan data kosong tanpa clipboard emoji
+        $response->assertSee('Belum ada catatan aktivitas pelayanan yang tersimpan di sistem.');
+        $response->assertDontSee('📋');
+    }
+
+    public function test_camat_aktivitas_json_endpoint_realtime(): void
+    {
+        // Setup user: 1 Operator, 1 Admin, 1 Petugas
+        User::factory()->create([
+            'name' => 'Operator PATEN',
+            'email' => 'operator@patenspace.test',
+            'role' => 'petugas',
+        ]);
+        User::factory()->create([
+            'name' => 'Admin PATEN',
+            'email' => 'admin@patenspace.test',
+            'role' => 'admin',
+        ]);
+        User::factory()->create([
+            'name' => 'Petugas PATEN',
+            'email' => 'petugas@patenspace.test',
+            'role' => 'petugas',
+        ]);
+
+        $response = $this->get('/camat/aktivitas?format=json');
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'totalPetugasLayanan' => 2,
+            'totalPetugasLayananFormatted' => '2 Petugas Layanan',
+            'breakdownPetugas' => '1 Operator · 1 Petugas',
+        ]);
+    }
+
+    public function test_camat_aktivitas_filter_actions_and_logs_display(): void
+    {
+        User::factory()->create([
+            'name' => 'Operator PATEN',
+            'email' => 'operator@patenspace.test',
+            'role' => 'petugas',
+        ]);
+        User::factory()->create([
+            'name' => 'Petugas PATEN',
+            'email' => 'petugas@patenspace.test',
+            'role' => 'petugas',
+        ]);
+
+        // Filter parameter pelaksana=Operator
+        $resOp = $this->get('/camat/aktivitas?pelaksana=Operator');
+        $resOp->assertStatus(200);
+
+        // Filter parameter pelaksana=Petugas
+        $resPt = $this->get('/camat/aktivitas?pelaksana=Petugas');
+        $resPt->assertStatus(200);
+
+        // Filter parameter pelaksana=semua
+        $resAll = $this->get('/camat/aktivitas?pelaksana=semua');
+        $resAll->assertStatus(200);
+    }
+
     /**
      * Test Notifikasi Camat
      */
