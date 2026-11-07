@@ -377,10 +377,12 @@ class CamatController extends Controller
     public function statistik(Request $request)
     {
         $pendaftarans = Pendaftaran::all();
+        $tahunInput = (string)$request->input('tahun', (string)now()->year);
+        $year = is_numeric($tahunInput) ? (int)$tahunInput : now()->year;
+        $periode = (string)$request->input('periode', (string)$year);
+
         $services = $this->getServicesCatalog($pendaftarans);
-        $year = now()->year;
         $monthlyTrend = $this->getMonthlyTrend($pendaftarans, $year);
-        $periode = $request->input('periode', (string)$year);
 
         $countsArray = array_column($services, 'count');
         $chartMax = max(1, !empty($countsArray) ? max($countsArray) : 0);
@@ -418,12 +420,175 @@ class CamatController extends Controller
         $peakMonth = collect($monthlyTrend)->sortByDesc('count')->first();
         $peakMonthLabel = ($totalPelayanan > 0 && $peakMonth && $peakMonth['count'] > 0) ? "{$peakMonth['name']} ({$peakMonth['count']})" : "-";
 
-        $dalamProses = $totalPelayanan - $selesaiCount;
+        // Filter data untuk Distribusi Status berdasarkan Tahun & Periode
+        $filtered = $pendaftarans;
+        if ($tahunInput !== 'semua' && !empty($tahunInput)) {
+            $filtered = $filtered->filter(function ($item) use ($year) {
+                $date = $item->tanggal_daftar ?? $item->created_at;
+                if (blank($date)) {
+                    return false;
+                }
+                try {
+                    return (int)Carbon::parse($date)->year === $year;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        }
+
+        if ($periode === 'bulan_ini') {
+            $currentMonth = (int)now()->month;
+            $filtered = $filtered->filter(function ($item) use ($currentMonth) {
+                $date = $item->tanggal_daftar ?? $item->created_at;
+                if (blank($date)) {
+                    return false;
+                }
+                try {
+                    return (int)Carbon::parse($date)->month === $currentMonth;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif (in_array($periode, ['tw1', 'triwulan_1'])) {
+            $filtered = $filtered->filter(function ($item) {
+                $date = $item->tanggal_daftar ?? $item->created_at;
+                if (blank($date)) {
+                    return false;
+                }
+                try {
+                    return in_array((int)Carbon::parse($date)->month, [1, 2, 3]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif (in_array($periode, ['tw2', 'triwulan_2'])) {
+            $filtered = $filtered->filter(function ($item) {
+                $date = $item->tanggal_daftar ?? $item->created_at;
+                if (blank($date)) {
+                    return false;
+                }
+                try {
+                    return in_array((int)Carbon::parse($date)->month, [4, 5, 6]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif (in_array($periode, ['tw3', 'triwulan_3'])) {
+            $filtered = $filtered->filter(function ($item) {
+                $date = $item->tanggal_daftar ?? $item->created_at;
+                if (blank($date)) {
+                    return false;
+                }
+                try {
+                    return in_array((int)Carbon::parse($date)->month, [7, 8, 9]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        } elseif (in_array($periode, ['tw4', 'triwulan_4'])) {
+            $filtered = $filtered->filter(function ($item) {
+                $date = $item->tanggal_daftar ?? $item->created_at;
+                if (blank($date)) {
+                    return false;
+                }
+                try {
+                    return in_array((int)Carbon::parse($date)->month, [10, 11, 12]);
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        }
+
+        // Agregasi 4 status pelayanan
+        $countSelesai = 0;
+        $countProses = 0;
+        $countMenunggu = 0;
+        $countRevisi = 0;
+
+        foreach ($filtered as $item) {
+            $st = strtolower(trim($item->status ?? ''));
+            if ($st === 'selesai') {
+                $countSelesai++;
+            } elseif (in_array($st, ['proses', 'dalam proses', 'dalam_proses', 'diproses', 'sedang diproses'])) {
+                $countProses++;
+            } elseif (in_array($st, ['ditolak', 'perlu revisi', 'perlu_revisi', 'revisi', 'tolak'])) {
+                $countRevisi++;
+            } else {
+                // Menunggu / Baru / Antrean Verifikasi
+                $countMenunggu++;
+            }
+        }
+
+        $totalDistribusi = $countSelesai + $countProses + $countMenunggu + $countRevisi;
+
+        $pctSelesai = $totalDistribusi > 0 ? round(($countSelesai / $totalDistribusi) * 100, 1) : 0;
+        $pctProses = $totalDistribusi > 0 ? round(($countProses / $totalDistribusi) * 100, 1) : 0;
+        $pctMenunggu = $totalDistribusi > 0 ? round(($countMenunggu / $totalDistribusi) * 100, 1) : 0;
+        $pctRevisi = $totalDistribusi > 0 ? round(($countRevisi / $totalDistribusi) * 100, 1) : 0;
+
+        $circ = 502.65; // Keliling lingkaran donat (2 * pi * 80)
+        $runningOffset = 0;
+
+        $rawItems = [
+            'selesai' => [
+                'key' => 'selesai',
+                'label' => 'Selesai',
+                'count' => $countSelesai,
+                'percentage' => $pctSelesai,
+                'color' => '#16a34a',
+                'desc' => 'Berkas tuntas diproses',
+            ],
+            'proses' => [
+                'key' => 'proses',
+                'label' => 'Dalam Proses',
+                'count' => $countProses,
+                'percentage' => $pctProses,
+                'color' => '#ea580c',
+                'desc' => 'Pengerjaan operator',
+            ],
+            'menunggu' => [
+                'key' => 'menunggu',
+                'label' => 'Menunggu',
+                'count' => $countMenunggu,
+                'percentage' => $pctMenunggu,
+                'color' => '#3b82f6',
+                'desc' => 'Antrean verifikasi',
+            ],
+            'perlu_revisi' => [
+                'key' => 'perlu_revisi',
+                'label' => 'Perlu Revisi',
+                'count' => $countRevisi,
+                'percentage' => $pctRevisi,
+                'color' => '#ef4444',
+                'desc' => 'Perbaikan dokumen',
+            ],
+        ];
+
+        $donutSegments = [];
+        foreach ($rawItems as $key => $item) {
+            $arcLen = $totalDistribusi > 0 ? round(($item['count'] / $totalDistribusi) * $circ, 2) : 0;
+            $donutSegments[$key] = array_merge($item, [
+                'count_formatted' => number_format($item['count'], 0, ',', '.'),
+                'arc_length' => $arcLen,
+                'dash_offset' => round($runningOffset, 2),
+            ]);
+            if ($item['count'] > 0) {
+                $runningOffset -= $arcLen;
+            }
+        }
+
+        $distribusiStatus = [
+            'total' => $totalDistribusi,
+            'total_formatted' => number_format($totalDistribusi, 0, ',', '.'),
+            'circumference' => $circ,
+            'items' => $donutSegments,
+        ];
+
         $statusPelayanan = [
-            'selesai' => ['count' => $selesaiCount, 'percentage' => $persenSelesai],
-            'proses' => ['count' => $dalamProses, 'percentage' => $totalPelayanan > 0 ? round(($dalamProses / $totalPelayanan) * 100, 1) : 0],
-            'menunggu' => ['count' => 0, 'percentage' => 0],
-            'perlu_revisi' => ['count' => 0, 'percentage' => 0],
+            'selesai' => ['count' => $countSelesai, 'percentage' => $pctSelesai],
+            'proses' => ['count' => $countProses, 'percentage' => $pctProses],
+            'menunggu' => ['count' => $countMenunggu, 'percentage' => $pctMenunggu],
+            'perlu_revisi' => ['count' => $countRevisi, 'percentage' => $pctRevisi],
         ];
 
         return view('camat.statistik', [
@@ -435,6 +600,7 @@ class CamatController extends Controller
             'desaStats' => $desaStats,
             'periode' => $periode,
             'year' => $year,
+            'tahun' => (string)$year,
             'totalPelayanan' => $totalPelayanan,
             'rataBulanan' => $rataBulanan,
             'persenSelesai' => $persenSelesai,
@@ -442,6 +608,7 @@ class CamatController extends Controller
             'highestServiceCount' => $highestServiceCount,
             'peakMonthLabel' => $peakMonthLabel,
             'statusPelayanan' => $statusPelayanan,
+            'distribusiStatus' => $distribusiStatus,
         ]);
     }
 

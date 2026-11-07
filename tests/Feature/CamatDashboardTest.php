@@ -186,6 +186,164 @@ class CamatDashboardTest extends TestCase
     }
 
     /**
+     * Test Camat Statistik menampilkan card Distribusi Status dalam kondisi kosong
+     */
+    public function test_camat_statistik_displays_distribusi_status_card_and_empty_state(): void
+    {
+        $response = $this->get('/camat/statistik');
+        $response->assertStatus(200);
+        $response->assertSee('Distribusi Status');
+        $response->assertSee('Komposisi status seluruh pelayanan');
+        $response->assertSee('Belum ada data pelayanan');
+        $response->assertSee('donut-tooltip');
+        $response->assertSee('Selesai');
+        $response->assertSee('Dalam Proses');
+        $response->assertSee('Menunggu');
+        $response->assertSee('Perlu Revisi');
+
+        $response->assertViewHas('distribusiStatus', function ($dist) {
+            return $dist['total'] === 0
+                && $dist['items']['selesai']['count'] === 0
+                && $dist['items']['proses']['count'] === 0
+                && $dist['items']['menunggu']['count'] === 0
+                && $dist['items']['perlu_revisi']['count'] === 0;
+        });
+    }
+
+    /**
+     * Test Camat Statistik Distribusi Status mengagregasi 4 status dengan benar
+     */
+    public function test_camat_statistik_distribusi_status_aggregates_all_four_categories(): void
+    {
+        // 2 Selesai
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Selesai 1',
+            'nik' => '3201010101010111',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-02-10',
+            'status' => 'Selesai',
+        ]);
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Selesai 2',
+            'nik' => '3201010101010112',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-02-11',
+            'status' => 'Selesai',
+        ]);
+
+        // 1 Dalam Proses
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Proses 1',
+            'nik' => '3201010101010113',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'Akta',
+            'tanggal_daftar' => '2026-02-12',
+            'status' => 'Proses',
+        ]);
+
+        // 1 Menunggu (Baru)
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Menunggu 1',
+            'nik' => '3201010101010114',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'Pindah',
+            'tanggal_daftar' => '2026-02-13',
+            'status' => 'Baru',
+        ]);
+
+        // 1 Perlu Revisi
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga Revisi 1',
+            'nik' => '3201010101010115',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'Kedatangan',
+            'tanggal_daftar' => '2026-02-14',
+            'status' => 'Perlu Revisi',
+        ]);
+
+        $response = $this->get('/camat/statistik?tahun=2026&periode=tw1');
+        $response->assertStatus(200);
+
+        $response->assertViewHas('distribusiStatus', function ($dist) {
+            return $dist['total'] === 5
+                && $dist['items']['selesai']['count'] === 2
+                && $dist['items']['selesai']['percentage'] == 40.0
+                && $dist['items']['proses']['count'] === 1
+                && $dist['items']['proses']['percentage'] == 20.0
+                && $dist['items']['menunggu']['count'] === 1
+                && $dist['items']['menunggu']['percentage'] == 20.0
+                && $dist['items']['perlu_revisi']['count'] === 1
+                && $dist['items']['perlu_revisi']['percentage'] == 20.0;
+        });
+
+        // Segments rendered in SVG
+        $response->assertSee('data-label="Selesai"', false);
+        $response->assertSee('data-label="Dalam Proses"', false);
+        $response->assertSee('data-label="Menunggu"', false);
+        $response->assertSee('data-label="Perlu Revisi"', false);
+        $response->assertSee('Selesai: 2 pelayanan (40%)');
+    }
+
+    /**
+     * Test Camat Statistik Distribusi Status sinkron dengan filter Tahun dan Periode
+     */
+    public function test_camat_statistik_distribusi_status_syncs_with_tahun_and_periode_filter(): void
+    {
+        // 2026 Q1
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga 2026 Q1',
+            'nik' => '3201010101010121',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-01-15',
+            'status' => 'Selesai',
+        ]);
+
+        // 2026 Q2
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga 2026 Q2',
+            'nik' => '3201010101010122',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-05-15',
+            'status' => 'Proses',
+        ]);
+
+        // 2025
+        Pendaftaran::create([
+            'nama_lengkap' => 'Warga 2025',
+            'nik' => '3201010101010123',
+            'alamat' => 'Jl. Jatisari',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2025-03-15',
+            'status' => 'Selesai',
+        ]);
+
+        // Filter 2026 Q1
+        $resQ1 = $this->get('/camat/statistik?tahun=2026&periode=tw1');
+        $resQ1->assertStatus(200);
+        $resQ1->assertViewHas('distribusiStatus', function ($dist) {
+            return $dist['total'] === 1 && $dist['items']['selesai']['count'] === 1;
+        });
+
+        // Filter 2026 Q2
+        $resQ2 = $this->get('/camat/statistik?tahun=2026&periode=tw2');
+        $resQ2->assertStatus(200);
+        $resQ2->assertViewHas('distribusiStatus', function ($dist) {
+            return $dist['total'] === 1 && $dist['items']['proses']['count'] === 1;
+        });
+
+        // Filter 2025
+        $res2025 = $this->get('/camat/statistik?tahun=2025');
+        $res2025->assertStatus(200);
+        $res2025->assertViewHas('distribusiStatus', function ($dist) {
+            return $dist['total'] === 1 && $dist['items']['selesai']['count'] === 1;
+        });
+    }
+
+    /**
      * Test Laporan Pelayanan
      */
     public function test_camat_laporan_renders_successfully(): void
