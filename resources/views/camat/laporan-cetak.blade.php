@@ -377,178 +377,22 @@
 
     {{-- LEMBAR DOKUMEN LAPORAN RESMI KECAMATAN JATISARI --}}
     <div class="sheet">
-
-        {{-- 1. KOP SURAT RESMI DENGAN LOGO KABUPATEN KARAWANG --}}
-        <div class="kop-wrapper">
-            @php
-                $logoUrl = isset($isPdf) && $isPdf && !empty($logoBase64)
-                    ? $logoBase64
-                    : asset('images/logo-karawang.png');
-            @endphp
-            <img src="{{ $logoUrl }}" alt="Logo Kabupaten Karawang" class="kop-logo">
-            <div class="kop-text">
-                <div class="kop-instansi">PEMERINTAH KABUPATEN KARAWANG</div>
-                <div class="kop-kecamatan">KECAMATAN JATISARI</div>
-                <div class="kop-alamat">Jl. Raya Jatisari No. 1, Jatisari, Kec. Jatisari, Kabupaten Karawang, Jawa Barat 41374</div>
-            </div>
-        </div>
-        <hr class="kop-line-thick">
-        <hr class="kop-line-thin">
-
-        {{-- TANGGAL CETAK DI BAGIAN ATAS POJOK KANAN (SEBELUM JUDUL LAPORAN) --}}
-        <div class="report-date-right">
-            Karawang, {{ $tanggalCetak }}
-        </div>
-
-        {{-- 2. JUDUL DAN INFORMASI LAPORAN --}}
-        <div class="report-title-block">
-            <div class="report-title">REKAPITULASI LAPORAN PELAYANAN PATEN</div>
-            <div class="report-periode-info">
-                @php
-                    $periodeText = 'Januari – Desember ' . $tahun;
-                    if ($bulan !== 'semua' && !empty($bulan)) {
-                        $periodeText = 'Bulan ' . ucfirst($bulan) . ' Tahun ' . $tahun;
-                    }
-                @endphp
-                <strong>Periode:</strong> {{ $periodeText }}
-                @if ($jenisLayanan !== 'semua')
-                    &bull; <strong>Jenis Pelayanan:</strong> {{ $selectedLayananLabel }}
-                @endif
-                @if ($status !== 'semua')
-                    &bull; <strong>Status:</strong> {{ $status === 'selesai' ? 'Selesai' : 'Dalam Proses' }}
-                @endif
-            </div>
-        </div>
-
-        {{-- 3. BAGIAN A — RINGKASAN HASIL PELAYANAN (DUA KOLOM BERDAMPINGAN) --}}
-        <div class="section-heading">A. RINGKASAN HASIL PELAYANAN</div>
-
-        @php
-            $persenTuntas = $total > 0 ? round(($totalSelesai / $total) * 100, 1) : 0;
-        @endphp
-
-        <table class="summary-side-by-side">
-            <tr>
-                {{-- KOLOM KIRI: TABEL URAIAN DAN JUMLAH --}}
-                <td class="summary-left-col">
-                    <table class="formal-table">
-                        <thead>
-                            <tr>
-                                <th style="text-align: left; width: 62%;">Uraian</th>
-                                <th style="text-align: right; width: 38%;">Jumlah</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Total Berkas Pelayanan</td>
-                                <td style="text-align: right; font-weight: bold;">{{ number_format($total, 0, ',', '.') }} Berkas</td>
-                            </tr>
-                            <tr>
-                                <td>Berkas Selesai</td>
-                                <td style="text-align: right; font-weight: bold;">{{ number_format($totalSelesai, 0, ',', '.') }} Berkas</td>
-                            </tr>
-                            <tr>
-                                <td>Berkas Dalam Proses</td>
-                                <td style="text-align: right; font-weight: bold;">{{ number_format($totalProses, 0, ',', '.') }} Berkas</td>
-                            </tr>
-                            <tr style="background-color: #f9f9f9;">
-                                <td style="font-weight: bold;">Persentase Penyelesaian</td>
-                                <td style="text-align: right; font-weight: bold;">{{ $persenTuntas }}%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-
-                {{-- KOLOM KANAN: KETERANGAN RINGKAS SEJAJAR HORIZONTAL --}}
-                <td class="summary-right-col">
-                    <div class="summary-brief-box">
-                        <div style="font-weight: bold; margin-bottom: 4px; text-decoration: underline;">Keterangan Ringkasan:</div>
-                        <ul>
-                            <li>Total pelayanan: <strong>{{ number_format($total, 0, ',', '.') }}</strong> berkas</li>
-                            <li>Berkas selesai: <strong>{{ number_format($totalSelesai, 0, ',', '.') }}</strong> berkas</li>
-                            <li>Dalam proses: <strong>{{ number_format($totalProses, 0, ',', '.') }}</strong> berkas</li>
-                            <li>Penyelesaian: <strong>{{ $persenTuntas }}%</strong></li>
-                        </ul>
-                        <div style="font-size: 8.8pt; color: #333333; line-height: 1.35; margin-top: 4px;">
-                            @if ($total === 0)
-                                <em>Belum ada pengajuan berkas pelayanan yang terdaftar untuk filter yang dipilih.</em>
-                            @elseif ($totalSelesai === $total)
-                                <em>Seluruh permohonan pelayanan administrasi telah diselesaikan 100% oleh petugas.</em>
-                            @elseif ($totalProses > 0)
-                                <em>Sebagian permohonan saat ini masih dalam proses penanganan oleh petugas operator.</em>
-                            @endif
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        {{-- 4. BAGIAN B — RINCIAN REKAPITULASI PELAYANAN (TABEL 7 JENIS PELAYANAN) --}}
-        <div class="section-heading">B. RINCIAN REKAPITULASI PELAYANAN</div>
-
-        <table class="formal-table" style="margin-bottom: 20px;">
-            <thead>
-                <tr>
-                    <th style="width: 36px;">No.</th>
-                    <th style="text-align: left;">Jenis Pelayanan</th>
-                    <th style="width: 90px;">Total Berkas</th>
-                    <th style="width: 75px;">Selesai</th>
-                    <th style="width: 95px;">Dalam Proses</th>
-                    <th style="width: 85px;">Persentase</th>
-                    <th style="text-align: left; width: 145px;">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($services as $index => $item)
-                    @php
-                        $pct = $item['count'] > 0 ? round(($item['selesai'] / $item['count']) * 100, 1) : 0;
-                        if ($item['count'] === 0) {
-                            $keterangan = 'Belum Ada Data';
-                        } elseif ($item['proses'] === 0 && $item['selesai'] > 0) {
-                            $keterangan = 'Pelayanan Selesai 100%';
-                        } elseif ($item['selesai'] === 0 && $item['proses'] > 0) {
-                            $keterangan = 'Sedang Diproses Operator';
-                        } else {
-                            $keterangan = 'Pelayanan Berjalan Optimal';
-                        }
-                    @endphp
-                    <tr>
-                        <td style="text-align: center;">{{ $loop->iteration }}</td>
-                        <td style="text-align: left; font-weight: 500;">{{ $item['label'] }}</td>
-                        <td style="text-align: center;">{{ number_format($item['count'], 0, ',', '.') }}</td>
-                        <td style="text-align: center;">{{ number_format($item['selesai'], 0, ',', '.') }}</td>
-                        <td style="text-align: center;">{{ number_format($item['proses'], 0, ',', '.') }}</td>
-                        <td style="text-align: center; font-weight: bold;">{{ $pct }}%</td>
-                        <td style="text-align: left;">{{ $keterangan }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" style="text-align: center; padding: 16px;">Belum Ada Data</td>
-                    </tr>
-                @endforelse
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2" style="text-align: right; padding-right: 12px;">TOTAL:</td>
-                    <td style="text-align: center;">{{ number_format($total, 0, ',', '.') }}</td>
-                    <td style="text-align: center;">{{ number_format($totalSelesai, 0, ',', '.') }}</td>
-                    <td style="text-align: center;">{{ number_format($totalProses, 0, ',', '.') }}</td>
-                    <td style="text-align: center;">{{ $persenTuntas }}%</td>
-                    <td style="text-align: left;">Terverifikasi</td>
-                </tr>
-            </tfoot>
-        </table>
-
-        {{-- 5. BAGIAN TANDA TANGAN CAMAT (DI KANAN BAWAH) --}}
-        <div class="signature-block">
-            <div class="signature-box">
-                <div style="font-weight: bold; margin-bottom: 65px; letter-spacing: 0.5px;">CAMAT JATISARI</div>
-                <div class="signature-name">H. SURISNO.SKM.MAP</div>
-                <div style="font-size: 9.5pt; margin-top: 2px;">NIP. 19690516 1989903 1 003</div>
-            </div>
-        </div>
-
+        @include('camat.partials.laporan-dokumen')
     </div>
 
+    @if(request()->boolean('auto_print') || request()->has('auto_print'))
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                try {
+                    window.focus();
+                    window.print();
+                } catch (e) {
+                    console.log('Auto-print error', e);
+                }
+            }, 250);
+        });
+    </script>
+    @endif
 </body>
 </html>

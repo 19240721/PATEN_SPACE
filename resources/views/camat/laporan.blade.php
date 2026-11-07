@@ -143,7 +143,36 @@
 
     /* CSS KHUSUS PRINT DOKUMEN RESMI (GAYA MICROSOFT WORD) */
     @media print {
+        html, body {
+            background: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            min-height: auto !important;
+            height: auto !important;
+            font-family: Arial, Helvetica, sans-serif !important;
+            color: #000000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .app-shell, .main-panel, .dashboard-content {
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            overflow: visible !important;
+            min-height: auto !important;
+            height: auto !important;
+        }
+
         .sidebar,
+        .sidebar-toggle,
         .dashboard-topbar,
         .dashboard-heading,
         .dashboard-stats,
@@ -151,6 +180,7 @@
         .recent-panel,
         .camat-filter-form,
         .print-header,
+        #printSettingsModal,
         .no-print {
             display: none !important;
         }
@@ -166,15 +196,15 @@
         }
 
         thead {
-            display: table-header-group;
+            display: table-header-group !important;
         }
 
         tr {
-            page-break-inside: avoid;
+            page-break-inside: avoid !important;
         }
 
         .signature-block {
-            page-break-inside: avoid;
+            page-break-inside: avoid !important;
         }
     }
 
@@ -407,167 +437,7 @@
 
 {{-- DOKUMEN CETAK & PDF RESMI (HANYA MUNCUL KETIKA DICETAK / EXPORT PDF, GAYA FORMAL MICROSOFT WORD) --}}
 <div class="official-print-document">
-    {{-- 1. KOP SURAT RESMI DENGAN LOGO RESMI KABUPATEN KARAWANG --}}
-    <div style="display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 6px;">
-        <img src="{{ asset('images/logo-karawang.png') }}" alt="Logo Kabupaten Karawang" style="width: 75px; height: auto; max-height: 90px; object-fit: contain;">
-        <div style="text-align: center;">
-            <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: #000;">PEMERINTAH KABUPATEN KARAWANG</div>
-            <div style="font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin: 2px 0; color: #000;">KECAMATAN JATISARI</div>
-            <div style="font-size: 9.5pt; margin: 0; color: #000; line-height: 1.3;">Jl. Raya Jatisari No. 1, Jatisari, Kec. Jatisari, Kabupaten Karawang, Jawa Barat 41374</div>
-        </div>
-    </div>
-    <hr style="border: 0; border-top: 2.5px solid #000; margin-top: 10px; margin-bottom: 2px;">
-    <hr style="border: 0; border-top: 1px solid #000; margin-top: 0; margin-bottom: 12px;">
-
-    {{-- TANGGAL CETAK DI BAGIAN ATAS POJOK KANAN (SEBELUM JUDUL LAPORAN) --}}
-    <div style="text-align: right; font-size: 10pt; color: #000; margin-bottom: 10px;">
-        Karawang, {{ $tanggalCetak }}
-    </div>
-
-    {{-- 2. JUDUL DAN INFORMASI LAPORAN --}}
-    <div style="text-align: center; margin-bottom: 14px;">
-        <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; margin: 0 0 5px; color: #000; letter-spacing: 0.5px;">REKAPITULASI LAPORAN PELAYANAN PATEN</div>
-        <div style="font-size: 10pt; color: #000; margin: 0;">
-            @php
-                $periodeText = 'Januari – Desember ' . $tahun;
-                if ($bulan !== 'semua' && !empty($bulan)) {
-                    $periodeText = 'Bulan ' . ucfirst($bulan) . ' Tahun ' . $tahun;
-                }
-            @endphp
-            <strong>Periode:</strong> {{ $periodeText }}
-            @if ($jenisLayanan !== 'semua')
-                &bull; <strong>Jenis Pelayanan:</strong> {{ $selectedLayananLabel }}
-            @endif
-            @if ($status !== 'semua')
-                &bull; <strong>Status:</strong> {{ $status === 'selesai' ? 'Selesai' : 'Dalam Proses' }}
-            @endif
-        </div>
-    </div>
-
-    {{-- 3. BAGIAN A — RINGKASAN HASIL PELAYANAN (DUA KOLOM BERDAMPINGAN) --}}
-    <div style="font-size: 11pt; font-weight: bold; color: #000; margin-top: 14px; margin-bottom: 8px; text-transform: uppercase;">A. RINGKASAN HASIL PELAYANAN</div>
-
-    @php
-        $persenTuntas = $total > 0 ? round(($totalSelesai / $total) * 100, 1) : 0;
-    @endphp
-
-    <table style="width: 100%; border-collapse: collapse; border: 0; margin-bottom: 16px;">
-        <tr>
-            <td style="width: 54%; padding: 0 12px 0 0; vertical-align: top; border: 0;">
-                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-size: 9.5pt; color: #000;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="border: 1px solid #000; padding: 6px 8px; text-align: left; width: 62%; font-weight: bold;">Uraian</th>
-                            <th style="border: 1px solid #000; padding: 6px 8px; text-align: right; width: 38%; font-weight: bold;">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 6px 8px;">Total Berkas Pelayanan</td>
-                            <td style="border: 1px solid #000; padding: 6px 8px; text-align: right; font-weight: bold;">{{ number_format($total, 0, ',', '.') }} Berkas</td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 6px 8px;">Berkas Selesai</td>
-                            <td style="border: 1px solid #000; padding: 6px 8px; text-align: right; font-weight: bold;">{{ number_format($totalSelesai, 0, ',', '.') }} Berkas</td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 6px 8px;">Berkas Dalam Proses</td>
-                            <td style="border: 1px solid #000; padding: 6px 8px; text-align: right; font-weight: bold;">{{ number_format($totalProses, 0, ',', '.') }} Berkas</td>
-                        </tr>
-                        <tr style="background-color: #f9f9f9;">
-                            <td style="border: 1px solid #000; padding: 6px 8px; font-weight: bold;">Persentase Penyelesaian</td>
-                            <td style="border: 1px solid #000; padding: 6px 8px; text-align: right; font-weight: bold;">{{ $persenTuntas }}%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-            <td style="width: 46%; padding: 0 0 0 12px; vertical-align: top; border: 0;">
-                <div style="border: 1px solid #000; padding: 10px 14px; background: #ffffff; font-size: 9.5pt; line-height: 1.5;">
-                    <div style="font-weight: bold; margin-bottom: 4px; text-decoration: underline;">Keterangan Ringkasan:</div>
-                    <ul style="margin: 4px 0 8px; padding-left: 18px;">
-                        <li>Total pelayanan: <strong>{{ number_format($total, 0, ',', '.') }}</strong> berkas</li>
-                        <li>Berkas selesai: <strong>{{ number_format($totalSelesai, 0, ',', '.') }}</strong> berkas</li>
-                        <li>Dalam proses: <strong>{{ number_format($totalProses, 0, ',', '.') }}</strong> berkas</li>
-                        <li>Penyelesaian: <strong>{{ $persenTuntas }}%</strong></li>
-                    </ul>
-                    <div style="font-size: 8.8pt; color: #333333; line-height: 1.35; margin-top: 4px;">
-                        @if ($total === 0)
-                            <em>Belum ada pengajuan berkas pelayanan yang terdaftar untuk filter yang dipilih.</em>
-                        @elseif ($totalSelesai === $total)
-                            <em>Seluruh permohonan pelayanan administrasi telah diselesaikan 100% oleh petugas.</em>
-                        @elseif ($totalProses > 0)
-                            <em>Sebagian permohonan saat ini masih dalam proses penanganan oleh petugas operator.</em>
-                        @endif
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    {{-- 4. BAGIAN B — RINCIAN REKAPITULASI PELAYANAN (TABEL 7 JENIS PELAYANAN) --}}
-    <div style="font-size: 11pt; font-weight: bold; color: #000; margin-top: 14px; margin-bottom: 8px; text-transform: uppercase;">B. RINCIAN REKAPITULASI PELAYANAN</div>
-
-    <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-size: 9.5pt; color: #000; margin-bottom: 20px;">
-        <thead>
-            <tr style="background-color: #f2f2f2;">
-                <th style="border: 1px solid #000; padding: 6px 6px; width: 36px; text-align: center; font-weight: bold;">No.</th>
-                <th style="border: 1px solid #000; padding: 6px 8px; text-align: left; font-weight: bold;">Jenis Pelayanan</th>
-                <th style="border: 1px solid #000; padding: 6px 8px; width: 90px; text-align: center; font-weight: bold;">Total Berkas</th>
-                <th style="border: 1px solid #000; padding: 6px 8px; width: 75px; text-align: center; font-weight: bold;">Selesai</th>
-                <th style="border: 1px solid #000; padding: 6px 8px; width: 95px; text-align: center; font-weight: bold;">Dalam Proses</th>
-                <th style="border: 1px solid #000; padding: 6px 8px; width: 85px; text-align: center; font-weight: bold;">Persentase</th>
-                <th style="border: 1px solid #000; padding: 6px 8px; width: 145px; text-align: left; font-weight: bold;">Keterangan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($services as $index => $item)
-                @php
-                    $pct = $item['count'] > 0 ? round(($item['selesai'] / $item['count']) * 100, 1) : 0;
-                    if ($item['count'] === 0) {
-                        $keterangan = 'Belum Ada Data';
-                    } elseif ($item['proses'] === 0 && $item['selesai'] > 0) {
-                        $keterangan = 'Pelayanan Selesai 100%';
-                    } elseif ($item['selesai'] === 0 && $item['proses'] > 0) {
-                        $keterangan = 'Sedang Diproses Operator';
-                    } else {
-                        $keterangan = 'Pelayanan Berjalan Optimal';
-                    }
-                @endphp
-                <tr>
-                    <td style="border: 1px solid #000; padding: 5px 6px; text-align: center;">{{ $loop->iteration }}</td>
-                    <td style="border: 1px solid #000; padding: 5px 8px; text-align: left; font-weight: 500;">{{ $item['label'] }}</td>
-                    <td style="border: 1px solid #000; padding: 5px 8px; text-align: center;">{{ number_format($item['count'], 0, ',', '.') }}</td>
-                    <td style="border: 1px solid #000; padding: 5px 8px; text-align: center;">{{ number_format($item['selesai'], 0, ',', '.') }}</td>
-                    <td style="border: 1px solid #000; padding: 5px 8px; text-align: center;">{{ number_format($item['proses'], 0, ',', '.') }}</td>
-                    <td style="border: 1px solid #000; padding: 5px 8px; text-align: center; font-weight: bold;">{{ $pct }}%</td>
-                    <td style="border: 1px solid #000; padding: 5px 8px; text-align: left;">{{ $keterangan }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" style="border: 1px solid #000; text-align: center; padding: 16px;">Belum Ada Data</td>
-                </tr>
-            @endforelse
-        </tbody>
-        <tfoot>
-            <tr style="background-color: #f2f2f2; font-weight: bold;">
-                <td colspan="2" style="border: 1px solid #000; padding: 6px 8px; text-align: right; font-weight: bold;">TOTAL:</td>
-                <td style="border: 1px solid #000; padding: 6px 8px; text-align: center;">{{ number_format($total, 0, ',', '.') }}</td>
-                <td style="border: 1px solid #000; padding: 6px 8px; text-align: center;">{{ number_format($totalSelesai, 0, ',', '.') }}</td>
-                <td style="border: 1px solid #000; padding: 6px 8px; text-align: center;">{{ number_format($totalProses, 0, ',', '.') }}</td>
-                <td style="border: 1px solid #000; padding: 6px 8px; text-align: center;">{{ $persenTuntas }}%</td>
-                <td style="border: 1px solid #000; padding: 6px 8px; text-align: left;">Terverifikasi</td>
-            </tr>
-        </tfoot>
-    </table>
-
-    {{-- 5. BAGIAN TANDA TANGAN CAMAT (DI KANAN BAWAH) --}}
-    <div style="display: flex; justify-content: flex-end; margin-top: 24px; page-break-inside: avoid;">
-        <div style="text-align: center; width: 270px; font-size: 10pt; line-height: 1.4; color: #000;">
-            <div style="font-weight: bold; margin-bottom: 65px; letter-spacing: 0.5px;">CAMAT JATISARI</div>
-            <div style="font-weight: bold; text-decoration: underline;">H. SURISNO.SKM.MAP</div>
-            <div style="font-size: 9.5pt; margin-top: 2px;">NIP. 19690516 1989903 1 003</div>
-        </div>
-    </div>
+    @include('camat.partials.laporan-dokumen')
 </div>
 
 {{-- MODAL PENGATURAN CETAK & EXPORT PDF --}}
@@ -581,7 +451,7 @@
             <button type="button" onclick="closePrintModal()" style="background: transparent; border: 0; color: #ffffff; font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
         </div>
         <div style="padding: 20px 22px;">
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; font-size: 0.82rem; color: #475569; line-height: 1.45;">
+            <div id="modalDescription" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; font-size: 0.82rem; color: #475569; line-height: 1.45;">
                 Format dokumen resmi standar administrasi Kecamatan Jatisari (Font Arial, Tinta Hitam, Kop Kabupaten Karawang, Tanpa Blok Warna).
             </div>
 
@@ -625,17 +495,24 @@
         const modalTitle = document.getElementById('modalTitle');
         const modalIcon = document.getElementById('modalIcon');
         const actionBtn = document.getElementById('modalActionButton');
+        const modalDesc = document.getElementById('modalDescription');
 
         if (mode === 'pdf') {
             modalTitle.innerText = 'Pengaturan Export PDF Laporan';
             modalIcon.innerText = '📥';
             actionBtn.innerHTML = '<span>📥</span> Export / Simpan sebagai PDF';
             actionBtn.style.background = '#0870c9';
+            if (modalDesc) {
+                modalDesc.innerHTML = 'Format dokumen resmi standar administrasi Kecamatan Jatisari. Pada jendela cetak browser yang terbuka, pilih tujuan (Destination): <strong>Simpan sebagai PDF (Save as PDF)</strong>.';
+            }
         } else {
             modalTitle.innerText = 'Pengaturan Cetak Dokumen Laporan';
             modalIcon.innerText = '🖨';
             actionBtn.innerHTML = '<span>🖨</span> Cetak Dokumen Sekarang';
             actionBtn.style.background = '#796743';
+            if (modalDesc) {
+                modalDesc.innerHTML = 'Format dokumen resmi standar administrasi Kecamatan Jatisari (Font Arial, Tinta Hitam, Kop Kabupaten Karawang, Tanpa Blok Warna).';
+            }
         }
 
         updatePreviewLink();
@@ -686,9 +563,35 @@
         applyDynamicPaperStyle(kertas, orientasi);
         closePrintModal();
 
-        setTimeout(() => {
-            window.print();
-        }, 150);
+        const baseUrl = "{{ route('camat.laporan.cetak') }}";
+        const params = new URLSearchParams(window.location.search);
+        params.set('kertas', kertas);
+        params.set('orientasi', orientasi);
+        params.set('auto_print', '1');
+        params.set('_t', Date.now());
+        const printUrl = baseUrl + '?' + params.toString();
+
+        printDocumentViaFrame(printUrl);
+    }
+
+    function printDocumentViaFrame(url) {
+        let iframe = document.getElementById('officialPrintFrame');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'officialPrintFrame';
+            iframe.name = 'officialPrintFrame';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '10px';
+            iframe.style.height = '10px';
+            iframe.style.opacity = '0.01';
+            iframe.style.zIndex = '-9999';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
+        }
+
+        iframe.src = url;
     }
 </script>
 @endsection
