@@ -55,6 +55,7 @@ class ProfileAndAccountSettingsTest extends TestCase
             ->assertSee('H. Surisno, SKM., MAP.')
             ->assertSee('19690516 198903 1 003')
             ->assertSee('Pimpinan / Camat')
+            ->assertDontSee('(Monitoring & Pengawasan)')
             ->assertSee('Kecamatan Jatisari')
             ->assertSee('Kabupaten Karawang');
 
@@ -172,5 +173,54 @@ class ProfileAndAccountSettingsTest extends TestCase
         // Cek halaman terproteksi tidak bisa diakses
         $this->get(route('profil'))->assertRedirect(route('login'));
         $this->get(route('account.profile'))->assertRedirect(route('login'));
+    }
+
+    /**
+     * 6. Test Sinkronisasi Profil Camat dan Edit Profil Akun Camat
+     */
+    public function test_camat_profile_and_edit_profile_synchronization(): void
+    {
+        $camat = User::factory()->create([
+            'role' => 'camat',
+            'name' => 'H. Surisno, SKM., MAP.',
+            'nip' => '19690516 198903 1 003',
+            'nik' => '3200000000000001',
+            'phone' => '081200000001',
+            'alamat_kantor' => 'Jl. Raya Jatisari No. 1, Jatisari, Karawang',
+        ]);
+
+        // 1. Camat Profile page (/camat/profil)
+        $camatProfile = $this->actingAs($camat)->get(route('camat.profil'));
+        $camatProfile->assertOk();
+        $camatProfile->assertSee('Pimpinan / Camat');
+        $camatProfile->assertDontSee('(Monitoring & Pengawasan)');
+        $camatProfile->assertSee('19690516 198903 1 003');
+
+        // 2. Camat Edit Profile page (/profil-akun/data)
+        $camatEdit = $this->actingAs($camat)->get(route('account.profile.data'));
+        $camatEdit->assertOk();
+        // NIP sinkron dan konsisten menggunakan label NIP
+        $camatEdit->assertSee('NIP:');
+        $camatEdit->assertSee('19690516 198903 1 003');
+        $camatEdit->assertDontSee('3200000000000001'); // Tidak menampilkan NIK sebagai NIP
+        // Jabatan resmi Camat
+        $camatEdit->assertSee('Jabatan:');
+        $camatEdit->assertSee('Pimpinan / Camat');
+        $camatEdit->assertDontSee('Petugas Loket');
+
+        // 3. Verifikasi Akun Operator tetap menampilkan Petugas Loket dan NIK / Identitas Pegawai
+        $operator = User::factory()->create([
+            'role' => 'petugas',
+            'name' => 'Petugas Loket PATEN',
+            'nik' => '3200000000000004',
+            'phone' => '081200000004',
+        ]);
+
+        $operatorEdit = $this->actingAs($operator)->get(route('account.profile.data'));
+        $operatorEdit->assertOk();
+        $operatorEdit->assertSee('NIK / Identitas Pegawai:');
+        $operatorEdit->assertSee('Peran / Jabatan:');
+        $operatorEdit->assertSee('Petugas Loket');
+        $operatorEdit->assertDontSee('Pimpinan / Camat');
     }
 }

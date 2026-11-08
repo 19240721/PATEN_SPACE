@@ -35,7 +35,9 @@
             <span>
                 <strong>{{ $user->name }}</strong>
                 <small>
-                    @if ($user->role === 'masyarakat')
+                    @if ($user->role === 'camat')
+                        Pimpinan / Camat
+                    @elseif ($user->role === 'masyarakat')
                         Warga Pemohon
                     @elseif ($user->peran_layanan === 'Operator')
                         Operator Kecamatan
@@ -74,7 +76,9 @@
                     <div class="profile-identity-copy">
                         <h1>{{ $user->name }}</h1>
                         <p>
-                            @if ($user->role === 'masyarakat')
+                            @if ($user->role === 'camat')
+                                Pimpinan / Camat
+                            @elseif ($user->role === 'masyarakat')
                                 Masyarakat (Warga Pemohon)
                             @elseif ($user->peran_layanan === 'Operator')
                                 Operator Kecamatan

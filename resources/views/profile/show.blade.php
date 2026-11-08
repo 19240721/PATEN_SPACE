@@ -41,7 +41,9 @@
             <span>
                 <strong>{{ $user->name }}</strong>
                 <small>
-                    @if ($user->role === 'masyarakat')
+                    @if ($user->role === 'camat')
+                        Pimpinan / Camat
+                    @elseif ($user->role === 'masyarakat')
                         Warga Pemohon
                     @elseif ($user->peran_layanan === 'Operator')
                         Operator Kecamatan
@@ -102,7 +104,9 @@
                         <div>
                             <h1 style="margin: 0 0 4px; font-size: 1.35rem; color: #1e3a5f; font-weight: 750;">{{ $user->name }}</h1>
                             <div style="font-size: 0.86rem; color: #64748b; font-weight: 600; margin-bottom: 8px;">
-                                @if ($user->role === 'masyarakat')
+                                @if ($user->role === 'camat')
+                                    Pimpinan / Camat
+                                @elseif ($user->role === 'masyarakat')
                                     Masyarakat (Warga Pemohon Layanan)
                                 @elseif ($user->peran_layanan === 'Operator')
                                     Operator Kecamatan (Pengelola Pelayanan Utama)
@@ -143,7 +147,9 @@
                     <div style="padding: 13px 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
                         <div style="font-size: 0.72rem; color: #64748b; margin-bottom: 4px; font-weight: 600;">Peran / Jabatan Sistem</div>
                         <div style="font-size: 0.92rem; font-weight: 700; color: #1e3a5f;">
-                            @if ($user->role === 'masyarakat')
+                            @if ($user->role === 'camat')
+                                Pimpinan / Camat
+                            @elseif ($user->role === 'masyarakat')
                                 Masyarakat
                             @elseif ($user->peran_layanan === 'Operator')
                                 Operator Kecamatan
@@ -153,7 +159,19 @@
                         </div>
                     </div>
 
-                    @if ($user->role === 'masyarakat')
+                    @if ($user->role === 'camat')
+                        {{-- NIP Camat --}}
+                        <div style="padding: 13px 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
+                            <div style="font-size: 0.72rem; color: #64748b; margin-bottom: 4px; font-weight: 600;">Nomor Induk Pegawai (NIP)</div>
+                            <div style="font-size: 0.92rem; font-weight: 700; color: #1e3a5f;">{{ $user->nip ?: '—' }}</div>
+                        </div>
+
+                        {{-- Instansi --}}
+                        <div style="padding: 13px 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
+                            <div style="font-size: 0.72rem; color: #64748b; margin-bottom: 4px; font-weight: 600;">Instansi</div>
+                            <div style="font-size: 0.92rem; font-weight: 700; color: #1e3a5f;">Pemerintah Kabupaten Karawang</div>
+                        </div>
+                    @elseif ($user->role === 'masyarakat')
                         {{-- NIK Masyarakat --}}
                         <div style="padding: 13px 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
                             <div style="font-size: 0.72rem; color: #64748b; margin-bottom: 4px; font-weight: 600;">Nomor Induk Kependudukan (NIK)</div>

@@ -1169,7 +1169,7 @@ class CamatController extends Controller
             'kecamatan' => 'Jatisari',
             'kabupaten' => 'Karawang',
             'instansi' => 'Pemerintah Kabupaten Karawang',
-            'role' => 'Pimpinan / Camat (Monitoring & Pengawasan)',
+            'role' => 'Pimpinan / Camat',
             'nip' => $nip,
             'email' => $email,
             'telepon' => $telepon,

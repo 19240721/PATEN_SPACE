@@ -65,16 +65,34 @@
 
                         <div>
                             <span style="font-size: 0.7rem; color: #64748b; display: block; font-weight: 600;">
-                                {{ $user->role === 'masyarakat' ? 'NIK Kependudukan:' : 'NIK / Identitas Pegawai:' }}
+                                @if ($user->role === 'camat')
+                                    NIP:
+                                @elseif ($user->role === 'masyarakat')
+                                    NIK Kependudukan:
+                                @else
+                                    NIK / Identitas Pegawai:
+                                @endif
                             </span>
-                            <div style="font-size: 0.88rem; font-weight: 700; color: #334155; margin-top: 2px;">{{ $user->nik ?: ($user->nip ?: '—') }}</div>
-                            <small style="font-size: 0.68rem; color: #94a3b8;">Nomor identitas terdaftar</small>
+                            <div style="font-size: 0.88rem; font-weight: 700; color: #334155; margin-top: 2px;">
+                                @if ($user->role === 'camat')
+                                    {{ $user->nip ?: '—' }}
+                                @else
+                                    {{ $user->nik ?: ($user->nip ?: '—') }}
+                                @endif
+                            </div>
+                            <small style="font-size: 0.68rem; color: #94a3b8;">
+                                {{ $user->role === 'camat' ? 'Nomor Induk Pegawai resmi' : 'Nomor identitas terdaftar' }}
+                            </small>
                         </div>
 
                         <div>
-                            <span style="font-size: 0.7rem; color: #64748b; display: block; font-weight: 600;">Peran / Jabatan:</span>
+                            <span style="font-size: 0.7rem; color: #64748b; display: block; font-weight: 600;">
+                                {{ $user->role === 'camat' ? 'Jabatan:' : 'Peran / Jabatan:' }}
+                            </span>
                             <div style="font-size: 0.88rem; font-weight: 700; color: #334155; margin-top: 2px;">
-                                @if ($user->role === 'masyarakat')
+                                @if ($user->role === 'camat')
+                                    {{ $user->jabatan }}
+                                @elseif ($user->role === 'masyarakat')
                                     Masyarakat (Warga Pemohon)
                                 @elseif ($user->peran_layanan === 'Operator')
                                     Operator Kecamatan

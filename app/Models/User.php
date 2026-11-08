@@ -79,6 +79,23 @@ class User extends Authenticatable
         return 'Petugas';
     }
 
+    public function getJabatanAttribute(): string
+    {
+        if ($this->role === 'camat') {
+            return 'Pimpinan / Camat';
+        }
+
+        if ($this->role === 'masyarakat') {
+            return 'Masyarakat (Warga Pemohon)';
+        }
+
+        if ($this->peran_layanan === 'Operator') {
+            return 'Operator Kecamatan';
+        }
+
+        return 'Petugas Loket';
+    }
+
     public function getFotoProfilUrlAttribute(): ?string
     {
         if (!empty($this->foto_profil) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->foto_profil)) {
