@@ -1192,14 +1192,11 @@ class CamatController extends Controller
         abort_unless($user && $user->role === 'camat', 403, 'Akses tidak diizinkan.');
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:30', 'regex:/^[0-9\+\-\s\(\)\.\/]+$/'],
             'alamat_kantor' => ['nullable', 'string', 'max:500'],
             'foto_profil' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ], [
-            'name.required' => 'Nama lengkap Camat tidak boleh kosong.',
-            'name.string' => 'Nama lengkap harus berupa teks.',
-            'name.max' => 'Nama lengkap maksimal 255 karakter.',
             'phone.required' => 'Nomor telepon tidak boleh kosong.',
             'phone.regex' => 'Format nomor telepon tidak valid. Gunakan format angka dan tanda baca yang wajar.',
             'phone.max' => 'Nomor telepon maksimal 30 karakter.',
@@ -1221,7 +1218,9 @@ class CamatController extends Controller
             }
         }
 
-        $user->name = $validated['name'];
+        if (!empty($validated['name'])) {
+            $user->name = $validated['name'];
+        }
         $user->phone = $validated['phone'];
         if (array_key_exists('alamat_kantor', $validated)) {
             $user->alamat_kantor = $validated['alamat_kantor'];

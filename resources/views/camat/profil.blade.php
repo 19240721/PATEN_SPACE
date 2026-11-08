@@ -227,6 +227,24 @@
                    ">
                     🔒 Ubah Password
                 </a>
+
+                <a href="{{ route('account.profile') }}"
+                   style="
+                        border: 1px solid #e2e8f0;
+                        background: #ffffff;
+                        color: #475569;
+                        padding: 9px 13px;
+                        border-radius: 8px;
+                        font-size: 0.78rem;
+                        font-weight: 650;
+                        cursor: pointer;
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                   ">
+                    ⚙ Pengaturan Akun
+                </a>
             </div>
         </div>
     </div>

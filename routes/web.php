@@ -36,6 +36,7 @@ Route::get('/daftar', [AuthController::class, 'showRegister'])->name('account.re
 Route::post('/daftar', [AuthController::class, 'register'])->name('account.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 Route::middleware('auth')->group(function () {
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profil');
     Route::get('/profil-akun', [ProfileController::class, 'edit'])->name('account.profile');
     Route::get('/profil-akun/data', [ProfileController::class, 'editData'])->name('account.profile.data');
     Route::put('/profil-akun/data', [ProfileController::class, 'updateData'])->name('account.profile.data.update');

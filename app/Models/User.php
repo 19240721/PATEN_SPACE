@@ -78,4 +78,24 @@ class User extends Authenticatable
 
         return 'Petugas';
     }
+
+    public function getFotoProfilUrlAttribute(): ?string
+    {
+        if (!empty($this->foto_profil) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->foto_profil)) {
+            return asset('storage/' . $this->foto_profil);
+        }
+        return null;
+    }
+
+    public function getInisialAttribute(): string
+    {
+        $words = preg_split('/[\s,\.]+/', trim($this->name ?? ''), -1, PREG_SPLIT_NO_EMPTY);
+        if (empty($words)) {
+            return strtoupper(substr($this->role ?? 'U', 0, 1));
+        }
+        if (count($words) === 1) {
+            return strtoupper(substr($words[0], 0, 2));
+        }
+        return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+    }
 }

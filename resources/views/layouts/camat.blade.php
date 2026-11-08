@@ -48,24 +48,6 @@
             border: 1px solid #cbd5e1;
         }
 
-        .logout-nav-item {
-            background-color: #dc2626 !important;
-            color: #ffffff !important;
-            border: none;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-        }
-        .logout-nav-item:hover {
-            background-color: #b91c1c !important;
-            color: #ffffff !important;
-        }
-        .logout-nav-item {
-            justify-content: center !important;
-            text-align: center !important;
-        }
-
         .sidebar-counter {
             margin-left: auto;
             background: #ef4444;
@@ -399,18 +381,16 @@
                 <a href="{{ route('camat.profil') }}" class="nav-item {{ request()->routeIs('camat.profil') ? 'active' : '' }}">
                     <span>👤</span> Profil
                 </a>
-                <form action="{{ route('logout') }}" method="POST" style="margin: 0; padding: 0;">
-                    @csrf
-                    <button type="submit" class="nav-item logout-nav-item" style="border: none; width: 100%; cursor: pointer; font-family: inherit; font-size: inherit; display: flex; align-items: center; justify-content: center; text-align: center;" title="Logout">
-                        Logout
-                    </button>
-                </form>
             </nav>
 
-            <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil akun">
-                <span class="profile-avatar">CJ</span>
+            <a href="{{ route('camat.profil') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil akun">
+                @if(auth()->user()?->foto_profil_url)
+                    <img src="{{ auth()->user()->foto_profil_url }}" alt="{{ auth()->user()->name }}" class="profile-avatar" style="object-fit: cover;">
+                @else
+                    <span class="profile-avatar">{{ auth()->user()?->inisial ?? 'CJ' }}</span>
+                @endif
                 <span>
-                    <strong>Camat Kecamatan</strong>
+                    <strong>{{ auth()->user()->name ?? 'Camat Kecamatan' }}</strong>
                     <small>Pimpinan / Camat</small>
                 </span>
             </a>

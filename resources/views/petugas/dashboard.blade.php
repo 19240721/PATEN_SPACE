@@ -31,10 +31,14 @@
             <a href="{{ route('laporan') }}" class="nav-item">Laporan</a>
         </div>
 
-        <form method="POST" action="{{ route('logout') }}" style="padding: 16px;">
-            @csrf
-            <button class="logout-btn" type="submit">Keluar</button>
-        </form>
+        <a href="{{ route('profil') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
+            @if(auth()->user()?->foto_profil_url)
+                <img src="{{ auth()->user()->foto_profil_url }}" alt="{{ auth()->user()->name }}" class="profile-avatar" style="object-fit: cover;">
+            @else
+                <span class="profile-avatar">{{ auth()->user()?->inisial ?? strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            @endif
+            <span><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->peran_layanan === 'Operator' ? 'Operator Kecamatan' : 'Petugas Loket' }}</small></span>
+        </a>
     </aside>
 
     <main class="main-panel">

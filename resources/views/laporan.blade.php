@@ -25,9 +25,13 @@
                 </div>
             </details>
         </nav>
-        <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
-            <span class="profile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-            <span><strong>{{ auth()->user()->name }}</strong><small>Operator Kecamatan</small></span>
+        <a href="{{ route('profil') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">
+            @if(auth()->user()?->foto_profil_url)
+                <img src="{{ auth()->user()->foto_profil_url }}" alt="{{ auth()->user()->name }}" class="profile-avatar" style="object-fit: cover;">
+            @else
+                <span class="profile-avatar">{{ auth()->user()?->inisial ?? strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            @endif
+            <span><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->peran_layanan === 'Operator' ? 'Operator Kecamatan' : 'Petugas Loket' }}</small></span>
         </a>
     </aside>
 
