@@ -119,5 +119,7 @@
             });
         });
         </script>
+
+        @include('partials.logout-modal')
     </body>
 </html>

@@ -123,7 +123,11 @@ class ProfileAndAccountSettingsTest extends TestCase
             ->assertSee(route('account.profile.settings'))
             ->assertSee(route('profil'))
             ->assertSee(route('logout'))
-            ->assertSee('Apakah Anda yakin ingin keluar dari akun PATEN SPACE?');
+            ->assertSee('Yakin ingin keluar?')
+            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
+            ->assertSee('Ya, Keluar')
+            ->assertSee('Batal')
+            ->assertDontSee("confirm('");
     }
 
     /**
@@ -222,5 +226,59 @@ class ProfileAndAccountSettingsTest extends TestCase
         $operatorEdit->assertSee('Peran / Jabatan:');
         $operatorEdit->assertSee('Petugas Loket');
         $operatorEdit->assertDontSee('Pimpinan / Camat');
+    }
+
+    /**
+     * 7. Test Modal Konfirmasi Logout Kustom Tersinkronisasi untuk Camat & Operator
+     */
+    public function test_custom_logout_modal_synchronized_for_camat_and_operator(): void
+    {
+        $camat = User::factory()->create([
+            'role' => 'camat',
+            'name' => 'H. Surisno, SKM., MAP.',
+        ]);
+
+        $operator = User::factory()->create([
+            'role' => 'petugas',
+            'name' => 'Petugas Loket PATEN',
+        ]);
+
+        // Verifikasi untuk Akun Camat di Dashboard & Pengaturan Akun
+        $camatDashboard = $this->actingAs($camat)->get(route('camat.dashboard'));
+        $camatDashboard->assertOk()
+            ->assertSee('id="logout-confirm-modal"', false)
+            ->assertSee('Yakin ingin keluar?')
+            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
+            ->assertSee('Ya, Keluar')
+            ->assertSee('Batal')
+            ->assertDontSee("confirm('");
+
+        $camatProfileSettings = $this->actingAs($camat)->get(route('account.profile'));
+        $camatProfileSettings->assertOk()
+            ->assertSee('id="logout-confirm-modal"', false)
+            ->assertSee('Yakin ingin keluar?')
+            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
+            ->assertSee('Ya, Keluar')
+            ->assertSee('Batal')
+            ->assertDontSee("confirm('");
+
+        // Verifikasi untuk Akun Operator di Dashboard & Pengaturan Akun
+        $operatorDashboard = $this->actingAs($operator)->get(route('petugas.dashboard'));
+        $operatorDashboard->assertOk()
+            ->assertSee('id="logout-confirm-modal"', false)
+            ->assertSee('Yakin ingin keluar?')
+            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
+            ->assertSee('Ya, Keluar')
+            ->assertSee('Batal')
+            ->assertDontSee("confirm('");
+
+        $operatorProfileSettings = $this->actingAs($operator)->get(route('account.profile'));
+        $operatorProfileSettings->assertOk()
+            ->assertSee('id="logout-confirm-modal"', false)
+            ->assertSee('Yakin ingin keluar?')
+            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
+            ->assertSee('Ya, Keluar')
+            ->assertSee('Batal')
+            ->assertDontSee("confirm('");
     }
 }

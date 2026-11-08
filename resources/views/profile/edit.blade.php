@@ -150,10 +150,10 @@
                         <span class="profile-menu-label">Kembali ke Profil</span><b aria-hidden="true">›</b>
                     </a>
 
-                    {{-- 5. Keluar (Logout dengan Konfirmasi) --}}
-                    <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari akun PATEN SPACE?');" style="margin: 0; padding: 0;">
+                    {{-- 5. Keluar (Logout dengan Modal Konfirmasi Kustom) --}}
+                    <form action="{{ route('logout') }}" method="POST" style="margin: 0; padding: 0;">
                         @csrf
-                        <button type="submit">
+                        <button type="button" class="btn-trigger-logout" onclick="openLogoutModal()">
                             <span class="profile-menu-icon profile-menu-icon--logout" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M10 17l5-5-5-5M15 12H3"></path>
