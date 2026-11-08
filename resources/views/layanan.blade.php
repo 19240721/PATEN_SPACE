@@ -12,8 +12,6 @@
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
-            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
-            <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Laporan</a>
             <details class="service-menu" open>
                 <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
                 <div class="service-submenu">
