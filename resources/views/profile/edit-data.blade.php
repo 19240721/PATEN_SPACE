@@ -132,7 +132,7 @@
 
                 <div class="profile-form-actions" style="display: flex; gap: 12px; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 18px;">
                     <button type="submit" class="dashboard-primary-link" style="border: none; padding: 10px 22px; font-size: 0.86rem; font-weight: 700; cursor: pointer; border-radius: 8px;">
-                        💾 Simpan Perubahan
+                        Simpan Perubahan
                     </button>
                     <a href="{{ route('account.profile') }}" class="profile-back-link" style="padding: 9px 18px; border: 1px solid #cbd5e1; border-radius: 8px; color: #64748b; text-decoration: none; font-size: 0.84rem; font-weight: 600;">
                         Batal
