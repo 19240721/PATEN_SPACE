@@ -564,9 +564,9 @@
 
         {{-- Tombol Logout / Keluar --}}
         <div class="mob-logout-box">
-            <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari akun PATEN SPACE?');">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
                 @csrf
-                <button type="submit" class="mob-btn-logout">
+                <button type="button" class="mob-btn-logout btn-trigger-logout" onclick="openLogoutModal(event)">
                     <span>🚪</span>
                     <span>Keluar dari Akun</span>
                 </button>
