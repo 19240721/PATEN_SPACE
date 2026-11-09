@@ -411,6 +411,41 @@
     .mob-error { color: #dc2626; font-size: 0.7rem; margin-top: 3px; font-weight: 600; }
     .mob-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
+    /* ── Mobile Entry Cards (KK Anggota & Perubahan Data) ── */
+    .mob-entry-card {
+        background: #fdfcf9;
+        border: 1.5px solid var(--khaki-border, #e5e0d3);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        transition: border-color 0.18s, box-shadow 0.18s, background-color 0.18s;
+    }
+    .mob-entry-card:focus-within {
+        border-color: var(--khaki-primary);
+        background: #ffffff;
+        box-shadow: 0 3px 10px rgba(138, 108, 66, 0.1);
+    }
+    .mob-entry-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--khaki-darker);
+        background: var(--khaki-soft);
+        border: 1px solid var(--khaki-border);
+        border-radius: 6px;
+        padding: 3px 9px;
+        margin-bottom: 10px;
+    }
+    .mob-sublabel {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #78716c;
+        margin-bottom: 4px;
+    }
+
     /* ── Step 3 Service Detail Sections ── */
     .mob-service-section { display: none; }
     .mob-service-section.show { display: block; }
@@ -1039,89 +1074,67 @@
                         </div>
 
                         {{-- Daftar Anggota Keluarga --}}
-                        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
-                            <div class="mob-card-head" style="margin-bottom:10px;">Daftar Anggota Keluarga</div>
-                            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-                                <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:420px;">
-                                    <thead>
-                                        <tr style="background:#f5f2eb;">
-                                            <th style="width:36px;padding:7px 8px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">No</th>
-                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Nama</th>
-                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">NIK</th>
-                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">SHDK</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for($i = 0; $i < 7; $i++)
-                                        <tr>
-                                            <td style="padding:3px 6px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;font-size:12px;">{{ $i + 1 }}</td>
-                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
-                                                <input type="text" name="anggota_kk[{{ $i }}][nama]"
-                                                       value="{{ old('anggota_kk.'.$i.'.nama') }}"
-                                                       placeholder="Nama"
-                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
-                                            </td>
-                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
-                                                <input type="text" name="anggota_kk[{{ $i }}][nik]"
-                                                       value="{{ old('anggota_kk.'.$i.'.nik') }}"
-                                                       placeholder="NIK" maxlength="16" inputmode="numeric"
-                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
-                                            </td>
-                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
-                                                <input type="text" name="anggota_kk[{{ $i }}][shdk]"
-                                                       value="{{ old('anggota_kk.'.$i.'.shdk') }}"
-                                                       placeholder="Hub. Keluarga"
-                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
-                                            </td>
-                                        </tr>
-                                        @endfor
-                                    </tbody>
-                                </table>
+                        <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
+                            <div class="mob-card-head" style="margin-bottom:6px;">👨‍👩‍👧‍👦 Daftar Anggota Keluarga</div>
+                            <p style="font-size:0.72rem;color:#78716c;margin:0 0 12px;">Isi data anggota keluarga yang akan dimasukkan ke KK (hingga 7 orang):</p>
+
+                            @for($i = 0; $i < 7; $i++)
+                            <div class="mob-entry-card">
+                                <div class="mob-entry-badge">Anggota #{{ $i + 1 }}</div>
+                                <div class="mob-field" style="margin-bottom:8px;">
+                                    <label class="mob-sublabel">Nama Lengkap</label>
+                                    <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][nama]"
+                                           value="{{ old('anggota_kk.'.$i.'.nama') }}"
+                                           placeholder="Nama lengkap anggota keluarga">
+                                </div>
+                                <div class="mob-grid-2">
+                                    <div class="mob-field" style="margin-bottom:0;">
+                                        <label class="mob-sublabel">NIK (16 Digit)</label>
+                                        <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][nik]"
+                                               value="{{ old('anggota_kk.'.$i.'.nik') }}"
+                                               placeholder="16 digit NIK" maxlength="16" inputmode="numeric">
+                                    </div>
+                                    <div class="mob-field" style="margin-bottom:0;">
+                                        <label class="mob-sublabel">Status Hubungan (SHDK)</label>
+                                        <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][shdk]"
+                                               value="{{ old('anggota_kk.'.$i.'.shdk') }}"
+                                               placeholder="Kepala / Istri / Anak / dll">
+                                    </div>
+                                </div>
                             </div>
-                            <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi nama, NIK, dan hubungan dalam keluarga</p>
+                            @endfor
                         </div>
 
                         {{-- Perubahan Data (Pendidikan, Pekerjaan, Agama, dll) --}}
-                        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
-                            <div class="mob-card-head" style="margin-bottom:10px;">Perubahan Data</div>
-                            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-                                <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:420px;">
-                                    <thead>
-                                        <tr style="background:#f5f2eb;">
-                                            <th style="width:36px;padding:7px 8px;text-align:center;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">No</th>
-                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Semula</th>
-                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Menjadi</th>
-                                            <th style="padding:7px 8px;border:1px solid #e1d8c2;color:#5b4b2d;font-weight:700;font-size:12px;">Dasar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for($i = 0; $i < 5; $i++)
-                                        <tr>
-                                            <td style="padding:3px 6px;border:1px solid #e1d8c2;text-align:center;color:#8898aa;font-weight:600;font-size:12px;">{{ $i + 1 }}</td>
-                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
-                                                <input type="text" name="perubahan_kk[{{ $i }}][semula]"
-                                                       value="{{ old('perubahan_kk.'.$i.'.semula') }}"
-                                                       placeholder="Sebelumnya"
-                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
-                                            </td>
-                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
-                                                <input type="text" name="perubahan_kk[{{ $i }}][menjadi]"
-                                                       value="{{ old('perubahan_kk.'.$i.'.menjadi') }}"
-                                                       placeholder="Data baru"
-                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
-                                            </td>
-                                            <td style="padding:2px 4px;border:1px solid #e1d8c2;">
-                                                <input type="text" name="perubahan_kk[{{ $i }}][dasar]"
-                                                       value="{{ old('perubahan_kk.'.$i.'.dasar') }}"
-                                                       placeholder="Dasar"
-                                                       class="mob-input" style="border:none;padding:5px 6px;font-size:12px;background:transparent;outline:none;">
-                                            </td>
-                                        </tr>
-                                        @endfor
-                                    </tbody>
-                                </table>
+                        <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
+                            <div class="mob-card-head" style="margin-bottom:6px;">📝 Perubahan Data</div>
+                            <p style="font-size:0.72rem;color:#78716c;margin:0 0 12px;">Isi jika ada pembaruan pendidikan, pekerjaan, agama, status kawin, dll:</p>
+
+                            @for($i = 0; $i < 5; $i++)
+                            <div class="mob-entry-card">
+                                <div class="mob-entry-badge">Perubahan #{{ $i + 1 }}</div>
+                                <div class="mob-grid-2" style="margin-bottom:8px;">
+                                    <div class="mob-field" style="margin-bottom:0;">
+                                        <label class="mob-sublabel">Data Semula</label>
+                                        <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][semula]"
+                                               value="{{ old('perubahan_kk.'.$i.'.semula') }}"
+                                               placeholder="Data sebelumnya">
+                                    </div>
+                                    <div class="mob-field" style="margin-bottom:0;">
+                                        <label class="mob-sublabel">Data Menjadi</label>
+                                        <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][menjadi]"
+                                               value="{{ old('perubahan_kk.'.$i.'.menjadi') }}"
+                                               placeholder="Data baru">
+                                    </div>
+                                </div>
+                                <div class="mob-field" style="margin-bottom:0;">
+                                    <label class="mob-sublabel">Dasar Perubahan</label>
+                                    <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][dasar]"
+                                           value="{{ old('perubahan_kk.'.$i.'.dasar') }}"
+                                           placeholder="Contoh: Ijazah / SK / Buku Nikah">
+                                </div>
                             </div>
-                            <p style="font-size:11px;color:#8898aa;margin-top:6px;margin-bottom:0;">* Isi jika ada perubahan pendidikan, pekerjaan, agama, dll</p>
+                            @endfor
                         </div>
                     </div>
                 </div>
