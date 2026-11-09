@@ -526,32 +526,32 @@
 
             <div class="mob-detail-list">
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">👤 Nama Lengkap</span>
+                    <span class="mob-detail-label">Nama Lengkap</span>
                     <span class="mob-detail-val">{{ $user->name }}</span>
                 </div>
 
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">🏷️ Peran / Jabatan Sistem</span>
+                    <span class="mob-detail-label">Peran / Jabatan Sistem</span>
                     <span class="mob-detail-val">Masyarakat</span>
                 </div>
 
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">🆔 Nomor Induk Kependudukan (NIK)</span>
+                    <span class="mob-detail-label">Nomor Induk Kependudukan (NIK)</span>
                     <span class="mob-detail-val">{{ $user->nik ?: 'Belum diisi' }}</span>
                 </div>
 
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">📧 Alamat Email</span>
+                    <span class="mob-detail-label">Alamat Email</span>
                     <span class="mob-detail-val">{{ $user->email }}</span>
                 </div>
 
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">📱 Nomor Telepon / WhatsApp</span>
+                    <span class="mob-detail-label">Nomor Telepon / WhatsApp</span>
                     <span class="mob-detail-val">{{ $user->phone ?: 'Belum diisi' }}</span>
                 </div>
 
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">📍 Wilayah Pelayanan</span>
+                    <span class="mob-detail-label">Wilayah Pelayanan</span>
                     <span class="mob-detail-val">Kecamatan Jatisari, Kabupaten Karawang</span>
                 </div>
             </div>
@@ -567,7 +567,7 @@
             <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
                 @csrf
                 <button type="button" class="mob-btn-logout btn-trigger-logout" onclick="openLogoutModal(event)">
-                    <span>🚪</span>
+                    <span></span>
                     <span>Keluar dari Akun</span>
                 </button>
             </form>
