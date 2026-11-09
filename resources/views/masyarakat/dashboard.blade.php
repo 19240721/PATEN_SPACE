@@ -768,7 +768,7 @@
             </div>
             <a href="{{ route('profil') }}" class="mob-user-badge" title="Lihat Profil {{ auth()->user()->name }}">
                 <span>👤</span>
-                <span class="mob-user-badge-name">{{ auth()->user()->name }}</span>
+                <span class="mob-user-badge-name">Profil Saya</span>
             </a>
         </div>
 
