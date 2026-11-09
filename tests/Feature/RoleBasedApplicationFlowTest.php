@@ -473,4 +473,23 @@ class RoleBasedApplicationFlowTest extends TestCase
             ->assertSee('mob-user-badge', false)
             ->assertSee('mob-user-badge-name', false);
     }
+
+    public function test_citizen_profile_renders_mobile_phone_frame_with_battery_status_bar(): void
+    {
+        $citizen = User::factory()->create([
+            'name' => 'Sandy Aulia',
+            'role' => 'masyarakat',
+        ]);
+
+        $response = $this->actingAs($citizen)->get(route('profil'));
+
+        $response->assertOk()
+            ->assertSee('phone-status-bar', false)
+            ->assertSee('psb-battery-unit', false)
+            ->assertSee('psb-battery-level', false)
+            ->assertSee('5G')
+            ->assertSee('mob-shell', false)
+            ->assertSee('mob-bottom-nav', false)
+            ->assertSee('Sandy Aulia');
+    }
 }
