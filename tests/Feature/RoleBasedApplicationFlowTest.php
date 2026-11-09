@@ -457,4 +457,20 @@ class RoleBasedApplicationFlowTest extends TestCase
         $previewResponse->assertOk()
             ->assertHeader('content-disposition', 'inline; filename="ktp-asli.jpg"');
     }
+
+    public function test_citizen_dashboard_displays_user_badge_linking_to_profile(): void
+    {
+        $citizen = User::factory()->create([
+            'name' => 'Sandy Aulia',
+            'role' => 'masyarakat',
+        ]);
+
+        $response = $this->actingAs($citizen)->get(route('masyarakat.dashboard'));
+
+        $response->assertOk()
+            ->assertSee(route('profil'))
+            ->assertSee('Sandy Aulia')
+            ->assertSee('mob-user-badge', false)
+            ->assertSee('mob-user-badge-name', false);
+    }
 }

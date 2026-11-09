@@ -256,7 +256,7 @@
         opacity: 0.92;
     }
     .mob-user-badge {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 6px;
         background: rgba(255, 255, 255, 0.2);
@@ -266,6 +266,28 @@
         font-size: 0.72rem;
         font-weight: 700;
         color: #ffffff;
+        text-decoration: none;
+        cursor: pointer;
+        max-width: 155px;
+        transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+    }
+    .mob-user-badge:hover,
+    .mob-user-badge:focus-visible {
+        background: rgba(255, 255, 255, 0.32);
+        color: #ffffff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+    .mob-user-badge:active {
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.25);
+    }
+    .mob-user-badge-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
     }
 
     /* Greeting Section in Header */
@@ -744,10 +766,10 @@
                     <p>Kecamatan Jatisari</p>
                 </div>
             </div>
-            <div class="mob-user-badge">
+            <a href="{{ route('profil') }}" class="mob-user-badge" title="Lihat Profil {{ auth()->user()->name }}">
                 <span>👤</span>
-                <span>Warga</span>
-            </div>
+                <span class="mob-user-badge-name">{{ auth()->user()->name }}</span>
+            </a>
         </div>
 
         <div class="mob-greeting">
