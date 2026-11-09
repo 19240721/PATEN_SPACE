@@ -285,6 +285,11 @@ class PendaftaranController extends Controller
             $validated['alamat'] = !empty($parts) ? implode(', ', $parts) : '-';
         }
 
+        if (($validated['jenis_layanan'] ?? null) === 'KK') {
+            $validated['tempat_lahir'] = null;
+            $validated['tanggal_lahir'] = null;
+        }
+
         unset($validated['documents']);
 
         // Filter baris kosong anggota_kk
@@ -652,6 +657,11 @@ class PendaftaranController extends Controller
         ]);
 
         $newDocuments = $this->storeDocuments($request, $pendaftaran);
+        if (($validated['jenis_layanan'] ?? null) === 'KK') {
+            $validated['tempat_lahir'] = null;
+            $validated['tanggal_lahir'] = null;
+        }
+
         unset($validated['documents']);
         if ($newDocuments !== []) {
             $validated['documents'] = array_merge($pendaftaran->documents ?? [], $newDocuments);

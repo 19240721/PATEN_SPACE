@@ -422,4 +422,35 @@ class PendaftaranTest extends TestCase
             'nik_saksi2' => '3215000000000025',
         ]);
     }
+
+    public function test_masyarakat_kk_submission_does_not_require_birth_place_and_date(): void
+    {
+        $citizen = User::factory()->create([
+            'role' => 'masyarakat',
+            'nik' => '3215112233440001',
+        ]);
+
+        $response = $this->actingAs($citizen)->post(route('masyarakat.permohonan.store'), [
+            'nama_lengkap' => 'Kepala Keluarga Contoh',
+            'nik' => '3215112233440001',
+            'jenis_kelamin' => 'L',
+            'no_telepon' => '081234567890',
+            'desa' => 'Jatisari',
+            'jalan' => 'Jl. Merdeka No. 1',
+            'rt' => '001',
+            'rw' => '002',
+            'jenis_layanan' => 'KK',
+            'nomor_kk' => '3215110000000001',
+            'kepala_keluarga' => 'Kepala Keluarga Contoh',
+            'hubungan' => 'Kepala Keluarga',
+            'jumlah_anggota' => '4',
+            'tanggal_daftar' => now()->toDateString(),
+        ]);
+
+        $pendaftaran = Pendaftaran::where('nik', '3215112233440001')->first();
+        $this->assertNotNull($pendaftaran);
+        $response->assertRedirect(route('masyarakat.permohonan.success', $pendaftaran));
+        $this->assertNull($pendaftaran->tempat_lahir);
+        $this->assertNull($pendaftaran->tanggal_lahir);
+    }
 }

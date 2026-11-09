@@ -911,7 +911,7 @@
                         </div>
                     </div>
 
-                    <div class="mob-grid-2">
+                    <div class="mob-grid-2" id="mob-ttl-group" style="{{ old('jenis_layanan', $selectedService) === 'KK' ? 'display:none;' : '' }}">
                         <div class="mob-field">
                             <label class="mob-label">Tempat Lahir</label>
                             <input class="mob-input" name="tempat_lahir" type="text"
@@ -1514,6 +1514,17 @@ function selectService(value) {
     document.querySelectorAll('.mob-service-section').forEach(s => {
         s.classList.toggle('show', s.dataset.for === value);
     });
+
+    // Sembunyikan Tempat Lahir & Tanggal Lahir untuk permohonan KK
+    const ttlGroup = document.getElementById('mob-ttl-group');
+    if (ttlGroup) {
+        if (value === 'KK') {
+            ttlGroup.style.display = 'none';
+            ttlGroup.querySelectorAll('input').forEach(inp => inp.value = '');
+        } else {
+            ttlGroup.style.display = '';
+        }
+    }
 }
 
 (function() {
