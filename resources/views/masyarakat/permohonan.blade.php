@@ -411,32 +411,163 @@
     .mob-error { color: #dc2626; font-size: 0.7rem; margin-top: 3px; font-weight: 600; }
     .mob-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    /* ── Mobile Entry Cards (KK Anggota & Perubahan Data) ── */
-    .mob-entry-card {
-        background: #fdfcf9;
+    /* ── Collapsible Accordions (KK Anggota & Perubahan Data) ── */
+    .mob-accordion-card {
         border: 1.5px solid var(--khaki-border, #e5e0d3);
         border-radius: 12px;
-        padding: 12px 14px;
-        margin-bottom: 12px;
-        transition: border-color 0.18s, box-shadow 0.18s, background-color 0.18s;
-    }
-    .mob-entry-card:focus-within {
-        border-color: var(--khaki-primary);
         background: #ffffff;
-        box-shadow: 0 3px 10px rgba(138, 108, 66, 0.1);
+        margin-top: 14px;
+        overflow: hidden;
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .mob-entry-badge {
+    .mob-accordion-card[open] {
+        border-color: var(--khaki-accent, #c4a468);
+        box-shadow: 0 4px 12px rgba(121, 103, 67, 0.08);
+    }
+    .mob-accordion-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 11px 13px;
+        background: #faf8f5;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+        transition: background 0.15s;
+    }
+    .mob-accordion-head::-webkit-details-marker {
+        display: none;
+    }
+    .mob-accordion-head:active {
+        background: #f2eee5;
+    }
+    .mob-accordion-head-left {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex: 1;
+        min-width: 0;
+    }
+    .mob-accordion-icon {
+        font-size: 1.2rem;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    .mob-accordion-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--khaki-darker, #5b4b2d);
+        line-height: 1.25;
+    }
+    .mob-accordion-desc {
+        font-size: 0.68rem;
+        color: #78716c;
+        margin-top: 2px;
+    }
+    .mob-accordion-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--khaki-primary, #796743);
+        background: #ffffff;
+        border: 1px solid var(--khaki-border, #e5e0d3);
+        border-radius: 16px;
+        padding: 3px 9px;
+        flex-shrink: 0;
+    }
+    .mob-accordion-chevron {
+        font-size: 0.65rem;
+        transition: transform 0.22s ease;
+        display: inline-block;
+    }
+    .mob-accordion-card[open] > .mob-accordion-head .mob-accordion-chevron {
+        transform: rotate(180deg);
+    }
+    .mob-accordion-body {
+        padding: 12px 12px;
+        background: #fdfcf9;
+        border-top: 1px dashed var(--khaki-border, #e5e0d3);
+    }
+
+    /* Sub-accordion items inside (each family member & change) */
+    .mob-sub-accordion {
+        background: #ffffff;
+        border: 1px solid var(--khaki-border, #e5e0d3);
+        border-radius: 10px;
+        margin-bottom: 8px;
+        overflow: hidden;
+        transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .mob-sub-accordion[open] {
+        border-color: var(--khaki-primary, #796743);
+        box-shadow: 0 2px 8px rgba(121, 103, 67, 0.08);
+    }
+    .mob-sub-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 11px;
+        background: #f9f7f3;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--khaki-darker, #5b4b2d);
+    }
+    .mob-sub-head::-webkit-details-marker {
+        display: none;
+    }
+    .mob-sub-head:active {
+        background: #f2eee5;
+    }
+    .mob-sub-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        font-size: 0.72rem;
+        min-width: 0;
+    }
+    .mob-sub-tag {
+        background: var(--khaki-soft, #f7f5f0);
+        border: 1px solid var(--khaki-border, #e5e0d3);
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 0.68rem;
         font-weight: 800;
-        color: var(--khaki-darker);
-        background: var(--khaki-soft);
-        border: 1px solid var(--khaki-border);
-        border-radius: 6px;
-        padding: 3px 9px;
-        margin-bottom: 10px;
+        color: var(--khaki-darker, #5b4b2d);
+        flex-shrink: 0;
+    }
+    .mob-sub-preview {
+        font-weight: 600;
+        color: #78716c;
+        font-size: 0.7rem;
+        max-width: 130px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .mob-sub-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--khaki-primary, #796743);
+        flex-shrink: 0;
+    }
+    .mob-sub-chevron {
+        font-size: 0.6rem;
+        transition: transform 0.2s ease;
+        display: inline-block;
+    }
+    .mob-sub-accordion[open] > .mob-sub-head .mob-sub-chevron {
+        transform: rotate(180deg);
+    }
+    .mob-sub-content {
+        padding: 10px 10px 10px;
+        border-top: 1px solid #f2eee5;
     }
     .mob-sublabel {
         display: block;
@@ -1073,69 +1204,212 @@
                             <textarea class="mob-textarea" name="keterangan_kk" rows="2" placeholder="Keterangan permohonan KK">{{ old('keterangan_kk') }}</textarea>
                         </div>
 
-                        {{-- Daftar Anggota Keluarga --}}
-                        <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
-                            <div class="mob-card-head" style="margin-bottom:6px;">👨‍👩‍👧‍👦 Daftar Anggota Keluarga</div>
-                            <p style="font-size:0.72rem;color:#78716c;margin:0 0 12px;">Isi data anggota keluarga yang akan dimasukkan ke KK (hingga 7 orang):</p>
+                        @php
+                            $hasAnggotaOld = false;
+                            for ($chk = 0; $chk < 7; $chk++) {
+                                if (old('anggota_kk.'.$chk.'.nama') || old('anggota_kk.'.$chk.'.nik') || old('anggota_kk.'.$chk.'.shdk')) {
+                                    $hasAnggotaOld = true;
+                                    break;
+                                }
+                            }
+                            $hasPerubahanOld = false;
+                            for ($chk = 0; $chk < 5; $chk++) {
+                                if (old('perubahan_kk.'.$chk.'.semula') || old('perubahan_kk.'.$chk.'.menjadi') || old('perubahan_kk.'.$chk.'.dasar')) {
+                                    $hasPerubahanOld = true;
+                                    break;
+                                }
+                            }
+                        @endphp
 
-                            @for($i = 0; $i < 7; $i++)
-                            <div class="mob-entry-card">
-                                <div class="mob-entry-badge">Anggota #{{ $i + 1 }}</div>
-                                <div class="mob-field" style="margin-bottom:8px;">
-                                    <label class="mob-sublabel">Nama Lengkap</label>
-                                    <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][nama]"
-                                           value="{{ old('anggota_kk.'.$i.'.nama') }}"
-                                           placeholder="Nama lengkap anggota keluarga">
-                                </div>
-                                <div class="mob-grid-2">
-                                    <div class="mob-field" style="margin-bottom:0;">
-                                        <label class="mob-sublabel">NIK (16 Digit)</label>
-                                        <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][nik]"
-                                               value="{{ old('anggota_kk.'.$i.'.nik') }}"
-                                               placeholder="16 digit NIK" maxlength="16" inputmode="numeric">
-                                    </div>
-                                    <div class="mob-field" style="margin-bottom:0;">
-                                        <label class="mob-sublabel">Status Hubungan (SHDK)</label>
-                                        <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][shdk]"
-                                               value="{{ old('anggota_kk.'.$i.'.shdk') }}"
-                                               placeholder="Kepala / Istri / Anak / dll">
+                        {{-- Daftar Anggota Keluarga (Collapsible Accordion) --}}
+                        <details class="mob-accordion-card" {{ $hasAnggotaOld ? 'open' : '' }}>
+                            <summary class="mob-accordion-head">
+                                <div class="mob-accordion-head-left">
+                                    <span class="mob-accordion-icon">👨‍👩‍👧‍👦</span>
+                                    <div>
+                                        <div class="mob-accordion-title">Daftar Anggota Keluarga</div>
+                                        <div class="mob-accordion-desc">Ketuk untuk buka / isi (hingga 7 orang)</div>
                                     </div>
                                 </div>
+                                <span class="mob-accordion-pill">
+                                    <span>Buka / Tutup</span>
+                                    <span class="mob-accordion-chevron">▾</span>
+                                </span>
+                            </summary>
+                            <div class="mob-accordion-body">
+                                <p style="font-size:0.7rem;color:#78716c;margin:0 0 10px;">Isi data anggota keluarga yang akan dimasukkan ke KK:</p>
+
+                                {{-- Anggota #1: Terbuka default --}}
+                                <div class="mob-sub-accordion" style="border-color:var(--khaki-border,#e5e0d3);">
+                                    <div class="mob-sub-head" style="background:#f4f0e6;cursor:default;">
+                                        <div class="mob-sub-badge">
+                                            <span class="mob-sub-tag">Anggota #1</span>
+                                            <span style="font-size:0.68rem;color:#78716c;font-weight:600;">(Utama)</span>
+                                        </div>
+                                    </div>
+                                    <div class="mob-sub-content">
+                                        <div class="mob-field" style="margin-bottom:8px;">
+                                            <label class="mob-sublabel">Nama Lengkap</label>
+                                            <input class="mob-input" type="text" name="anggota_kk[0][nama]"
+                                                   value="{{ old('anggota_kk.0.nama') }}"
+                                                   placeholder="Nama lengkap anggota keluarga">
+                                        </div>
+                                        <div class="mob-grid-2">
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">NIK (16 Digit)</label>
+                                                <input class="mob-input" type="text" name="anggota_kk[0][nik]"
+                                                       value="{{ old('anggota_kk.0.nik') }}"
+                                                       placeholder="16 digit NIK" maxlength="16" inputmode="numeric">
+                                            </div>
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">SHDK</label>
+                                                <input class="mob-input" type="text" name="anggota_kk[0][shdk]"
+                                                       value="{{ old('anggota_kk.0.shdk') }}"
+                                                       placeholder="Kepala / Istri / Anak">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Anggota #2 s/d #7: Sub-accordion buka/tutup --}}
+                                @for($i = 1; $i < 7; $i++)
+                                @php
+                                    $itemFilled = old('anggota_kk.'.$i.'.nama') || old('anggota_kk.'.$i.'.nik') || old('anggota_kk.'.$i.'.shdk');
+                                    $namaVal = old('anggota_kk.'.$i.'.nama');
+                                @endphp
+                                <details class="mob-sub-accordion" {{ $itemFilled ? 'open' : '' }}>
+                                    <summary class="mob-sub-head">
+                                        <div class="mob-sub-badge">
+                                            <span class="mob-sub-tag">Anggota #{{ $i + 1 }}</span>
+                                            <span class="mob-sub-preview" id="preview-anggota-{{ $i }}">{{ $namaVal ? '• '.$namaVal : '' }}</span>
+                                        </div>
+                                        <span class="mob-sub-btn" id="btn-anggota-{{ $i }}">
+                                            <span>{{ $itemFilled ? '✓ Terisi' : '+ Tambah' }}</span>
+                                            <span class="mob-sub-chevron">▾</span>
+                                        </span>
+                                    </summary>
+                                    <div class="mob-sub-content">
+                                        <div class="mob-field" style="margin-bottom:8px;">
+                                            <label class="mob-sublabel">Nama Lengkap</label>
+                                            <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][nama]"
+                                                   value="{{ old('anggota_kk.'.$i.'.nama') }}"
+                                                   placeholder="Nama lengkap anggota keluarga">
+                                        </div>
+                                        <div class="mob-grid-2">
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">NIK (16 Digit)</label>
+                                                <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][nik]"
+                                                       value="{{ old('anggota_kk.'.$i.'.nik') }}"
+                                                       placeholder="16 digit NIK" maxlength="16" inputmode="numeric">
+                                            </div>
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">SHDK</label>
+                                                <input class="mob-input" type="text" name="anggota_kk[{{ $i }}][shdk]"
+                                                       value="{{ old('anggota_kk.'.$i.'.shdk') }}"
+                                                       placeholder="Hubungan">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </details>
+                                @endfor
                             </div>
-                            @endfor
-                        </div>
+                        </details>
 
-                        {{-- Perubahan Data (Pendidikan, Pekerjaan, Agama, dll) --}}
-                        <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
-                            <div class="mob-card-head" style="margin-bottom:6px;">📝 Perubahan Data</div>
-                            <p style="font-size:0.72rem;color:#78716c;margin:0 0 12px;">Isi jika ada pembaruan pendidikan, pekerjaan, agama, status kawin, dll:</p>
-
-                            @for($i = 0; $i < 5; $i++)
-                            <div class="mob-entry-card">
-                                <div class="mob-entry-badge">Perubahan #{{ $i + 1 }}</div>
-                                <div class="mob-grid-2" style="margin-bottom:8px;">
-                                    <div class="mob-field" style="margin-bottom:0;">
-                                        <label class="mob-sublabel">Data Semula</label>
-                                        <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][semula]"
-                                               value="{{ old('perubahan_kk.'.$i.'.semula') }}"
-                                               placeholder="Data sebelumnya">
-                                    </div>
-                                    <div class="mob-field" style="margin-bottom:0;">
-                                        <label class="mob-sublabel">Data Menjadi</label>
-                                        <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][menjadi]"
-                                               value="{{ old('perubahan_kk.'.$i.'.menjadi') }}"
-                                               placeholder="Data baru">
+                        {{-- Perubahan Data (Collapsible Accordion) --}}
+                        <details class="mob-accordion-card" {{ $hasPerubahanOld ? 'open' : '' }}>
+                            <summary class="mob-accordion-head">
+                                <div class="mob-accordion-head-left">
+                                    <span class="mob-accordion-icon">📝</span>
+                                    <div>
+                                        <div class="mob-accordion-title">Perubahan Data</div>
+                                        <div class="mob-accordion-desc">Pendidikan, pekerjaan, agama, dll (Opsional)</div>
                                     </div>
                                 </div>
-                                <div class="mob-field" style="margin-bottom:0;">
-                                    <label class="mob-sublabel">Dasar Perubahan</label>
-                                    <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][dasar]"
-                                           value="{{ old('perubahan_kk.'.$i.'.dasar') }}"
-                                           placeholder="Contoh: Ijazah / SK / Buku Nikah">
+                                <span class="mob-accordion-pill">
+                                    <span>Buka / Tutup</span>
+                                    <span class="mob-accordion-chevron">▾</span>
+                                </span>
+                            </summary>
+                            <div class="mob-accordion-body">
+                                <p style="font-size:0.7rem;color:#78716c;margin:0 0 10px;">Isi jika terdapat data yang diperbarui:</p>
+
+                                {{-- Perubahan #1: Terbuka default di dalam section perubahan --}}
+                                <div class="mob-sub-accordion" style="border-color:var(--khaki-border,#e5e0d3);">
+                                    <div class="mob-sub-head" style="background:#f4f0e6;cursor:default;">
+                                        <div class="mob-sub-badge">
+                                            <span class="mob-sub-tag">Perubahan #1</span>
+                                            <span style="font-size:0.68rem;color:#78716c;font-weight:600;">(Baris 1)</span>
+                                        </div>
+                                    </div>
+                                    <div class="mob-sub-content">
+                                        <div class="mob-grid-2" style="margin-bottom:8px;">
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">Data Semula</label>
+                                                <input class="mob-input" type="text" name="perubahan_kk[0][semula]"
+                                                       value="{{ old('perubahan_kk.0.semula') }}"
+                                                       placeholder="Sebelumnya">
+                                            </div>
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">Data Menjadi</label>
+                                                <input class="mob-input" type="text" name="perubahan_kk[0][menjadi]"
+                                                       value="{{ old('perubahan_kk.0.menjadi') }}"
+                                                       placeholder="Data baru">
+                                            </div>
+                                        </div>
+                                        <div class="mob-field" style="margin-bottom:0;">
+                                            <label class="mob-sublabel">Dasar Perubahan</label>
+                                            <input class="mob-input" type="text" name="perubahan_kk[0][dasar]"
+                                                   value="{{ old('perubahan_kk.0.dasar') }}"
+                                                   placeholder="Contoh: Ijazah / SK / Buku Nikah">
+                                        </div>
+                                    </div>
                                 </div>
+
+                                {{-- Perubahan #2 s/d #5: Sub-accordion buka/tutup --}}
+                                @for($i = 1; $i < 5; $i++)
+                                @php
+                                    $itemFilled = old('perubahan_kk.'.$i.'.semula') || old('perubahan_kk.'.$i.'.menjadi') || old('perubahan_kk.'.$i.'.dasar');
+                                    $semulaVal = old('perubahan_kk.'.$i.'.semula');
+                                    $menjadiVal = old('perubahan_kk.'.$i.'.menjadi');
+                                    $prevText = ($semulaVal && $menjadiVal) ? ($semulaVal . ' → ' . $menjadiVal) : ($semulaVal ?: $menjadiVal);
+                                @endphp
+                                <details class="mob-sub-accordion" {{ $itemFilled ? 'open' : '' }}>
+                                    <summary class="mob-sub-head">
+                                        <div class="mob-sub-badge">
+                                            <span class="mob-sub-tag">Perubahan #{{ $i + 1 }}</span>
+                                            <span class="mob-sub-preview" id="preview-perubahan-{{ $i }}">{{ $prevText ? '• '.$prevText : '' }}</span>
+                                        </div>
+                                        <span class="mob-sub-btn" id="btn-perubahan-{{ $i }}">
+                                            <span>{{ $itemFilled ? '✓ Terisi' : '+ Tambah' }}</span>
+                                            <span class="mob-sub-chevron">▾</span>
+                                        </span>
+                                    </summary>
+                                    <div class="mob-sub-content">
+                                        <div class="mob-grid-2" style="margin-bottom:8px;">
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">Data Semula</label>
+                                                <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][semula]"
+                                                       value="{{ old('perubahan_kk.'.$i.'.semula') }}"
+                                                       placeholder="Sebelumnya">
+                                            </div>
+                                            <div class="mob-field" style="margin-bottom:0;">
+                                                <label class="mob-sublabel">Data Menjadi</label>
+                                                <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][menjadi]"
+                                                       value="{{ old('perubahan_kk.'.$i.'.menjadi') }}"
+                                                       placeholder="Data baru">
+                                            </div>
+                                        </div>
+                                        <div class="mob-field" style="margin-bottom:0;">
+                                            <label class="mob-sublabel">Dasar Perubahan</label>
+                                            <input class="mob-input" type="text" name="perubahan_kk[{{ $i }}][dasar]"
+                                                   value="{{ old('perubahan_kk.'.$i.'.dasar') }}"
+                                                   placeholder="Contoh: Ijazah / SK / Buku Nikah">
+                                        </div>
+                                    </div>
+                                </details>
+                                @endfor
                             </div>
-                            @endfor
-                        </div>
+                        </details>
                     </div>
                 </div>
 
@@ -1690,6 +1964,40 @@ function capturePhoto() {
         goStep(4);
     }, 'image/jpeg', 0.92);
 }
+
+// Live update badge preview when typing KK anggota & perubahan
+document.addEventListener('input', function(e) {
+    if (!e.target || !e.target.name) return;
+    if (e.target.name.startsWith('anggota_kk[')) {
+        const match = e.target.name.match(/anggota_kk\[(\d+)\]\[nama\]/);
+        if (match) {
+            const idx = match[1];
+            const preview = document.getElementById('preview-anggota-' + idx);
+            const btn = document.getElementById('btn-anggota-' + idx);
+            if (preview && btn) {
+                const val = e.target.value.trim();
+                preview.textContent = val ? '• ' + val : '';
+                btn.innerHTML = (val ? '✓ Terisi' : '+ Tambah') + ' <span class="mob-sub-chevron">▾</span>';
+            }
+        }
+    } else if (e.target.name.startsWith('perubahan_kk[')) {
+        const match = e.target.name.match(/perubahan_kk\[(\d+)\]/);
+        if (match) {
+            const idx = match[1];
+            const preview = document.getElementById('preview-perubahan-' + idx);
+            const btn = document.getElementById('btn-perubahan-' + idx);
+            if (preview && btn) {
+                const semulaInput = document.querySelector('input[name="perubahan_kk[' + idx + '][semula]"]');
+                const menjadiInput = document.querySelector('input[name="perubahan_kk[' + idx + '][menjadi]"]');
+                const semula = semulaInput ? semulaInput.value.trim() : '';
+                const menjadi = menjadiInput ? menjadiInput.value.trim() : '';
+                const txt = (semula && menjadi) ? (semula + ' → ' + menjadi) : (semula || menjadi);
+                preview.textContent = txt ? '• ' + txt : '';
+                btn.innerHTML = (txt ? '✓ Terisi' : '+ Tambah') + ' <span class="mob-sub-chevron">▾</span>';
+            }
+        }
+    }
+});
 
 document.getElementById('mob-form').addEventListener('submit', function(e) {
     const btn = document.getElementById('mob-submit-btn');
