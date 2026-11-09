@@ -46,8 +46,8 @@ class CamatDashboardTest extends TestCase
         $response = $this->get('/camat/dashboard');
         $response->assertStatus(200);
         $response->assertSee('Dashboard Camat');
-        $response->assertSee('Camat Jatisari');
-        $response->assertSee('CJ');
+        $response->assertDontSee('operator-chip');
+        $response->assertSee('Keluar');
         $response->assertSee('Total Pelayanan');
         $response->assertSee('Pelayanan Berdasarkan Jenis');
         $response->assertSee('Tren Pelayanan Bulanan');
@@ -989,7 +989,7 @@ class CamatDashboardTest extends TestCase
         $response = $this->get('/camat/profil');
         $response->assertStatus(200);
         $response->assertSee('Profil Camat');
-        $response->assertSee('Camat Jatisari');
+        $response->assertDontSee('operator-chip');
     }
 
     /**

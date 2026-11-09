@@ -416,10 +416,6 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <div class="operator-chip">
-                        <span>Camat Jatisari</span>
-                        <b title="Camat Jatisari">CJ</b>
-                    </div>
                     <form action="{{ route('logout') }}" method="POST" style="margin: 0; padding: 0;">
                         @csrf
                         <button type="submit" class="report-filter-button">Keluar</button>
