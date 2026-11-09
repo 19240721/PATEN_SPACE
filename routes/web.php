@@ -55,6 +55,7 @@ Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masy
     Route::get('/permohonan', [PendaftaranController::class, 'citizenCreate'])->name('permohonan.create');
     Route::post('/permohonan', [PendaftaranController::class, 'store'])->name('permohonan.store');
     Route::get('/permohonan/{pendaftaran}/sukses', [PendaftaranController::class, 'citizenSuccess'])->name('permohonan.success');
+    Route::get('/permohonan/{pendaftaran}/sptjm', [PendaftaranController::class, 'cetakSptjm'])->name('permohonan.sptjm');
     Route::get('/permohonan/{pendaftaran}/dokumen/{index}', [PendaftaranController::class, 'document'])->name('dokumen');
 });
 
@@ -64,6 +65,7 @@ Route::middleware(['auth', 'role:petugas'])->prefix('petugas')->name('petugas.')
     Route::get('/permohonan', [PendaftaranController::class, 'permohonanMasuk'])->name('permohonan.index');
     Route::get('/permohonan/{pendaftaran}', [PendaftaranController::class, 'showPermohonan'])->name('permohonan.show');
     Route::get('/permohonan/{pendaftaran}/formulir', [PendaftaranController::class, 'cetakFormulir'])->name('permohonan.formulir');
+    Route::get('/permohonan/{pendaftaran}/sptjm', [PendaftaranController::class, 'cetakSptjm'])->name('permohonan.sptjm');
     Route::patch('/permohonan/{pendaftaran}/status', [PendaftaranController::class, 'updateStatus'])->name('permohonan.status');
 });
 
@@ -78,6 +80,8 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::get('/pendaftaran/{pendaftaran}/edit', [PendaftaranController::class, 'edit'])->name('pendaftaran.edit');
     Route::put('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'update'])->name('pendaftaran.update');
     Route::delete('/pendaftaran/{pendaftaran}', [PendaftaranController::class, 'destroy'])->name('pendaftaran.destroy');
+    Route::get('/pendaftaran/{pendaftaran}/formulir', [PendaftaranController::class, 'cetakFormulir'])->name('pendaftaran.formulir');
+    Route::get('/pendaftaran/{pendaftaran}/sptjm', [PendaftaranController::class, 'cetakSptjm'])->name('pendaftaran.sptjm');
     Route::get('/pendaftaran/{pendaftaran}/dokumen/{index}', [PendaftaranController::class, 'document'])->name('pendaftaran.document');
 });
 

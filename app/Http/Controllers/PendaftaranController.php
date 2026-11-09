@@ -227,6 +227,15 @@ class PendaftaranController extends Controller
             'tempat_meninggal' => ['nullable', 'string', 'max:255'],
             'tanggal_meninggal' => ['nullable', 'date'],
             'keterangan_kematian' => ['nullable', 'string', 'max:255'],
+            'sptjm_kematian' => ['nullable', 'boolean'],
+            'nik_jenazah' => ['nullable', 'string', 'max:30'],
+            'tempat_lahir_jenazah' => ['nullable', 'string', 'max:255'],
+            'tanggal_lahir_jenazah' => ['nullable', 'string', 'max:50'],
+            'alamat_jenazah' => ['nullable', 'string', 'max:500'],
+            'penyebab_kematian' => ['nullable', 'string', 'max:255'],
+            'yang_menyatakan' => ['nullable', 'string', 'max:255'],
+            'nik_yang_menyatakan' => ['nullable', 'string', 'max:30'],
+            'hubungan_yang_menyatakan' => ['nullable', 'string', 'max:100'],
             'nik_pelapor' => ['nullable', 'string', 'max:30'],
             'nama_pelapor' => ['nullable', 'string', 'max:255'],
             'nik_ayah' => ['nullable', 'string', 'max:30'],
@@ -624,6 +633,15 @@ class PendaftaranController extends Controller
             'tempat_meninggal' => ['nullable', 'string', 'max:255'],
             'tanggal_meninggal' => ['nullable', 'date'],
             'keterangan_kematian' => ['nullable', 'string', 'max:255'],
+            'sptjm_kematian' => ['nullable', 'boolean'],
+            'nik_jenazah' => ['nullable', 'string', 'max:30'],
+            'tempat_lahir_jenazah' => ['nullable', 'string', 'max:255'],
+            'tanggal_lahir_jenazah' => ['nullable', 'string', 'max:50'],
+            'alamat_jenazah' => ['nullable', 'string', 'max:500'],
+            'penyebab_kematian' => ['nullable', 'string', 'max:255'],
+            'yang_menyatakan' => ['nullable', 'string', 'max:255'],
+            'nik_yang_menyatakan' => ['nullable', 'string', 'max:30'],
+            'hubungan_yang_menyatakan' => ['nullable', 'string', 'max:100'],
             'nik_pelapor' => ['nullable', 'string', 'max:30'],
             'nama_pelapor' => ['nullable', 'string', 'max:255'],
             'nik_ayah' => ['nullable', 'string', 'max:30'],
@@ -816,6 +834,31 @@ class PendaftaranController extends Controller
         }
 
         return view('petugas.formulir-permohonan', [
+            'pendaftaran' => $pendaftaran,
+            'logoBase64' => $logoBase64,
+            'isPdf' => false,
+        ]);
+    }
+
+    public function cetakSptjm(Request $request, Pendaftaran $pendaftaran)
+    {
+        $logoPath = public_path('images/logo-karawang.png');
+        $logoBase64 = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : '';
+
+        if ($request->boolean('pdf') && class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('petugas.sptjm-kematian', [
+                'pendaftaran' => $pendaftaran,
+                'logoBase64' => $logoBase64,
+                'isPdf' => true,
+            ]);
+            $pdf->setPaper('A4', 'portrait');
+            $filename = 'SPTJM-Kematian-' . preg_replace('/[^A-Za-z0-9\-]/', '', $pendaftaran->nik) . '-' . $pendaftaran->id . '.pdf';
+            return $pdf->stream($filename);
+        }
+
+        return view('petugas.sptjm-kematian', [
             'pendaftaran' => $pendaftaran,
             'logoBase64' => $logoBase64,
             'isPdf' => false,

@@ -373,6 +373,35 @@
                         <div class="field-group"><label>Keterangan</label><input type="text" name="keterangan_kematian" value="{{ old('keterangan_kematian', $pendaftaran->keterangan_kematian ?? '') }}" placeholder="Keterangan"></div>
                     </div>
 
+                    {{-- Opsi SPTJM Kebenaran Data Kematian --}}
+                    <div style="margin-top: 16px; padding: 12px 14px; background: #fdfbf7; border: 1.5px solid #d1c9b6; border-radius: 8px;">
+                        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin:0;">
+                            <input type="hidden" name="sptjm_kematian" value="0">
+                            <input type="checkbox" name="sptjm_kematian" id="reg_sptjm_kematian" value="1"
+                                   {{ old('sptjm_kematian', $pendaftaran->sptjm_kematian ?? false) ? 'checked' : '' }}
+                                   onchange="toggleRegSptjm(this.checked)"
+                                   style="width:18px;height:18px;margin-top:2px;cursor:pointer;">
+                            <div>
+                                <span style="font-weight:700;font-size:13px;color:#5b4b2d;">📄 KTP Jenazah Tidak Ada? (Gunakan SPTJM Kebenaran Data Kematian)</span>
+                                <p style="margin:2px 0 0;font-size:11.5px;color:#78716c;">Centang jika KTP jenazah tidak ada. Sistem akan menyertakan SPTJM bermaterai Rp 10.000 dengan tanda tangan pembuat pernyataan dan 2 saksi.</p>
+                            </div>
+                        </label>
+
+                        <div id="reg_sptjm_fields" style="{{ old('sptjm_kematian', $pendaftaran->sptjm_kematian ?? false) ? '' : 'display:none;' }} margin-top:12px; padding-top:12px; border-top:1px dashed #d1c9b6;">
+                            <span style="display:block;font-size:11.5px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Data SPTJM Kematian</span>
+                            <div class="form-grid compact-grid">
+                                <div class="field-group"><label>NIK Jenazah</label><input type="text" name="nik_jenazah" value="{{ old('nik_jenazah', $pendaftaran->nik_jenazah ?? '') }}" placeholder="16 digit NIK jenazah" maxlength="16" inputmode="numeric"></div>
+                                <div class="field-group"><label>Tempat Lahir Jenazah</label><input type="text" name="tempat_lahir_jenazah" value="{{ old('tempat_lahir_jenazah', $pendaftaran->tempat_lahir_jenazah ?? '') }}" placeholder="Kota/Kab. lahir"></div>
+                                <div class="field-group"><label>Tanggal Lahir Jenazah</label><input type="date" name="tanggal_lahir_jenazah" value="{{ old('tanggal_lahir_jenazah', $pendaftaran->tanggal_lahir_jenazah ?? '') }}"></div>
+                                <div class="field-group"><label>Penyebab Kematian</label><input type="text" name="penyebab_kematian" value="{{ old('penyebab_kematian', $pendaftaran->penyebab_kematian ?? '') }}" placeholder="Sakit wajar / dll"></div>
+                                <div class="field-group" style="grid-column:span 2;"><label>Alamat Terakhir Jenazah</label><input type="text" name="alamat_jenazah" value="{{ old('alamat_jenazah', $pendaftaran->alamat_jenazah ?? '') }}" placeholder="Alamat lengkap jenazah"></div>
+                                <div class="field-group"><label>Nama Yang Menyatakan</label><input type="text" name="yang_menyatakan" value="{{ old('yang_menyatakan', $pendaftaran->yang_menyatakan ?? '') }}" placeholder="Nama pembuat pernyataan"></div>
+                                <div class="field-group"><label>NIK Yang Menyatakan</label><input type="text" name="nik_yang_menyatakan" value="{{ old('nik_yang_menyatakan', $pendaftaran->nik_yang_menyatakan ?? '') }}" placeholder="16 digit NIK" maxlength="16" inputmode="numeric"></div>
+                                <div class="field-group"><label>Hubungan dg Jenazah</label><input type="text" name="hubungan_yang_menyatakan" value="{{ old('hubungan_yang_menyatakan', $pendaftaran->hubungan_yang_menyatakan ?? '') }}" placeholder="Anak Kandung / Suami / Istri"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Identitas Kedua Orang Tua --}}
                     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d1c9b6;">
                         <span style="display:block;font-size:12px;font-weight:700;color:#5b4b2d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Identitas Kedua Orang Tua</span>
@@ -528,9 +557,16 @@
                     });
                 }
 
+                window.toggleRegSptjm = function(isChecked) {
+                    const fields = document.getElementById('reg_sptjm_fields');
+                    if (fields) fields.style.display = isChecked ? 'block' : 'none';
+                    updateServiceSections();
+                };
+
                 function updateServiceSections() {
                     const selected = serviceSelect.value || 'KTP';
                     const infoCard = document.querySelector('[data-role="informasi-pendaftar"]');
+                    const sptjmChecked = document.getElementById('reg_sptjm_kematian') ? document.getElementById('reg_sptjm_kematian').checked : false;
 
                     serviceSections.forEach(function (section) {
                         const show = section.dataset.service === selected;
@@ -549,6 +585,10 @@
                         });
                     }
 
+                    const aktaKematianDocs = sptjmChecked
+                        ? ['Surat Pernyataan Tanggung Jawab Mutlak (SPTJM) Kebenaran Data Kematian (Bermaterai Rp 10.000, TTD Yang Menyatakan & 2 Saksi)', 'Fotocopy KTP pelapor dan 2 orang saksi', 'Surat keterangan kematian dari desa', 'Fotocopy Kartu Keluarga (KK)']
+                        : ['Fotocopy KTP jenazah, pelapor, dan 2 saksi', 'Surat keterangan kematian dari desa', 'Fotocopy Kartu Keluarga (KK)'];
+
                     const serviceDocs = {
                         'KK': {
                             name: 'Kartu Keluarga (KK)',
@@ -564,7 +604,7 @@
                         },
                         'Akta Kematian': {
                             name: 'Akta Kematian',
-                            docs: ['Fotocopy KTP jenazah, pelapor, dan 2 saksi', 'Surat keterangan kematian dari desa', 'Fotocopy Kartu Keluarga (KK)']
+                            docs: aktaKematianDocs
                         },
                         'Akta Lahir': {
                             name: 'Akta Kelahiran',

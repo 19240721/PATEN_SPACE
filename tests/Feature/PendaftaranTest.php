@@ -453,4 +453,90 @@ class PendaftaranTest extends TestCase
         $this->assertNull($pendaftaran->tempat_lahir);
         $this->assertNull($pendaftaran->tanggal_lahir);
     }
+
+    public function test_akta_kematian_can_be_saved_with_sptjm_fields(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'petugas',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('pendaftaran.store'), [
+            'nama_lengkap' => 'Warga Pelapor',
+            'nik' => '3215000000000099',
+            'tempat_lahir' => 'Karawang',
+            'tanggal_lahir' => '1985-05-10',
+            'alamat' => 'Desa Barugbug RT 01 RW 02',
+            'jenis_layanan' => 'Akta Kematian',
+            'tanggal_daftar' => '2026-11-09',
+            'nama_alm' => 'Alm. Budi Santoso',
+            'tempat_meninggal' => 'Karawang',
+            'tanggal_meninggal' => '2026-11-01',
+            'keterangan_kematian' => 'Sakit wajar',
+            'sptjm_kematian' => 1,
+            'nik_jenazah' => '3215000000000088',
+            'tempat_lahir_jenazah' => 'Subang',
+            'tanggal_lahir_jenazah' => '1950-02-15',
+            'alamat_jenazah' => 'Desa Barugbug',
+            'penyebab_kematian' => 'Usia lanjut',
+            'yang_menyatakan' => 'Warga Pelapor',
+            'nik_yang_menyatakan' => '3215000000000099',
+            'hubungan_yang_menyatakan' => 'Anak Kandung',
+            'nama_saksi1' => 'Saksi Satu',
+            'nik_saksi1' => '3215000000000077',
+            'nama_saksi2' => 'Saksi Dua',
+            'nik_saksi2' => '3215000000000066',
+        ]);
+
+        $response->assertRedirect(route('pendaftaran.success'));
+        $this->assertDatabaseHas('pendaftarans', [
+            'nik' => '3215000000000099',
+            'nama_alm' => 'Alm. Budi Santoso',
+            'sptjm_kematian' => 1,
+            'nik_jenazah' => '3215000000000088',
+            'tempat_lahir_jenazah' => 'Subang',
+            'penyebab_kematian' => 'Usia lanjut',
+            'hubungan_yang_menyatakan' => 'Anak Kandung',
+        ]);
+    }
+
+    public function test_sptjm_kematian_page_can_be_rendered(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'petugas',
+        ]);
+
+        $pendaftaran = Pendaftaran::create([
+            'nama_lengkap' => 'Warga Pelapor',
+            'nik' => '3215000000000099',
+            'jenis_layanan' => 'Akta Kematian',
+            'tanggal_daftar' => '2026-11-09',
+            'nama_alm' => 'Alm. Budi Santoso',
+            'tempat_meninggal' => 'Karawang',
+            'tanggal_meninggal' => '2026-11-01',
+            'keterangan_kematian' => 'Sakit wajar',
+            'sptjm_kematian' => 1,
+            'nik_jenazah' => '3215000000000088',
+            'tempat_lahir_jenazah' => 'Subang',
+            'tanggal_lahir_jenazah' => '1950-02-15',
+            'alamat_jenazah' => 'Desa Barugbug',
+            'penyebab_kematian' => 'Usia lanjut',
+            'yang_menyatakan' => 'Warga Pelapor',
+            'nik_yang_menyatakan' => '3215000000000099',
+            'hubungan_yang_menyatakan' => 'Anak Kandung',
+            'nama_saksi1' => 'Saksi Satu',
+            'nik_saksi1' => '3215000000000077',
+            'nama_saksi2' => 'Saksi Dua',
+            'nik_saksi2' => '3215000000000066',
+            'status' => 'Baru',
+            'intake_source' => 'loket',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('petugas.permohonan.sptjm', $pendaftaran));
+        $response->assertOk();
+        $response->assertSee('SURAT PERNYATAAN TANGGUNG JAWAB MUTLAK');
+        $response->assertSee('Alm. Budi Santoso');
+        $response->assertSee('MATERAI');
+        $response->assertSee('Saksi Satu');
+        $response->assertSee('Saksi Dua');
+    }
 }

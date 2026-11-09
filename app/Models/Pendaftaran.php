@@ -51,6 +51,15 @@ class Pendaftaran extends Model
         'tempat_meninggal',
         'tanggal_meninggal',
         'keterangan_kematian',
+        'sptjm_kematian',
+        'nik_jenazah',
+        'tempat_lahir_jenazah',
+        'tanggal_lahir_jenazah',
+        'alamat_jenazah',
+        'penyebab_kematian',
+        'yang_menyatakan',
+        'nik_yang_menyatakan',
+        'hubungan_yang_menyatakan',
         'nik_pelapor',
         'nama_pelapor',
         'nik_ayah',
@@ -89,6 +98,7 @@ class Pendaftaran extends Model
     protected function casts(): array
     {
         return [
+            'sptjm_kematian' => 'boolean',
             'documents' => 'array',
             'anggota_kk' => 'array',
             'perubahan_kk' => 'array',

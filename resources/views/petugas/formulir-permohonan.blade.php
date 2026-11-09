@@ -701,6 +701,18 @@
         </tr>
         @endif
 
+        @if($pendaftaran->sptjm_kematian)
+        <tr>
+            <td class="col-num">&bull;</td>
+            <td class="col-label">Dokumen SPTJM</td>
+            <td class="col-sep">:</td>
+            <td class="col-val">
+                <strong>Ya, Menggunakan SPTJM Kebenaran Data Kematian (KTP Jenazah Tidak Ada)</strong>
+                <br><span style="font-size:10px;color:#4b5563;">NIK Jenazah: {{ $pendaftaran->nik_jenazah ?? '-' }} &bull; TTL: {{ $pendaftaran->tempat_lahir_jenazah ?? '-' }}, {{ $pendaftaran->tanggal_lahir_jenazah ?? '-' }} &bull; Bermaterai Rp 10.000 &bull; TTD Yang Menyatakan & 2 Saksi</span>
+            </td>
+        </tr>
+        @endif
+
         @if($pendaftaran->nama_kedatangan || $pendaftaran->nik_kedatangan)
         <tr>
             <td class="col-num">&bull;</td>

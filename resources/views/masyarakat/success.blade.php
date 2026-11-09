@@ -546,6 +546,21 @@
             </div>
             @endif
 
+            @if($pendaftaran->jenis_layanan === 'Akta Kematian' && $pendaftaran->sptjm_kematian)
+            <div style="margin-top: 14px; padding: 12px; background: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 12px;">
+                <div style="font-weight: 700; font-size: 0.85rem; color: #065f46; margin-bottom: 4px;">
+                    📄 Dokumen SPTJM Kematian Siap Dicetak
+                </div>
+                <p style="margin: 0 0 10px; font-size: 0.73rem; color: #047857; line-height: 1.45;">
+                    Karena KTP jenazah tidak ada, silakan cetak SPTJM ini, tempelkan <strong>Materai Rp 10.000</strong>, dan mintakan tanda tangan pembuat pernyataan serta 2 orang saksi untuk diserahkan ke kantor kecamatan.
+                </p>
+                <a href="{{ route('masyarakat.permohonan.sptjm', $pendaftaran) }}" target="_blank"
+                   style="display: block; text-align: center; padding: 10px; background: #059669; color: #ffffff; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: 700;">
+                    🖨️ Cetak / Unduh SPTJM Kematian
+                </a>
+            </div>
+            @endif
+
             <div class="notice-box">
                 <strong>ℹ️ Pelacakan Status & Pengambilan Berkas:</strong>
                 Pantau perkembangan permohonan melalui menu <strong>Beranda</strong>. Jika status sudah <strong>Selesai</strong>, silakan datang ke kantor Kecamatan Jatisari dengan menunjukkan nomor registrasi ini.

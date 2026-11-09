@@ -69,6 +69,12 @@
                        style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #796743; color: #ffffff; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 700; box-shadow: 0 2px 4px rgba(121, 103, 67, 0.2); transition: background .15s ease;">
                         <span>🖨️</span> Cetak Formulir
                     </a>
+                    @if($pendaftaran->jenis_layanan === 'Akta Kematian' && $pendaftaran->sptjm_kematian)
+                    <a href="{{ route('petugas.permohonan.sptjm', $pendaftaran) }}" target="_blank"
+                       style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #059669; color: #ffffff; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 700; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); transition: background .15s ease;">
+                        <span>📄</span> Cetak SPTJM Kematian
+                    </a>
+                    @endif
                     <div style="padding: 9px 14px; border: 1px solid #d9e4ee; border-radius: 8px; background: #fff; color: #53677e; font-size: 13px; font-weight: 600;">
                         {{ now()->translatedFormat('l, d F Y') }}
                     </div>
@@ -381,7 +387,31 @@
                         </section>
                     @endif
 
-                    {{-- Alasan Penolakan (Jika ada) --}}
+                    {{-- SPTJM Kematian (Jika digunakan) --}}
+                    @if($pendaftaran->jenis_layanan === 'Akta Kematian' && $pendaftaran->sptjm_kematian)
+                        <section class="dashboard-panel" style="padding: 20px; background: #fdfbf7; border: 1.5px solid #d1c9b6;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                                <div style="font-weight: 700; color: #5b4b2d; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                    <span>📄</span> Surat Pernyataan Tanggung Jawab Mutlak (SPTJM) Kematian
+                                </div>
+                                <a href="{{ route('petugas.permohonan.sptjm', $pendaftaran) }}" target="_blank"
+                                   style="padding: 6px 14px; background: #059669; color: #fff; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">
+                                    🖨️ Cetak SPTJM
+                                </a>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 13px;">
+                                <div><span style="color:#6b7280;">NIK Jenazah:</span> <strong>{{ $pendaftaran->nik_jenazah ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">TTL Jenazah:</span> <strong>{{ $pendaftaran->tempat_lahir_jenazah ?? '-' }}, {{ $pendaftaran->tanggal_lahir_jenazah ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">Alamat Jenazah:</span> <strong>{{ $pendaftaran->alamat_jenazah ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">Penyebab Kematian:</span> <strong>{{ $pendaftaran->penyebab_kematian ?? $pendaftaran->keterangan_kematian ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">Yang Menyatakan:</span> <strong>{{ $pendaftaran->yang_menyatakan ?? $pendaftaran->nama_pelapor ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">NIK Yang Menyatakan:</span> <strong>{{ $pendaftaran->nik_yang_menyatakan ?? $pendaftaran->nik_pelapor ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">Hubungan:</span> <strong>{{ $pendaftaran->hubungan_yang_menyatakan ?? '-' }}</strong></div>
+                                <div><span style="color:#6b7280;">Saksi I:</span> <strong>{{ $pendaftaran->nama_saksi1 ?? '-' }} (NIK: {{ $pendaftaran->nik_saksi1 ?? '-' }})</strong></div>
+                                <div><span style="color:#6b7280;">Saksi II:</span> <strong>{{ $pendaftaran->nama_saksi2 ?? '-' }} (NIK: {{ $pendaftaran->nik_saksi2 ?? '-' }})</strong></div>
+                            </div>
+                        </section>
+                    @endif
                     @if($pendaftaran->status === 'Ditolak' && $pendaftaran->alasan_penolakan)
                         <section class="dashboard-panel" style="padding: 20px; background: #fef2f2; border: 1px solid #fecaca;">
                             <div style="font-weight: 700; color: #991b1b; margin-bottom: 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
@@ -482,6 +512,12 @@
                                style="display: block; text-align: center; padding: 10px; background: #b45309; color: #fff; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 700;">
                                 🖨️ Cetak Formulir Permohonan
                             </a>
+                            @if($pendaftaran->jenis_layanan === 'Akta Kematian' && $pendaftaran->sptjm_kematian)
+                            <a href="{{ route('petugas.permohonan.sptjm', $pendaftaran) }}" target="_blank"
+                               style="display: block; text-align: center; padding: 10px; background: #059669; color: #fff; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 700;">
+                                📄 Cetak SPTJM Kematian
+                            </a>
+                            @endif
                             <a href="{{ route('petugas.permohonan.index') }}"
                                style="display: block; text-align: center; padding: 10px; background: #e8e2d2; color: #3f3523; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;">
                                 ← Kembali ke Daftar Permohonan

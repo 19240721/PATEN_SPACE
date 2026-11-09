@@ -1629,6 +1629,98 @@
                             <textarea class="mob-textarea" name="keterangan_kematian" rows="2" placeholder="Penyebab / keterangan">{{ old('keterangan_kematian') }}</textarea>
                         </div>
 
+                        {{-- Opsi SPTJM Kebenaran Data Kematian --}}
+                        <div style="margin-top:14px;padding:12px 14px;background:#fdfcf9;border:1.5px solid #dcd3be;border-radius:12px;">
+                            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:0;">
+                                <input type="hidden" name="sptjm_kematian" value="0">
+                                <input type="checkbox" name="sptjm_kematian" id="mob_sptjm_kematian" value="1"
+                                       {{ old('sptjm_kematian') ? 'checked' : '' }}
+                                       onchange="toggleMobSptjm(this.checked)"
+                                       style="width:20px;height:20px;accent-color:var(--khaki-primary);margin-top:2px;cursor:pointer;">
+                                <div style="flex:1;">
+                                    <div style="font-weight:800;font-size:0.84rem;color:var(--khaki-darker);">
+                                        📄 KTP Jenazah Tidak Ada? (Gunakan SPTJM Kematian)
+                                    </div>
+                                    <div style="font-size:0.71rem;color:#78716c;margin-top:2px;line-height:1.4;">
+                                        Centang opsi ini jika KTP almarhum/ah tidak ada. Sistem akan menyiapkan <strong>Surat Pernyataan Tanggung Jawab Mutlak (SPTJM)</strong> bermaterai Rp 10.000 disertai tanda tangan yang menyatakan dan 2 orang saksi.
+                                    </div>
+                                </div>
+                            </label>
+
+                            {{-- Form Khusus SPTJM Kematian --}}
+                            <div id="mob_sptjm_fields" style="{{ old('sptjm_kematian') ? '' : 'display:none;' }} margin-top:12px;padding-top:12px;border-top:1px dashed var(--khaki-border,#e5e0d3);">
+                                <div style="font-size:0.75rem;font-weight:800;color:var(--khaki-darker);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                                    <span>📝</span> Kelengkapan Data Jenazah untuk SPTJM:
+                                </div>
+
+                                <div class="mob-grid-2">
+                                    <div class="mob-field">
+                                        <label class="mob-sublabel">NIK Jenazah</label>
+                                        <input class="mob-input" type="text" name="nik_jenazah"
+                                               value="{{ old('nik_jenazah') }}"
+                                               placeholder="16 digit NIK almarhum/ah" maxlength="16" inputmode="numeric">
+                                    </div>
+                                    <div class="mob-field">
+                                        <label class="mob-sublabel">Tempat Lahir Jenazah</label>
+                                        <input class="mob-input" type="text" name="tempat_lahir_jenazah"
+                                               value="{{ old('tempat_lahir_jenazah') }}"
+                                               placeholder="Kota / Kab. Lahir">
+                                    </div>
+                                </div>
+
+                                <div class="mob-grid-2">
+                                    <div class="mob-field">
+                                        <label class="mob-sublabel">Tanggal Lahir Jenazah</label>
+                                        <input class="mob-input" type="date" name="tanggal_lahir_jenazah"
+                                               value="{{ old('tanggal_lahir_jenazah') }}">
+                                    </div>
+                                    <div class="mob-field">
+                                        <label class="mob-sublabel">Penyebab Kematian</label>
+                                        <input class="mob-input" type="text" name="penyebab_kematian"
+                                               value="{{ old('penyebab_kematian') }}"
+                                               placeholder="Contoh: Sakit Wajar / Usia Lanjut">
+                                    </div>
+                                </div>
+
+                                <div class="mob-field">
+                                    <label class="mob-sublabel">Alamat Terakhir Jenazah</label>
+                                    <input class="mob-input" type="text" name="alamat_jenazah"
+                                           value="{{ old('alamat_jenazah') }}"
+                                           placeholder="Alamat domisili terakhir almarhum/ah">
+                                </div>
+
+                                <div style="font-size:0.75rem;font-weight:800;color:var(--khaki-darker);margin:12px 0 8px;display:flex;align-items:center;gap:6px;">
+                                    <span>✍️</span> Data Yang Membuat Pernyataan:
+                                </div>
+
+                                <div class="mob-grid-2">
+                                    <div class="mob-field">
+                                        <label class="mob-sublabel">Nama Yang Menyatakan</label>
+                                        <input class="mob-input" type="text" name="yang_menyatakan"
+                                               value="{{ old('yang_menyatakan') }}"
+                                               placeholder="Nama lengkap pembuat pernyataan">
+                                    </div>
+                                    <div class="mob-field">
+                                        <label class="mob-sublabel">Hubungan dengan Jenazah</label>
+                                        <input class="mob-input" type="text" name="hubungan_yang_menyatakan"
+                                               value="{{ old('hubungan_yang_menyatakan') }}"
+                                               placeholder="Contoh: Anak Kandung / Suami / Istri">
+                                    </div>
+                                </div>
+
+                                <div class="mob-field">
+                                    <label class="mob-sublabel">NIK Yang Menyatakan</label>
+                                    <input class="mob-input" type="text" name="nik_yang_menyatakan"
+                                           value="{{ old('nik_yang_menyatakan') }}"
+                                           placeholder="16 digit NIK pembuat pernyataan" maxlength="16" inputmode="numeric">
+                                </div>
+
+                                <div style="padding:8px 10px;background:#f5f2eb;border-radius:8px;font-size:0.7rem;color:#5b4b2d;line-height:1.45;margin-top:6px;">
+                                    📌 <strong>Perhatian:</strong> SPTJM harus ditempel <strong>Materai Rp 10.000</strong> dan ditandatangani oleh pembuat pernyataan serta <strong>2 orang saksi</strong> (yang datanya diisikan pada bagian Saksi di bawah).
+                                </div>
+                            </div>
+                        </div>
+
                         {{-- Identitas Kedua Orang Tua --}}
                         <div class="mob-card-head" style="margin-top: 16px; border-top: 1px dashed var(--khaki-border, #e5e0d3); padding-top: 12px;">Identitas Kedua Orang Tua</div>
                         <div class="mob-grid-2">
@@ -1995,6 +2087,31 @@ const serviceDocsData = {
     }
 };
 
+function toggleMobSptjm(isChecked) {
+    const box = document.getElementById('mob_sptjm_fields');
+    if (box) {
+        box.style.display = isChecked ? 'block' : 'none';
+    }
+    if (isChecked) {
+        serviceDocsData['Akta Kematian'].docs = [
+            'Surat Pernyataan Tanggung Jawab Mutlak (SPTJM) Kebenaran Data Kematian (Bermaterai Rp 10.000, TTD Yang Menyatakan & 2 Saksi)',
+            'Fotocopy KTP pelapor dan 2 orang saksi',
+            'Surat keterangan kematian dari desa',
+            'Fotocopy Kartu Keluarga (KK)'
+        ];
+    } else {
+        serviceDocsData['Akta Kematian'].docs = [
+            'Fotocopy KTP jenazah, pelapor, dan 2 orang saksi',
+            'Surat keterangan kematian dari desa',
+            'Fotocopy Kartu Keluarga (KK)'
+        ];
+    }
+    const currentService = document.getElementById('hidden-jenis-layanan').value;
+    if (currentService === 'Akta Kematian') {
+        renderServiceRequirements('Akta Kematian');
+    }
+}
+
 function renderServiceRequirements(value) {
     const data = serviceDocsData[value];
     if (!data) return;
@@ -2044,6 +2161,9 @@ function selectService(value) {
 (function() {
     const saved = '{{ old('jenis_layanan', $selectedService) }}';
     if (saved) selectService(saved);
+    if (document.getElementById('mob_sptjm_kematian')?.checked) {
+        toggleMobSptjm(true);
+    }
     if ({{ $errors->any() ? 'true' : 'false' }}) {
         for (let i = 1; i <= totalSteps; i++) {
             document.getElementById('mob-step-' + i).style.display = 'none';
