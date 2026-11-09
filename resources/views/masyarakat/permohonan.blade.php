@@ -467,14 +467,13 @@
     .mob-accordion-pill {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        font-size: 0.7rem;
-        font-weight: 700;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
         color: var(--khaki-primary, #796743);
         background: #ffffff;
         border: 1px solid var(--khaki-border, #e5e0d3);
-        border-radius: 16px;
-        padding: 3px 9px;
+        border-radius: 50%;
         flex-shrink: 0;
     }
     .mob-accordion-chevron {
@@ -1228,11 +1227,10 @@
                                     <span class="mob-accordion-icon">👨‍👩‍👧‍👦</span>
                                     <div>
                                         <div class="mob-accordion-title">Daftar Anggota Keluarga</div>
-                                        <div class="mob-accordion-desc">Ketuk untuk buka / isi (hingga 7 orang)</div>
+                                        <div class="mob-accordion-desc">Data anggota keluarga (hingga 7 orang)</div>
                                     </div>
                                 </div>
                                 <span class="mob-accordion-pill">
-                                    <span>Buka / Tutup</span>
                                     <span class="mob-accordion-chevron">▾</span>
                                 </span>
                             </summary>
@@ -1326,7 +1324,6 @@
                                     </div>
                                 </div>
                                 <span class="mob-accordion-pill">
-                                    <span>Buka / Tutup</span>
                                     <span class="mob-accordion-chevron">▾</span>
                                 </span>
                             </summary>
