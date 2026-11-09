@@ -580,6 +580,42 @@
     .mob-service-section { display: none; }
     .mob-service-section.show { display: block; }
 
+    /* ── Requirement Notice Box (Berkas yang Harus Dilengkapi) ── */
+    .mob-req-notice {
+        background: linear-gradient(135deg, #fdfbf7 0%, #f7f3ea 100%);
+        border: 1.5px solid var(--khaki-border, #e5e0d3);
+        border-left: 4px solid var(--khaki-primary, #796743);
+        border-radius: 12px;
+        padding: 11px 13px;
+        margin-bottom: 14px;
+    }
+    .mob-req-notice-head {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.77rem;
+        font-weight: 800;
+        color: var(--khaki-darker, #5b4b2d);
+        margin-bottom: 6px;
+    }
+    .mob-req-notice-icon {
+        font-size: 0.95rem;
+        line-height: 1;
+    }
+    .mob-req-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 0.72rem;
+        color: #4b5563;
+        line-height: 1.5;
+    }
+    .mob-req-list li {
+        margin-bottom: 3px;
+    }
+    .mob-req-list li:last-child {
+        margin-bottom: 0;
+    }
+
     /* ── Camera & Upload Area (Step 4 Ringkas) ── */
     .mob-scan-card {
         border: 2px dashed var(--khaki-primary);
@@ -1023,6 +1059,15 @@
                     </div>
 
                     @error('jenis_layanan')<p class="mob-error">{{ $message }}</p>@enderror
+
+                    {{-- Live Requirement Preview on Step 1 --}}
+                    <div id="mob-step1-req-preview" class="mob-req-notice" style="margin-top:14px;display:none;">
+                        <div class="mob-req-notice-head">
+                            <span class="mob-req-notice-icon">📋</span>
+                            <span id="mob-step1-req-title">Berkas Persyaratan:</span>
+                        </div>
+                        <ul id="mob-step1-req-list" class="mob-req-list"></ul>
+                    </div>
                 </div>
 
                 <button type="button" onclick="goStep(2)" class="btn-step-next">
@@ -1135,6 +1180,19 @@
                 <div class="mob-service-section" data-for="KTP">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail KTP Pembaharuan</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>KTP asli</li>
+                                <li>Fotocopy Kartu Keluarga (KK)</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-field">
                             <label class="mob-label">Alasan Pembaharuan</label>
                             <select class="mob-select" name="alasan_pembaruan">
@@ -1151,6 +1209,19 @@
                 <div class="mob-service-section" data-for="PRR">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail PRR / KTP Baru</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>Fotocopy Kartu Keluarga (KK)</li>
+                                <li>Akta kelahiran / Ijazah</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-grid-2">
                             <div class="mob-field">
                                 <label class="mob-label">Bulan</label>
@@ -1180,6 +1251,21 @@
                 <div class="mob-service-section" data-for="KK">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail Kartu Keluarga</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>Kartu Keluarga (KK) asli</li>
+                                <li>KTP Kepala Keluarga</li>
+                                <li>Buku nikah (3 lembar utama)</li>
+                                <li>Berkas pendukung lainnya seperti ijazah, surat keterangan pekerjaan jika ada perubahan (lampirkan)</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-field">
                             <label class="mob-label">Nomor KK</label>
                             <input class="mob-input" name="nomor_kk" type="text" placeholder="16 digit nomor KK" value="{{ old('nomor_kk') }}">
@@ -1414,6 +1500,20 @@
                 <div class="mob-service-section" data-for="Akta Lahir">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail Akta Kelahiran</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>Fotocopy KTP pelapor, orang tua, dan 2 orang saksi</li>
+                                <li>Fotocopy buku nikah (3 lembar utama)</li>
+                                <li>Surat keterangan lahir</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-field">
                             <label class="mob-label">Nama Anak</label>
                             <input class="mob-input" name="nama_anak_lahir" type="text" placeholder="Nama lengkap anak" value="{{ old('nama_anak_lahir') }}">
@@ -1498,6 +1598,20 @@
                 <div class="mob-service-section" data-for="Akta Kematian">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail Akta Kematian</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>Fotocopy KTP jenazah, pelapor, dan 2 orang saksi</li>
+                                <li>Surat keterangan kematian dari desa</li>
+                                <li>Fotocopy Kartu Keluarga (KK)</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-field">
                             <label class="mob-label">Nama Almarhum/ah</label>
                             <input class="mob-input" name="nama_alm" type="text" placeholder="Nama lengkap" value="{{ old('nama_alm') }}">
@@ -1580,6 +1694,19 @@
                 <div class="mob-service-section" data-for="Kedatangan">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail Kedatangan</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>Surat pindah</li>
+                                <li>Fotocopy KTP dan Kartu Keluarga (KK)</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-field">
                             <label class="mob-label">Nama</label>
                             <input class="mob-input" name="nama_kedatangan" type="text" placeholder="Nama lengkap" value="{{ old('nama_kedatangan') }}">
@@ -1607,6 +1734,19 @@
                 <div class="mob-service-section" data-for="Pindah">
                     <div class="mob-card">
                         <div class="mob-card-head">Detail Surat Pindah</div>
+
+                        {{-- Persyaratan Berkas --}}
+                        <div class="mob-req-notice">
+                            <div class="mob-req-notice-head">
+                                <span class="mob-req-notice-icon">📋</span>
+                                <span>Berkas yang Harus Dilengkapi:</span>
+                            </div>
+                            <ul class="mob-req-list">
+                                <li>Fotocopy KTP</li>
+                                <li>Fotocopy Kartu Keluarga (KK)</li>
+                            </ul>
+                        </div>
+
                         <div class="mob-field">
                             <label class="mob-label">Nama</label>
                             <input class="mob-input" name="nama_pindah" type="text" placeholder="Nama lengkap" value="{{ old('nama_pindah') }}">
@@ -1651,6 +1791,15 @@
                     <p style="font-size:0.75rem;color:#78716c;margin-bottom:14px;line-height:1.45;">
                         Lampirkan foto atau scan dokumen pendukung (KTP asli, Kartu Keluarga, Akta, dll). Maks 5 file, 5 MB per file.
                     </p>
+
+                    {{-- Persyaratan Berkas Khusus Layanan Terpilih --}}
+                    <div id="mob-step4-req-box" class="mob-req-notice" style="margin-bottom:14px;">
+                        <div class="mob-req-notice-head">
+                            <span class="mob-req-notice-icon">📋</span>
+                            <span id="mob-step4-req-title">Berkas yang Harus Dilengkapi:</span>
+                        </div>
+                        <ul id="mob-step4-req-list" class="mob-req-list"></ul>
+                    </div>
 
                     {{-- Camera Scan --}}
                     <div class="mob-scan-card" onclick="openCamera()">
@@ -1790,6 +1939,85 @@ function validateStep1() {
     return true;
 }
 
+const serviceDocsData = {
+    'KK': {
+        name: 'Kartu Keluarga (KK)',
+        docs: [
+            'KK asli',
+            'KTP kepala keluarga',
+            'Buku nikah (3 lembar utama)',
+            'Berkas pendukung lainnya seperti ijazah, surat keterangan pekerjaan jika ada perubahan (lampirkan)'
+        ]
+    },
+    'PRR': {
+        name: 'PRR / KTP Baru',
+        docs: [
+            'Fotocopy Kartu Keluarga (KK)',
+            'Akta kelahiran / ijazah'
+        ]
+    },
+    'KTP': {
+        name: 'KTP Pembaharuan',
+        docs: [
+            'KTP asli',
+            'Fotocopy Kartu Keluarga (KK)'
+        ]
+    },
+    'Akta Kematian': {
+        name: 'Akta Kematian',
+        docs: [
+            'Fotocopy KTP jenazah, pelapor, dan 2 saksi',
+            'Surat keterangan kematian dari desa',
+            'Fotocopy Kartu Keluarga (KK)'
+        ]
+    },
+    'Akta Lahir': {
+        name: 'Akta Kelahiran',
+        docs: [
+            'Fotocopy KTP pelapor, orang tua, dan 2 saksi',
+            'Fotocopy buku nikah (3 lembar utama)',
+            'Surat keterangan lahir'
+        ]
+    },
+    'Pindah': {
+        name: 'Surat Pindah (SKPWNI)',
+        docs: [
+            'Fotocopy KTP',
+            'Fotocopy Kartu Keluarga (KK)'
+        ]
+    },
+    'Kedatangan': {
+        name: 'Kedatangan',
+        docs: [
+            'Surat pindah',
+            'Fotocopy KTP dan Kartu Keluarga (KK)'
+        ]
+    }
+};
+
+function renderServiceRequirements(value) {
+    const data = serviceDocsData[value];
+    if (!data) return;
+
+    // Step 1 Preview
+    const s1Box = document.getElementById('mob-step1-req-preview');
+    const s1Title = document.getElementById('mob-step1-req-title');
+    const s1List = document.getElementById('mob-step1-req-list');
+    if (s1Box && s1Title && s1List) {
+        s1Box.style.display = 'block';
+        s1Title.textContent = 'Berkas Persyaratan ' + data.name + ':';
+        s1List.innerHTML = data.docs.map(d => '<li>' + d + '</li>').join('');
+    }
+
+    // Step 4 Box
+    const s4Title = document.getElementById('mob-step4-req-title');
+    const s4List = document.getElementById('mob-step4-req-list');
+    if (s4Title && s4List) {
+        s4Title.textContent = 'Berkas yang Harus Dilengkapi (' + data.name + '):';
+        s4List.innerHTML = data.docs.map(d => '<li>' + d + '</li>').join('');
+    }
+}
+
 function selectService(value) {
     document.getElementById('hidden-jenis-layanan').value = value;
     document.querySelectorAll('.mob-service-pill').forEach(p => {
@@ -1798,6 +2026,8 @@ function selectService(value) {
     document.querySelectorAll('.mob-service-section').forEach(s => {
         s.classList.toggle('show', s.dataset.for === value);
     });
+
+    renderServiceRequirements(value);
 
     // Sembunyikan Tempat Lahir & Tanggal Lahir untuk permohonan KK
     const ttlGroup = document.getElementById('mob-ttl-group');

@@ -479,6 +479,15 @@
                     <h2>Dokumen Persyaratan</h2>
                 </div>
                 <p>Unggah hingga 5 berkas gambar atau PDF, maksimal 5 MB per berkas. Di ponsel, tombol kamera dapat digunakan untuk memotret dokumen.</p>
+
+                {{-- Berkas yang harus dilengkapi --}}
+                <div id="register-req-notice" style="background:#fdfbf7;border:1.5px solid #e5e0d3;border-left:4px solid #796743;border-radius:10px;padding:12px 14px;margin:12px 0 16px;">
+                    <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:0.85rem;color:#5b4b2d;margin-bottom:6px;">
+                        <span>📋</span>
+                        <span id="register-req-title">Berkas yang Harus Dilengkapi:</span>
+                    </div>
+                    <ul id="register-req-list" style="margin:0;padding-left:18px;font-size:0.8rem;color:#4b5563;line-height:1.5;"></ul>
+                </div>
                 <div class="form-grid compact-grid">
                     <div class="field-group">
                         <label for="documents-camera">Foto dengan kamera</label>
@@ -538,6 +547,45 @@
                                 && field.name !== 'jenis_layanan'
                                 && field.name !== 'tanggal_daftar';
                         });
+                    }
+
+                    const serviceDocs = {
+                        'KK': {
+                            name: 'Kartu Keluarga (KK)',
+                            docs: ['KK asli', 'KTP kepala keluarga', 'Buku nikah (3 lembar utama)', 'Berkas pendukung lainnya seperti ijazah, surat keterangan pekerjaan jika ada perubahan (lampirkan)']
+                        },
+                        'PRR': {
+                            name: 'PRR / KTP Baru',
+                            docs: ['Fotocopy Kartu Keluarga (KK)', 'Akta kelahiran / ijazah']
+                        },
+                        'KTP': {
+                            name: 'KTP Pembaharuan',
+                            docs: ['KTP asli', 'Fotocopy Kartu Keluarga (KK)']
+                        },
+                        'Akta Kematian': {
+                            name: 'Akta Kematian',
+                            docs: ['Fotocopy KTP jenazah, pelapor, dan 2 saksi', 'Surat keterangan kematian dari desa', 'Fotocopy Kartu Keluarga (KK)']
+                        },
+                        'Akta Lahir': {
+                            name: 'Akta Kelahiran',
+                            docs: ['Fotocopy KTP pelapor, orang tua, dan 2 saksi', 'Fotocopy buku nikah (3 lembar utama)', 'Surat keterangan lahir']
+                        },
+                        'Pindah': {
+                            name: 'Surat Pindah (SKPWNI)',
+                            docs: ['Fotocopy KTP', 'Fotocopy Kartu Keluarga (KK)']
+                        },
+                        'Kedatangan': {
+                            name: 'Kedatangan',
+                            docs: ['Surat pindah', 'Fotocopy KTP dan Kartu Keluarga (KK)']
+                        }
+                    };
+
+                    const reqNotice = document.getElementById('register-req-notice');
+                    const reqTitle = document.getElementById('register-req-title');
+                    const reqList = document.getElementById('register-req-list');
+                    if (reqNotice && reqTitle && reqList && serviceDocs[selected]) {
+                        reqTitle.textContent = 'Berkas yang Harus Dilengkapi (' + serviceDocs[selected].name + '):';
+                        reqList.innerHTML = serviceDocs[selected].docs.map(function(d) { return '<li>' + d + '</li>'; }).join('');
                     }
                 }
 
