@@ -531,7 +531,7 @@
                 </div>
 
                 <div class="mob-detail-item">
-                    <span class="mob-detail-label">Peran / Jabatan Sistem</span>
+                    <span class="mob-detail-label">Status Pengguna</span>
                     <span class="mob-detail-val">Masyarakat</span>
                 </div>
 
