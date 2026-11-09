@@ -411,7 +411,7 @@
 
             <div style="margin-top: 14px; margin-bottom: 8px;">
                 <button type="submit" class="mob-submit-btn">
-                    <span>💾</span>
+                    <span></span>
                     <span>Perbarui Password</span>
                 </button>
                 <a href="{{ route('profil') }}" class="mob-cancel-btn">Batal</a>
