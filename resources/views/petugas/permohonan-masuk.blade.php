@@ -282,12 +282,9 @@
                                     <td class="request-actions-cell">
                                         <div class="request-actions">
                                             <a href="{{ route('petugas.permohonan.show', $item) }}"
-                                               class="request-action detail">Detail &amp; Status
-                                            </a>
-                                            <a href="{{ route('petugas.permohonan.formulir', $item) }}" target="_blank"
-                                               class="request-action print"
-                                               title="Cetak formulir resmi">
-                                                Cetak Formulir
+                                               class="request-action verify"
+                                               title="Verifikasi permohonan dan kelengkapan berkas">
+                                                Verifikasi
                                             </a>
                                         </div>
                                     </td>
@@ -308,6 +305,30 @@
     </main>
 
     <style>
+        .request-action.verify {
+            background: #059669;
+            color: #ffffff !important;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(5, 150, 105, 0.25);
+        }
+        .request-action.verify:hover {
+            background: #047857;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(5, 150, 105, 0.35);
+        }
+        .request-action.verify:active {
+            transform: translateY(0);
+        }
+
         .status-cards-grid {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));

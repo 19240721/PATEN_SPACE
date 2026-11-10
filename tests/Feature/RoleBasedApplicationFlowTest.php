@@ -401,10 +401,11 @@ class RoleBasedApplicationFlowTest extends TestCase
             ->assertSee('Pemohon,')
             ->assertSee('Petugas Pelayanan PATEN Jatisari');
 
-        // Test list and detail page show print link
+        // Test list shows verification link, detail page shows print link
         $listResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.index'));
         $listResponse->assertOk()
-            ->assertSee(route('petugas.permohonan.formulir', $application));
+            ->assertSee('Verifikasi')
+            ->assertSee(route('petugas.permohonan.show', $application));
 
         $detailResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.show', $application));
         $detailResponse->assertOk()
