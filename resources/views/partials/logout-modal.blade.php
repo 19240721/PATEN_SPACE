@@ -177,120 +177,6 @@
     opacity: 0.65;
     cursor: not-allowed;
 }
-
-/* Penyesuaian Responsif & Viewport Khusus Akun Masyarakat (.mob-shell / Android Mobile) */
-.mob-shell > #logout-confirm-modal {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 999999 !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 16px !important;
-    box-sizing: border-box !important;
-    overflow-y: auto !important;
-}
-
-.mob-shell > #logout-confirm-modal .logout-modal-dialog {
-    width: 100% !important;
-    max-width: 360px !important;
-    max-height: calc(100% - 32px) !important;
-    overflow-y: auto !important;
-    padding: 22px 18px 20px !important;
-    border-radius: 16px !important;
-    margin: auto !important;
-    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.3) !important;
-}
-
-.mob-shell > #logout-confirm-modal .logout-modal-icon-badge {
-    width: 50px !important;
-    height: 50px !important;
-    margin: 0 auto 12px !important;
-}
-
-.mob-shell > #logout-confirm-modal .logout-modal-icon-badge svg {
-    width: 24px !important;
-    height: 24px !important;
-}
-
-.mob-shell > #logout-confirm-modal .logout-modal-title {
-    font-size: 1.12rem !important;
-    margin: 0 0 6px !important;
-}
-
-.mob-shell > #logout-confirm-modal .logout-modal-desc {
-    font-size: 0.82rem !important;
-    line-height: 1.45 !important;
-    margin: 0 0 18px !important;
-    padding: 0 4px !important;
-}
-
-.mob-shell > #logout-confirm-modal .logout-modal-actions {
-    display: flex !important;
-    gap: 10px !important;
-}
-
-.mob-shell > #logout-confirm-modal .modal-btn-cancel,
-.mob-shell > #logout-confirm-modal .modal-btn-confirm {
-    padding: 10px 14px !important;
-    font-size: 0.84rem !important;
-    border-radius: 10px !important;
-}
-
-@media (max-width: 480px) {
-    .logout-modal-backdrop {
-        height: 100vh;
-        height: 100dvh;
-        padding: 16px;
-        overflow-y: auto;
-    }
-
-    .logout-modal-dialog {
-        max-width: 92%;
-        max-height: calc(100dvh - 32px);
-        overflow-y: auto;
-        padding: 22px 18px 20px;
-        margin: auto;
-    }
-
-    .logout-modal-icon-badge {
-        width: 50px;
-        height: 50px;
-        margin: 0 auto 12px;
-    }
-
-    .logout-modal-icon-badge svg {
-        width: 24px;
-        height: 24px;
-    }
-
-    .logout-modal-title {
-        font-size: 1.12rem;
-        margin: 0 0 6px;
-    }
-
-    .logout-modal-desc {
-        font-size: 0.82rem;
-        line-height: 1.45;
-        margin: 0 0 18px;
-        padding: 0 4px;
-    }
-
-    .logout-modal-actions {
-        gap: 10px;
-    }
-
-    .modal-btn-cancel,
-    .modal-btn-confirm {
-        padding: 10px 14px;
-        font-size: 0.84rem;
-        border-radius: 10px;
-    }
-}
 </style>
 
 <script>
@@ -298,26 +184,13 @@ function openLogoutModal(e) {
     if (e && e.preventDefault) e.preventDefault();
     const modal = document.getElementById('logout-confirm-modal');
     if (!modal) return;
-
-    // Tempatkan di dalam .mob-shell jika halaman menggunakan frame ponsel Masyarakat
-    const mobShell = document.querySelector('.mob-shell');
-    if (mobShell && modal.parentElement !== mobShell) {
-        mobShell.appendChild(modal);
-    }
-
     modal.style.display = 'flex';
     requestAnimationFrame(() => {
         modal.classList.add('is-active');
     });
     document.body.style.overflow = 'hidden';
     const confirmBtn = document.getElementById('logout-modal-btn-confirm');
-    if (confirmBtn) {
-        try {
-            confirmBtn.focus({ preventScroll: true });
-        } catch (err) {
-            confirmBtn.focus();
-        }
-    }
+    if (confirmBtn) confirmBtn.focus();
 }
 
 function closeLogoutModal() {
@@ -333,12 +206,6 @@ function closeLogoutModal() {
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('logout-confirm-modal');
     if (!modal) return;
-
-    // Pindahkan modal ke dalam .mob-shell saat halaman Masyarakat dimuat
-    const mobShell = document.querySelector('.mob-shell');
-    if (mobShell && modal.parentElement !== mobShell) {
-        mobShell.appendChild(modal);
-    }
 
     // Klik di luar dialog (backdrop) untuk menutup tanpa logout
     modal.addEventListener('click', function (e) {

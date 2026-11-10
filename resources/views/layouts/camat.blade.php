@@ -230,81 +230,71 @@
             color: #0369a1;
         }
 
-        /* Tombol Toggle Sidebar (Buka/Tutup) Rapi & Sejajar */
-        .btn-sidebar-toggle {
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 36px !important;
-            height: 36px !important;
-            border-radius: 8px !important;
-            background: #ffffff !important;
-            border: 1px solid #d5cebf !important;
-            color: #5b4b2d !important;
-            cursor: pointer !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
-            transition: all 0.18s ease !important;
-            flex-shrink: 0 !important;
-            padding: 0 !important;
+        .sidebar-toggle {
+            position: absolute;
+            top: 16px;
+            right: 12px;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0;
+            cursor: pointer;
+            z-index: 3;
         }
-        .btn-sidebar-toggle:hover {
-            background: #f7f4ed !important;
-            border-color: #a89878 !important;
-            color: #3b2f19 !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
-        }
-        .btn-sidebar-toggle:active {
-            transform: scale(0.95) !important;
-        }
-        .btn-sidebar-toggle svg {
+
+        .sidebar-toggle span {
             display: block;
-            width: 20px;
-            height: 20px;
-            stroke: currentColor;
+            width: 18px;
+            height: 2px;
+            border-radius: 999px;
+            background: #ffffff;
+            transition: transform 0.25s ease, opacity 0.25s ease;
         }
 
-        /* Perbaikan tata letak topbar agar selalu sejajar horizontal */
-        .dashboard-topbar > div:first-child {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 12px !important;
-        }
-
-        /* Transisi Halus Buka-Tutup Sidebar */
         .sidebar {
-            transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                        max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                        flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                        padding 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                        margin 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.22s ease !important;
+            position: relative;
+            transition: width 0.25s ease, padding 0.25s ease;
         }
 
-        /* Kondisi Sidebar Tertutup (Collapsed) */
-        .app-shell.sidebar-collapsed .sidebar,
-        .sidebar.collapsed,
-        .dashboard-page .sidebar.collapsed {
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            flex: 0 0 0px !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            margin-left: 0 !important;
-            overflow: hidden !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-            border: none !important;
+        .sidebar.collapsed {
+            width: 92px;
+            padding-left: 12px;
+            padding-right: 12px;
         }
 
-        .app-shell.sidebar-collapsed .main-panel,
-        .sidebar.collapsed ~ .main-panel {
-            flex: 1 1 100% !important;
-            width: 100% !important;
-            min-width: 0 !important;
-            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        .sidebar.collapsed .brand-wrap {
+            justify-content: center;
+            padding: 8px 0 18px;
+            gap: 0;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .sidebar-nav,
+        .sidebar.collapsed .sidebar-profile {
+            display: none;
+        }
+
+        .sidebar.collapsed .brand-mark {
+            margin: 0 auto;
+        }
+
+        .sidebar-toggle[aria-expanded="false"] span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .sidebar-toggle[aria-expanded="false"] span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .sidebar-toggle[aria-expanded="false"] span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
         }
 
         @media print {
@@ -346,6 +336,12 @@
 <body>
     <div class="app-shell dashboard-page">
         <aside class="sidebar dark-sidebar">
+            <button class="sidebar-toggle" type="button" aria-label="Buka atau tutup sidebar" aria-expanded="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <a href="{{ route('camat.dashboard') }}" class="brand-wrap">
                 <img src="{{ asset('image/logo-kecamatan.png') }}" alt="Logo Kecamatan Jatisari" class="brand-mark">
                 <span class="brand-text">
@@ -402,20 +398,15 @@
 
         <main class="main-panel">
             <header class="dashboard-topbar">
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 12px;">
-                    <button type="button" class="btn-sidebar-toggle" title="Buka / Tutup Sidebar" aria-label="Buka atau tutup sidebar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
-                    <div style="display: flex; flex-direction: column; gap: 1px;">
-                        <strong>Kecamatan Jatisari</strong>
-                        <span>Kabupaten Karawang</span>
-                    </div>
+                <div>
+                    <strong>Kecamatan Jatisari</strong>
+                    <span>Kabupaten Karawang</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 14px;">
+                    <div class="operator-chip">
+                        <span>Camat Jatisari</span>
+                        <b title="Camat Jatisari">CJ</b>
+                    </div>
                     <form action="{{ route('logout') }}" method="POST" style="margin: 0; padding: 0;">
                         @csrf
                         <button type="submit" class="report-filter-button">Keluar</button>
@@ -431,27 +422,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const appShell = document.querySelector('.app-shell');
             const sidebar = document.querySelector('.sidebar');
-            const toggles = document.querySelectorAll('.btn-sidebar-toggle, .sidebar-toggle, .sidebar-close-btn');
+            const toggle = document.querySelector('.sidebar-toggle');
 
-            if (!sidebar) return;
-
-            // Pulihkan status sidebar dari localStorage
-            if (localStorage.getItem('paten-sidebar-collapsed') === '1') {
-                sidebar.classList.add('collapsed');
-                if (appShell) appShell.classList.add('sidebar-collapsed');
+            if (!sidebar || !toggle) {
+                return;
             }
 
-            toggles.forEach(function (btn) {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const isCollapsed = sidebar.classList.toggle('collapsed');
-                    if (appShell) {
-                        appShell.classList.toggle('sidebar-collapsed', isCollapsed);
-                    }
-                    localStorage.setItem('paten-sidebar-collapsed', isCollapsed ? '1' : '0');
-                });
+            toggle.addEventListener('click', function () {
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+                toggle.setAttribute('aria-expanded', String(!isCollapsed));
             });
         });
     </script>

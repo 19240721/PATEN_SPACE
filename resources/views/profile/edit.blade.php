@@ -409,9 +409,9 @@
 
         {{-- Tombol Keluar --}}
         <div style="margin-top: 4px; padding-bottom: 8px;">
-            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
+            <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar dari akun PATEN SPACE?');">
                 @csrf
-                <button type="button" class="btn-trigger-logout" onclick="openLogoutModal(event)" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; padding: 11px 16px; border-radius: 14px; font-size: 0.82rem; font-weight: 750; cursor: pointer; font-family: inherit;">
+                <button type="submit" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; padding: 11px 16px; border-radius: 14px; font-size: 0.82rem; font-weight: 750; cursor: pointer; font-family: inherit;">
                     <span>🚪</span>
                     <span>Keluar dari Akun</span>
                 </button>

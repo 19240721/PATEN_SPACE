@@ -280,29 +280,5 @@ class ProfileAndAccountSettingsTest extends TestCase
             ->assertSee('Ya, Keluar')
             ->assertSee('Batal')
             ->assertDontSee("confirm('");
-
-        // Verifikasi untuk Akun Masyarakat di Halaman Profil & Pengaturan Akun
-        $masyarakat = User::factory()->create([
-            'role' => 'masyarakat',
-            'name' => 'Warga Jatisari',
-        ]);
-
-        $masyarakatProfile = $this->actingAs($masyarakat)->get(route('profil'));
-        $masyarakatProfile->assertOk()
-            ->assertSee('id="logout-confirm-modal"', false)
-            ->assertSee('Yakin ingin keluar?')
-            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
-            ->assertSee('Ya, Keluar')
-            ->assertSee('Batal')
-            ->assertDontSee("confirm('");
-
-        $masyarakatSettings = $this->actingAs($masyarakat)->get(route('account.profile'));
-        $masyarakatSettings->assertOk()
-            ->assertSee('id="logout-confirm-modal"', false)
-            ->assertSee('Yakin ingin keluar?')
-            ->assertSee('Apakah kamu yakin ingin mengakhiri sesi dan keluar dari akun PATEN SPACE?')
-            ->assertSee('Ya, Keluar')
-            ->assertSee('Batal')
-            ->assertDontSee("confirm('");
     }
 }
