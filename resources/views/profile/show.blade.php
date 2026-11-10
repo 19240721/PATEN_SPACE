@@ -735,6 +735,20 @@
                 </div>
             </section>
 
+            @if ($user->role === 'petugas')
+                <section class="dashboard-panel" aria-labelledby="petugas-team-title" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-bottom: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                        <h2 id="petugas-team-title" style="margin: 0 0 4px; font-size: 1.08rem; color: #1e3a5f; font-weight: 750;">Petugas Pelayanan</h2>
+                        <p style="margin: 0; font-size: 0.82rem; color: #64748b;">Daftar petugas yang melayani dan menginput data menggunakan akun petugas ini.</p>
+                    </div>
+                    <ul style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #1e3a5f; font-weight: 700;">Andi Gunawan</li>
+                        <li style="padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #1e3a5f; font-weight: 700;">Selsa Bila</li>
+                        <li style="padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #1e3a5f; font-weight: 700;">Dimas Digantara</li>
+                    </ul>
+                </section>
+            @endif
+
             {{-- KARTU RINCIAN DATA PROFIL LENGKAP --}}
             <section class="dashboard-panel" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-bottom: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
                 <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">

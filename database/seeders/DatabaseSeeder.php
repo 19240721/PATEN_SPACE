@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $accounts = [
             [
-                'name' => 'Petugas PATEN',
+                'name' => 'Petugas PATEN Jatisari',
                 'email' => 'petugas@patenspace.test',
                 'role' => 'petugas',
                 'nik' => '3200000000000004',

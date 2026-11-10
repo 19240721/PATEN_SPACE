@@ -81,11 +81,15 @@ class ProfileAndAccountSettingsTest extends TestCase
             'email' => 'petugas@patenspace.test',
             'phone' => '081298765432',
         ]);
-        $this->actingAs($petugas)
+        $petugasProfile = $this->actingAs($petugas)
             ->get(route('profil'))
-            ->assertOk()
+            ->assertOk();
+        $petugasProfile
             ->assertSee('Petugas Loket PATEN')
             ->assertSee('Petugas Loket')
+            ->assertSee('Andi Gunawan')
+            ->assertSee('Selsa Bila')
+            ->assertSee('Dimas Digantara')
             ->assertSee('Kecamatan Jatisari');
 
         // Role Masyarakat
@@ -101,7 +105,10 @@ class ProfileAndAccountSettingsTest extends TestCase
             ->assertOk()
             ->assertSee('Warga Jatisari')
             ->assertSee('3215000000000001')
-            ->assertSee('Masyarakat');
+            ->assertSee('Masyarakat')
+            ->assertDontSee('Andi Gunawan')
+            ->assertDontSee('Selsa Bila')
+            ->assertDontSee('Dimas Digantara');
     }
 
     /**
