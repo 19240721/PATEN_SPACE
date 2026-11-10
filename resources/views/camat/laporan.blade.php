@@ -425,14 +425,6 @@
         </table>
     </div>
 
-    {{-- IDENTITAS CAMAT --}}
-    <div style="margin-top: 32px; padding: 10px 24px 20px; display: flex; justify-content: flex-end;">
-        <div style="text-align: center; width: 270px; font-size: 0.88rem; line-height: 1.5;">
-            <div style="font-weight: 700; color: #1e293b; margin-bottom: 65px; letter-spacing: 0.02em;">CAMAT JATISARI</div>
-            <div style="font-weight: 800; color: #0f172a; text-decoration: underline; font-size: 0.95rem;">H. SURISNO.SKM.MAP</div>
-            <div style="color: #475569; font-size: 0.82rem; margin-top: 2px;">NIP. 19690516 1989903 1 003</div>
-        </div>
-    </div>
 </section>
 
 {{-- DOKUMEN CETAK & PDF RESMI (HANYA MUNCUL KETIKA DICETAK / EXPORT PDF, GAYA FORMAL MICROSOFT WORD) --}}
