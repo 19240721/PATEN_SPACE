@@ -12,6 +12,10 @@
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('dashboard') }}" class="nav-item"><span>◫</span> Dashboard</a>
+            <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span>＋</span> Pendaftaran Baru</a>
+            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item"><span>▣</span> Daftar Permohonan @if(($newFromCitizen ?? 0) > 0)<span class="nav-counter">{{ $newFromCitizen }}</span>@endif</a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span>▥</span> Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item"><span>▥</span> Data dan Laporan</a>
             <details class="service-menu" open>
                 <summary class="nav-item service-menu-toggle"><span>▤</span> Jenis Layanan <span class="menu-chevron">⌄</span></summary>
                 <div class="service-submenu">

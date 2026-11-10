@@ -227,37 +227,34 @@ class RoleBasedApplicationFlowTest extends TestCase
     public function test_dashboard_and_incoming_requests_share_the_same_staff_navigation(): void
     {
         $petugas = User::factory()->create(['role' => 'petugas']);
+        $menuItems = ['Dashboard', 'Pendaftaran Baru', 'Daftar Permohonan', 'Semua Data', 'Data dan Laporan', 'PRR / KTP Baru'];
 
         $dashboard = $this->actingAs($petugas)->get(route('petugas.dashboard'));
         $dashboard->assertOk();
         $dashboard->assertSee('Menu Utama');
-        $dashboard->assertSee('Dashboard');
         $dashboard->assertSee('<details class="service-menu" open>', false);
         $dashboard->assertSee('<summary class="nav-item service-menu-toggle">', false);
-        $dashboard->assertSee('PRR / KTP Baru');
-        $dashboard->assertDontSee('<span>＋</span> Pendaftaran Baru', false);
-        $dashboard->assertDontSee('Daftar Permohonan');
-        $dashboard->assertDontSee('Data dan Laporan');
+        foreach ($menuItems as $menuItem) {
+            $dashboard->assertSee($menuItem);
+        }
 
         $incomingRequests = $this->get(route('petugas.permohonan.index'));
         $incomingRequests->assertOk();
         $incomingRequests->assertSee('Menu Utama');
-        $incomingRequests->assertSee('Dashboard');
         $incomingRequests->assertSee('<details class="service-menu" open>', false);
         $incomingRequests->assertSee('<summary class="nav-item service-menu-toggle">', false);
-        $incomingRequests->assertSee('PRR / KTP Baru');
-        $incomingRequests->assertDontSee('<span>＋</span> Pendaftaran Baru', false);
-        $incomingRequests->assertDontSee('Data dan Laporan');
+        foreach ($menuItems as $menuItem) {
+            $incomingRequests->assertSee($menuItem);
+        }
 
         $allData = $this->get(route('pendaftaran.index'));
         $allData->assertOk();
         $allData->assertSee('Menu Utama');
-        $allData->assertSee('Dashboard');
+        $allData->assertSee('<a href="'.route('pendaftaran.index').'" class="nav-item active" aria-current="page">', false);
         $allData->assertSee('<details class="service-menu" open>', false);
-        $allData->assertSee('PRR / KTP Baru');
-        $allData->assertDontSee('<span>＋</span> Pendaftaran Baru', false);
-        $allData->assertDontSee('Daftar Permohonan');
-        $allData->assertDontSee('Data dan Laporan');
+        foreach ($menuItems as $menuItem) {
+            $allData->assertSee($menuItem);
+        }
     }
 
     public function test_user_can_update_their_profile_and_password(): void

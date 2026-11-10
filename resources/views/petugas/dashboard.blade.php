@@ -16,6 +16,15 @@
         <div class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
             <a href="{{ route('petugas.dashboard') }}" class="nav-item active">Dashboard</a>
+            <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span>＋</span> Pendaftaran Baru</a>
+            <a href="{{ route('petugas.permohonan.index') }}" class="nav-item">
+                <span>📥</span> Daftar Permohonan
+                @if(($newFromCitizen ?? 0) > 0)
+                    <span style="background:#ef4444;color:#fff;border-radius:9999px;padding:2px 8px;font-size:11px;margin-left:6px;font-weight:700;">{{ $newFromCitizen }}</span>
+                @endif
+            </a>
+            <a href="{{ route('pendaftaran.index') }}" class="nav-item">Semua Data</a>
+            <a href="{{ route('laporan') }}" class="nav-item">Laporan</a>
         </div>
 
         <a href="{{ route('profil') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">

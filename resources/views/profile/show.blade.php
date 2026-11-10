@@ -634,6 +634,10 @@
                 <a href="{{ route('camat.aktivitas') }}" class="nav-item"><span aria-hidden="true">⏱</span> Aktivitas Pelayanan</a>
             @else
                 <a href="{{ route('dashboard') }}" class="nav-item"><span aria-hidden="true">◫</span> Dashboard</a>
+                <a href="{{ route('pendaftaran.create') }}" class="nav-item"><span aria-hidden="true">＋</span> Pendaftaran Baru</a>
+                <a href="{{ route('petugas.permohonan.index') }}" class="nav-item"><span aria-hidden="true">▣</span> Daftar Permohonan</a>
+                <a href="{{ route('pendaftaran.index') }}" class="nav-item"><span aria-hidden="true">▥</span> Semua Data</a>
+                <a href="{{ route('laporan') }}" class="nav-item"><span aria-hidden="true">▤</span> Data dan Laporan</a>
             @endif
         </nav>
 
