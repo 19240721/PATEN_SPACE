@@ -579,6 +579,19 @@
                         <span class="profile-menu-label">Pengaturan Akun</span><b aria-hidden="true">›</b>
                     </a>
 
+                    {{-- Buat Akun Baru (Hanya untuk Petugas / Operator) --}}
+                    @if (in_array($user->role, ['petugas', 'operator']))
+                        <a href="{{ route('account.users.create') }}">
+                            <span class="profile-menu-icon profile-menu-icon--create" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="9" cy="8" r="3.5"></circle>
+                                    <path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v8M15 12h8"></path>
+                                </svg>
+                            </span>
+                            <span class="profile-menu-label">Buat Akun Baru</span><b aria-hidden="true">›</b>
+                        </a>
+                    @endif
+
                     {{-- 4. Kembali ke Profil --}}
                     <a href="{{ route('profil') }}">
                         <span class="profile-menu-icon profile-menu-icon--dashboard" aria-hidden="true">
