@@ -80,7 +80,6 @@
                 <article class="dashboard-stat"><span class="stat-symbol">▥</span><div><span>PRR / KTP Baru</span><strong>{{ number_format($prr, 0, ',', '.') }}</strong></div></article>
                 <article class="dashboard-stat"><span class="stat-symbol">▣</span><div><span>KTP / Pembaharuan</span><strong>{{ number_format($ktp, 0, ',', '.') }}</strong></div></article>
                 <article class="dashboard-stat"><span class="stat-symbol">♧</span><div><span>Kartu Keluarga</span><strong>{{ number_format($kk, 0, ',', '.') }}</strong></div></article>
-                <article class="dashboard-stat"><span class="stat-symbol">▤</span><div><span>Kartu Kuning</span><strong>{{ number_format($kartuKuning, 0, ',', '.') }}</strong></div></article>
             </section>
 
             <section class="dashboard-panel recent-panel report-panel">

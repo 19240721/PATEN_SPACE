@@ -954,6 +954,7 @@ tr:last-child td { border-bottom: none; }
 .dashboard-page .table-action { padding: 6px 9px; font-size: .7rem; }
 .empty-state { padding: 28px !important; color: #7b8da1 !important; text-align: center; }
 .report-date { padding: 9px 12px; border: 1px solid #d9e4ee; border-radius: 6px; background: #fff; color: #53677e; font-size: .78rem; white-space: nowrap; }
+.report-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .report-stats .dashboard-stat { min-height: 88px; }
 .report-panel .panel-heading { padding: 0 20px; margin-bottom: 14px; }
 .report-filters { display: flex; align-items: center; gap: 10px; padding: 0 20px 14px; }
@@ -1103,7 +1104,7 @@ tr:last-child td { border-bottom: none; }
     .dashboard-content { padding: 22px 14px 24px; }
     .dashboard-heading { align-items: flex-start; flex-direction: column; }
     .dashboard-heading h1 { font-size: 1.55rem; }
-    .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .dashboard-stats, .report-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
     .dashboard-stat { min-height: 86px; padding: 11px 9px; }
     .dashboard-stat strong { font-size: 1.2rem; }
     .chart-panel { padding: 16px 12px 12px; }
