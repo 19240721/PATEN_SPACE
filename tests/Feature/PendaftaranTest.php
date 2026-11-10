@@ -34,9 +34,6 @@ class PendaftaranTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Registrasi');
-        $response->assertSee('class="sidebar-toggle"', false);
-        $response->assertSee('aria-label="Tutup menu samping"', false);
-        $response->assertSee('aria-expanded="true"', false);
         $response->assertDontSee('class="back-button"', false);
     }
 

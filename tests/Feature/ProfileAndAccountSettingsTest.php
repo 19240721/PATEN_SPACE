@@ -82,9 +82,9 @@ class ProfileAndAccountSettingsTest extends TestCase
             'phone' => '081298765432',
         ]);
         foreach ([
-            ['name' => 'Admin PATEN', 'email' => 'admin@patenspace.test', 'role' => 'admin'],
-            ['name' => 'Operator PATEN', 'email' => 'operator@patenspace.test', 'role' => 'operator'],
-            ['name' => 'Petugas PATEN', 'email' => 'petugas@patenspace.test', 'role' => 'petugas'],
+            ['name' => 'Admin PATEN', 'email' => 'admin-sample@patenspace.test', 'role' => 'admin'],
+            ['name' => 'Operator PATEN', 'email' => 'operator-sample@patenspace.test', 'role' => 'operator'],
+            ['name' => 'Petugas PATEN', 'email' => 'petugas-sample@patenspace.test', 'role' => 'petugas'],
         ] as $account) {
             User::factory()->create($account);
         }
