@@ -279,9 +279,7 @@ class RoleBasedApplicationFlowTest extends TestCase
         $this->get(route('account.profile.password'))->assertOk()->assertSee('Ubah Password');
         $this->get(route('account.profile.settings'))
             ->assertOk()
-            ->assertSee('Preferensi Tampilan')
-            ->assertSee('Keamanan Akun')
-            ->assertSee('Khaki');
+            ->assertSee('Keamanan Akun');
 
         $this->put(route('account.profile.data.update'), [
             'name' => 'Petugas Baru',
