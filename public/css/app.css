@@ -1160,6 +1160,14 @@ tr:last-child td { border-bottom: none; }
 .dashboard-page .report-filter-button:hover { background: #635435; }
 .dashboard-page .dashboard-stat-link:hover { border-color: #c7b991; }
 .dashboard-page .dashboard-stat-link:focus-visible { outline-color: #9b875d; }
+.dashboard-stat-link.active-filter-stat {
+    border-color: #796743;
+    background: #fdfbf7;
+    box-shadow: 0 4px 12px rgba(121, 103, 67, 0.15);
+}
+.dashboard-stat-link.active-filter-stat strong {
+    color: #796743;
+}
 .dashboard-page .stat-symbol:not(.green):not(.gold) { background: #eee8d7; color: #796743; }
 .dashboard-page .service-bar { background: #9b875d; }
 .dashboard-page .trend-chart polyline,

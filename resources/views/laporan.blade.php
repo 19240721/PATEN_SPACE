@@ -76,10 +76,37 @@
             </section>
 
             <section class="dashboard-stats report-stats" aria-label="Ringkasan laporan">
-                <article class="dashboard-stat total-stat"><span class="stat-symbol">▤</span><div><span>Total Pendaftar</span><strong>{{ number_format($total, 0, ',', '.') }}</strong></div></article>
-                <article class="dashboard-stat"><span class="stat-symbol">▥</span><div><span>PRR / KTP Baru</span><strong>{{ number_format($prr, 0, ',', '.') }}</strong></div></article>
-                <article class="dashboard-stat"><span class="stat-symbol">▣</span><div><span>KTP / Pembaharuan</span><strong>{{ number_format($ktp, 0, ',', '.') }}</strong></div></article>
-                <article class="dashboard-stat"><span class="stat-symbol">♧</span><div><span>Kartu Keluarga</span><strong>{{ number_format($kk, 0, ',', '.') }}</strong></div></article>
+                <a href="{{ route('laporan', request()->except(['jenis_layanan', 'page'])) }}" class="dashboard-stat dashboard-stat-link total-stat {{ !request('jenis_layanan') ? 'active-filter-stat' : '' }}" title="Tampilkan Semua Layanan">
+                    <span class="stat-symbol">▤</span>
+                    <div>
+                        <span>Total Pendaftar</span>
+                        <strong>{{ number_format($total, 0, ',', '.') }}</strong>
+                    </div>
+                </a>
+
+                <a href="{{ route('laporan', array_merge(request()->except(['page']), ['jenis_layanan' => 'PRR'])) }}" class="dashboard-stat dashboard-stat-link {{ request('jenis_layanan') === 'PRR' ? 'active-filter-stat' : '' }}" title="Filter Layanan PRR / KTP Baru">
+                    <span class="stat-symbol">▥</span>
+                    <div>
+                        <span>PRR / KTP Baru</span>
+                        <strong>{{ number_format($prr, 0, ',', '.') }}</strong>
+                    </div>
+                </a>
+
+                <a href="{{ route('laporan', array_merge(request()->except(['page']), ['jenis_layanan' => 'KTP'])) }}" class="dashboard-stat dashboard-stat-link {{ request('jenis_layanan') === 'KTP' ? 'active-filter-stat' : '' }}" title="Filter Layanan KTP / Pembaharuan">
+                    <span class="stat-symbol">▣</span>
+                    <div>
+                        <span>KTP / Pembaharuan</span>
+                        <strong>{{ number_format($ktp, 0, ',', '.') }}</strong>
+                    </div>
+                </a>
+
+                <a href="{{ route('laporan', array_merge(request()->except(['page']), ['jenis_layanan' => 'KK'])) }}" class="dashboard-stat dashboard-stat-link {{ request('jenis_layanan') === 'KK' ? 'active-filter-stat' : '' }}" title="Filter Layanan Kartu Keluarga">
+                    <span class="stat-symbol">♧</span>
+                    <div>
+                        <span>Kartu Keluarga</span>
+                        <strong>{{ number_format($kk, 0, ',', '.') }}</strong>
+                    </div>
+                </a>
             </section>
 
             <section class="dashboard-panel recent-panel report-panel">
