@@ -1006,13 +1006,13 @@ tr:last-child td { border-bottom: none; }
 .report-filter-button { height: 42px; padding: 0 15px; border: 0; border-radius: 6px; background: #0870c9; color: #fff; font-size: .8rem; font-weight: 700; cursor: pointer; }
 .report-reset { color: #5c7188; font-size: .8rem; text-decoration: none; }
 .report-table { min-width: 900px; }
-.form-page-shell .sidebar { background: linear-gradient(180deg, rgba(255,255,255,.24) 0, rgba(255,255,255,.68) 145px, #f6f5ef 235px), url('/image/kantor-kecamatan.jpg') center top / 100% auto no-repeat; background-color: #f6f5ef; color: #1d354b; }
+.form-page-shell .sidebar { background: #e1d8c2; color: #3f3523; }
 .form-page-shell .brand-title { color: #17334c; }
 .form-page-shell .brand-sub { color: #3e586d; opacity: 1; }
 .form-page-shell .nav-group-label { color: #435d72; }
 .form-page-shell .sidebar-nav > .nav-item { border-radius: 6px; background: rgba(255,255,255,.34); color: #263f55; font-weight: 700; }
 .form-page-shell .sidebar-nav > .nav-item:hover { background: rgba(255,255,255,.68); }
-.form-page-shell .sidebar-nav > .nav-item.active { background: #079fe3; color: #fff; }
+.form-page-shell .sidebar-nav > .nav-item.active { background: #c7b991; color: #3f3523; }
 .form-page-shell .service-menu-toggle { color: #263f55; font-weight: 700; }
 .form-page-shell .service-menu[open] .menu-chevron { transform: rotate(180deg); }
 .form-page-shell .service-submenu { gap: 6px; padding: 5px 0; }
@@ -1130,30 +1130,45 @@ tr:last-child td { border-bottom: none; }
 .form-page-shell .sidebar {
     position: sticky;
     top: 0;
-    flex: 0 0 290px;
-    width: 290px;
+    flex: 0 0 250px;
+    width: 250px;
     height: 100vh;
     min-height: 100vh;
-    background: linear-gradient(180deg, rgba(199, 185, 145, .42) 0, rgba(199, 185, 145, .76) 130px, #e1d8c2 160px), url('/image/kantor-kecamatan.jpg') center top / 100% 160px no-repeat;
-    background-color: #e1d8c2;
+    padding: 16px 12px 0;
+    background: #e1d8c2;
 }
 
-.form-page-shell .brand-wrap { padding-right: 44px; }
+.form-page-shell .brand-wrap {
+    margin: 0 0 12px;
+    padding: 2px 8px 18px;
+    border-bottom: 1px solid rgba(19, 48, 72, .2);
+}
+
 .form-page-shell .brand-mark {
     border-radius: 8px;
     background: rgba(199, 185, 145, .82);
     color: #5b4b2d;
-    font-weight: 800;
 }
-.form-page-shell .brand-title { color: #17334c; }
-.form-page-shell .brand-sub { color: #3e586d; opacity: 1; }
-.form-page-shell .nav-group-label { color: #665536; }
-.form-page-shell .sidebar-nav > .nav-item { background: rgba(255, 255, 255, .48); color: #3f3523; }
-.form-page-shell .sidebar-nav > .nav-item:hover { background: rgba(255, 255, 255, .78); }
+.form-page-shell .brand-title { color: #5b4b2d; }
+.form-page-shell .brand-sub { color: #665536; opacity: 1; }
+.form-page-shell .nav-group-label { margin-top: 12px; padding: 8px 10px 5px; font-size: .65rem; color: #665536; }
+.form-page-shell .sidebar-nav { gap: 5px; margin-top: 0; overflow-y: auto; }
+.form-page-shell .sidebar-nav > .nav-item {
+    display: flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: #3f3523;
+    font-size: .84rem;
+    font-weight: 700;
+}
+.form-page-shell .sidebar-nav > .nav-item:hover { background: rgba(255, 255, 255, .68); }
+.form-page-shell .sidebar-nav > .nav-item:not(.active) { background: rgba(255, 255, 255, .48); }
 .form-page-shell .sidebar-nav > .nav-item.active { background: #c7b991; color: #3f3523; box-shadow: inset 3px 0 #796743; }
 .form-page-shell .service-nav-item { background: rgba(255, 255, 255, .48); color: #3f3523; }
-.form-page-shell .logout-btn { border-color: rgba(121, 103, 67, .35); background: rgba(255, 255, 255, .62); color: #5b4b2d; }
-.form-page-shell .logout-btn:hover { background: #eee8d7; }
+.form-page-shell .logout-btn { border: 0; background: rgba(255, 255, 255, .62); color: #5b4b2d; }
+.form-page-shell .logout-btn:hover { background: rgba(255, 255, 255, .68); }
 .form-page-shell .form-page-main { min-width: 0; background: #f5f3ed; }
 .form-page-shell .topbar { border-color: #e5dece; }
 .form-page-shell .form-card { border-color: #e5dece; }
@@ -1165,33 +1180,6 @@ tr:last-child td { border-bottom: none; }
 .form-page-shell .btn-secondary { background: #eee8d7; color: #5b4b2d; border-color: #d7cbaa; }
 .form-page-shell .back-button { border-color: #d7cbaa; color: #5b4b2d; }
 .form-page-shell .back-button:hover { background: #eee8d7; border-color: #9b875d; }
-
-.form-page-shell .sidebar-toggle {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    width: 34px;
-    height: 34px;
-    border-color: rgba(121, 103, 67, .35);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .72);
-}
-
-.form-page-shell .sidebar-toggle span {
-    width: 4px;
-    height: 4px;
-    background: #796743;
-    transform: none !important;
-    opacity: 1 !important;
-}
-
-.form-page-shell .sidebar.collapsed {
-    flex-basis: 92px;
-    width: 92px;
-}
 
 .form-page-shell .sidebar.collapsed .sidebar-nav,
 .form-page-shell .sidebar.collapsed form { display: none; }

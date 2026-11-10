@@ -77,19 +77,30 @@ class ProfileAndAccountSettingsTest extends TestCase
         // Role Petugas
         $petugas = User::factory()->create([
             'role' => 'petugas',
-            'name' => 'Petugas Loket PATEN',
-            'email' => 'petugas@patenspace.test',
+            'name' => 'Andi hendriy',
+            'email' => 'andi.hendriy@patenspace.test',
             'phone' => '081298765432',
         ]);
+        foreach ([
+            ['name' => 'Admin PATEN', 'email' => 'admin@patenspace.test', 'role' => 'admin'],
+            ['name' => 'Operator PATEN', 'email' => 'operator@patenspace.test', 'role' => 'operator'],
+            ['name' => 'Petugas PATEN', 'email' => 'petugas@patenspace.test', 'role' => 'petugas'],
+        ] as $account) {
+            User::factory()->create($account);
+        }
         $petugasProfile = $this->actingAs($petugas)
             ->get(route('profil'))
             ->assertOk();
         $petugasProfile
-            ->assertSee('Petugas Loket PATEN')
+            ->assertSee('Andi hendriy')
             ->assertSee('Petugas Loket')
-            ->assertSee('Andi Gunawan')
-            ->assertSee('Selsa Bila')
-            ->assertSee('Dimas Digantara')
+            ->assertSee('>Andi hendriy</li>', false)
+            ->assertDontSee('Admin PATEN')
+            ->assertDontSee('Operator PATEN')
+            ->assertDontSee('Petugas PATEN')
+            ->assertDontSee('Andi Gunawan')
+            ->assertDontSee('Selsa Bila')
+            ->assertDontSee('Dimas Digantara')
             ->assertSee('Kecamatan Jatisari');
 
         // Role Masyarakat

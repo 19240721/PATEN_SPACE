@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -22,6 +23,13 @@ class ProfileController extends Controller
 
         return view('profile.show', [
             'user' => $user,
+            'petugasLayanan' => $user->role === 'petugas'
+                ? User::query()
+                    ->whereIn('role', ['petugas', 'operator', 'admin'])
+                    ->whereRaw("LOWER(TRIM(name)) NOT IN ('admin paten', 'operator paten', 'petugas paten')")
+                    ->orderBy('name')
+                    ->get(['id', 'name'])
+                : collect(),
         ]);
     }
 
