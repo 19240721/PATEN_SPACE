@@ -31,11 +31,6 @@
             <div class="nav-group-label">Layanan PATEN</div>
             <a href="{{ $isCitizen ? route('masyarakat.permohonan.create') : route('pendaftaran.create') }}" class="nav-item active">{{ $isCitizen ? 'Ajukan Permohonan' : 'Registrasi / Pendaftaran' }}</a>
             @unless($isCitizen)<a href="{{ route('pendaftaran.index') }}" class="nav-item">Daftar Permohonan</a>@endunless
-
-            <div class="nav-group-label">Pengelolaan</div>
-            <a href="#" class="nav-item">Data Pengguna</a>
-            <a href="#" class="nav-item">Laporan</a>
-            <a href="#" class="nav-item">Pengaturan</a>
         </nav>
 
         <a href="{{ route('account.profile') }}" class="sidebar-profile sidebar-profile-link" aria-label="Buka profil {{ auth()->user()->name }}">

@@ -20,11 +20,6 @@
             <div class="nav-group-label">Layanan PATEN</div>
             <a href="{{ route('pendaftaran.create') }}" class="sidebar-button active">Registrasi / Pendaftaran</a>
             <a href="#" class="nav-item">Data Penduduk</a>
-
-            <div class="nav-group-label">Pengelolaan</div>
-            <a href="#" class="nav-item">Data Pengguna</a>
-            <a href="#" class="nav-item">Laporan</a>
-            <a href="#" class="nav-item">Pengaturan</a>
         </div>
 
         <div class="filter-bar">
