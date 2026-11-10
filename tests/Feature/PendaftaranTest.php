@@ -538,4 +538,88 @@ class PendaftaranTest extends TestCase
         $response->assertSee('Saksi Satu');
         $response->assertSee('Saksi Dua');
     }
+
+    public function test_laporan_page_supports_search_and_filtering(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'petugas',
+        ]);
+
+        Pendaftaran::create([
+            'nama_lengkap' => 'Sandy Aulia',
+            'nik' => '3215123456780001',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-11-01',
+            'status' => 'Selesai',
+            'petugas' => 'Petugas Loket',
+        ]);
+
+        Pendaftaran::create([
+            'nama_lengkap' => 'Budi Setiawan',
+            'nik' => '3215123456780002',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-11-05',
+            'status' => 'Baru',
+            'petugas' => 'Operator Paten',
+        ]);
+
+        // Filter pencarian nama
+        $resSearch = $this->actingAs($user)->get(route('laporan', ['q' => 'Sandy']));
+        $resSearch->assertOk();
+        $resSearch->assertSee('Sandy Aulia');
+        $resSearch->assertDontSee('Budi Setiawan');
+        $resSearch->assertSee('Cetak Laporan');
+
+        // Filter jenis layanan
+        $resLayanan = $this->actingAs($user)->get(route('laporan', ['jenis_layanan' => 'KTP']));
+        $resLayanan->assertOk();
+        $resLayanan->assertSee('Budi Setiawan');
+        $resLayanan->assertDontSee('Sandy Aulia');
+
+        // Filter status
+        $resStatus = $this->actingAs($user)->get(route('laporan', ['status' => 'Selesai']));
+        $resStatus->assertOk();
+        $resStatus->assertSee('Sandy Aulia');
+        $resStatus->assertDontSee('Budi Setiawan');
+    }
+
+    public function test_laporan_cetak_renders_printable_document_with_filters(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'petugas',
+            'name' => 'Petugas Jatisari',
+        ]);
+
+        Pendaftaran::create([
+            'nama_lengkap' => 'Sandy Aulia',
+            'nik' => '3215123456780001',
+            'jenis_layanan' => 'KK',
+            'tanggal_daftar' => '2026-11-01',
+            'status' => 'Selesai',
+            'petugas' => 'Petugas Loket',
+        ]);
+
+        Pendaftaran::create([
+            'nama_lengkap' => 'Budi Setiawan',
+            'nik' => '3215123456780002',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-11-05',
+            'status' => 'Baru',
+            'petugas' => 'Operator Paten',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('laporan.cetak', [
+            'q' => 'Sandy',
+            'jenis_layanan' => 'KK',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Laporan Data Pelayanan PATEN');
+        $response->assertSee('Kecamatan Jatisari');
+        $response->assertSee('Pencarian: "Sandy"', false);
+        $response->assertSee('Sandy Aulia');
+        $response->assertDontSee('Budi Setiawan');
+        $response->assertSee('window.print()', false);
+        $response->assertSee('Kembali ke Data dan Laporan');
+    }
 }

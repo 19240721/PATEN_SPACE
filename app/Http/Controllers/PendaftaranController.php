@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
+use App\Notifications\StatusPermohonanNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -12,6 +13,20 @@ use Illuminate\Validation\Rule;
 
 class PendaftaranController extends Controller
 {
+    private function notifyCitizenOfStatus(Pendaftaran $pendaftaran, ?string $previousStatus = null): void
+    {
+        if ($previousStatus === $pendaftaran->status || ! StatusPermohonanNotification::supportsStatus($pendaftaran->status)) {
+            return;
+        }
+
+        $recipient = $pendaftaran->user;
+        if ($recipient?->role !== 'masyarakat') {
+            return;
+        }
+
+        $recipient->notify(new StatusPermohonanNotification($pendaftaran));
+    }
+
     private function normalizeManualDate(?string $value): ?string
     {
         if (blank($value)) {
@@ -331,6 +346,8 @@ class PendaftaranController extends Controller
         }
 
         if ($isCitizen) {
+            $this->notifyCitizenOfStatus($pendaftaran);
+
             return redirect()->route('masyarakat.permohonan.success', $pendaftaran);
         }
 
@@ -390,12 +407,38 @@ class PendaftaranController extends Controller
     /**
      * Menampilkan halaman laporan.
      */
-    public function laporan()
+    public function laporan(Request $request)
     {
-        // Ambil semua data pendaftaran
-        $pendaftarans = Pendaftaran::latest('tanggal_daftar')->get();
+        $query = Pendaftaran::query()->latest('tanggal_daftar')->latest('id');
 
-        // Total seluruh pelayanan
+        if ($request->filled('q')) {
+            $search = $request->input('q');
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%")
+                  ->orWhere('petugas', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('jenis_layanan')) {
+            $query->where('jenis_layanan', $request->input('jenis_layanan'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('tanggal_awal')) {
+            $query->whereDate('tanggal_daftar', '>=', $request->input('tanggal_awal'));
+        }
+
+        if ($request->filled('tanggal_akhir')) {
+            $query->whereDate('tanggal_daftar', '<=', $request->input('tanggal_akhir'));
+        }
+
+        $pendaftarans = $query->get();
+
+        // Total seluruh pelayanan sesuai filter
         $totalPelayanan = $pendaftarans->count();
 
         // Rekap berdasarkan jenis layanan
@@ -443,8 +486,7 @@ class PendaftaranController extends Controller
             ['type' => 'Kedatangan', 'title' => 'Kedatangan'],
             ['type' => 'Pindah', 'title' => 'Pindah'],
         ];
-        $newFromCitizen = $pendaftarans
-            ->where('intake_source', 'masyarakat')
+        $newFromCitizen = Pendaftaran::where('intake_source', 'masyarakat')
             ->where('status', 'Baru')
             ->count();
 
@@ -718,7 +760,9 @@ class PendaftaranController extends Controller
             }
         }
 
+        $previousStatus = $pendaftaran->status;
         $pendaftaran->update($validated);
+        $this->notifyCitizenOfStatus($pendaftaran, $previousStatus);
 
         try {
             if ($request->user() && in_array(strtolower($request->user()->role ?? ''), ['petugas', 'operator', 'admin'])) {
@@ -883,7 +927,9 @@ class PendaftaranController extends Controller
             $updateData['petugas'] = $request->user()->name;
         }
 
+        $previousStatus = $pendaftaran->status;
         $pendaftaran->update($updateData);
+        $this->notifyCitizenOfStatus($pendaftaran, $previousStatus);
 
         try {
             $logStatus = $validated['status'] === 'Ditolak' ? 'Ditolak' : 'Berhasil';
@@ -900,5 +946,18 @@ class PendaftaranController extends Controller
         return redirect()
             ->route('petugas.permohonan.show', $pendaftaran)
             ->with('success', 'Status permohonan berhasil diperbarui menjadi '.$validated['status'].'.');
+    }
+
+    public function markStatusNotificationRead(Request $request, string $notification)
+    {
+        $statusNotification = $request->user()
+            ->notifications()
+            ->where('id', $notification)
+            ->where('type', StatusPermohonanNotification::class)
+            ->firstOrFail();
+
+        $statusNotification->markAsRead();
+
+        return back();
     }
 }

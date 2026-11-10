@@ -57,6 +57,7 @@ Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masy
     Route::get('/permohonan/{pendaftaran}/sukses', [PendaftaranController::class, 'citizenSuccess'])->name('permohonan.success');
     Route::get('/permohonan/{pendaftaran}/sptjm', [PendaftaranController::class, 'cetakSptjm'])->name('permohonan.sptjm');
     Route::get('/permohonan/{pendaftaran}/dokumen/{index}', [PendaftaranController::class, 'document'])->name('dokumen');
+    Route::post('/notifikasi/{notification}/baca', [PendaftaranController::class, 'markStatusNotificationRead'])->name('notifikasi.read');
 });
 
 Route::get('/petugas/dashboard', [PendaftaranController::class, 'petugasDashboard'])->middleware(['auth', 'role:petugas'])->name('petugas.dashboard');

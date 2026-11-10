@@ -58,8 +58,21 @@
 
         <div class="dashboard-content">
             <section class="dashboard-heading">
-                <div><h1>Laporan Pelayanan</h1><p>Ringkasan data pelayanan PATEN Kecamatan Jatisari.</p></div>
-                <span class="chart-year">{{ now()->translatedFormat('l, d F Y') }}</span>
+                <div>
+                    <h1>Laporan Pelayanan</h1>
+                    <p>Ringkasan data pelayanan PATEN Kecamatan Jatisari.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <a href="{{ route('laporan.cetak', request()->query()) }}" target="_blank" class="report-filter-button" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 0 16px; background: #796743; color: #fff; font-weight: 700; height: 40px; border-radius: 6px;" title="Cetak atau unduh laporan">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        <span>Cetak Laporan</span>
+                    </a>
+                    <span class="chart-year">{{ now()->translatedFormat('l, d F Y') }}</span>
+                </div>
             </section>
 
             <section class="dashboard-stats report-stats" aria-label="Ringkasan laporan">
@@ -71,7 +84,59 @@
             </section>
 
             <section class="dashboard-panel recent-panel report-panel">
-                <div class="panel-heading"><div><h2>Daftar Pendaftaran</h2><p>{{ $pendaftarans->count() }} data ditampilkan</p></div></div>
+                <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2>Daftar Pendaftaran</h2>
+                        <p>{{ $pendaftarans->count() }} data ditampilkan</p>
+                    </div>
+                    @if(request()->hasAny(['q', 'jenis_layanan', 'status', 'tanggal_awal', 'tanggal_akhir']))
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 0.78rem; color: #796743; font-weight: 600; background: #f5f0e6; padding: 4px 10px; border-radius: 4px;">
+                                Filter Aktif
+                            </span>
+                        </div>
+                    @endif
+                </div>
+
+                <form method="GET" action="{{ route('laporan') }}" class="report-filters" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 0 20px 16px;">
+                    <div class="report-search" style="flex: 1; min-width: 220px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama pemohon, NIK, petugas...">
+                    </div>
+
+                    <select name="jenis_layanan" aria-label="Filter Jenis Layanan">
+                        <option value="">Semua Layanan</option>
+                        @foreach ($services as $service)
+                            <option value="{{ $service['type'] }}" {{ request('jenis_layanan') === $service['type'] ? 'selected' : '' }}>
+                                {{ $service['title'] }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <select name="status" aria-label="Filter Status">
+                        <option value="">Semua Status</option>
+                        <option value="Baru" {{ request('status') === 'Baru' ? 'selected' : '' }}>Baru</option>
+                        <option value="Proses" {{ request('status') === 'Proses' ? 'selected' : '' }}>Proses</option>
+                        <option value="Selesai" {{ request('status') === 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                        <option value="Ditolak" {{ request('status') === 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+                    </select>
+
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" class="report-date" title="Tanggal Awal">
+                        <span style="color: #64748b; font-size: 0.8rem;">s/d</span>
+                        <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="report-date" title="Tanggal Akhir">
+                    </div>
+
+                    <button type="submit" class="report-filter-button">Terapkan</button>
+
+                    @if(request()->hasAny(['q', 'jenis_layanan', 'status', 'tanggal_awal', 'tanggal_akhir']))
+                        <a href="{{ route('laporan') }}" class="report-reset" title="Hapus semua filter" style="color: #e11d48; font-weight: 600;">✕ Reset</a>
+                    @endif
+                </form>
+
                 <div class="table-scroll"><table class="report-table">
                     <thead><tr><th>No</th><th>Nama</th><th>Jenis Layanan</th><th>Petugas</th><th>Tanggal Daftar</th><th>Status</th></tr></thead>
                     <tbody>

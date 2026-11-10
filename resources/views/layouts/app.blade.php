@@ -93,6 +93,19 @@
     <body>
         @yield('content')
 
+        @if (auth()->check() && auth()->user()->role === 'masyarakat')
+            @php
+                $statusNotification = auth()->user()
+                    ->unreadNotifications()
+                    ->where('type', \App\Notifications\StatusPermohonanNotification::class)
+                    ->latest()
+                    ->first();
+            @endphp
+            @if ($statusNotification)
+                @include('partials.masyarakat-status-notification', ['notification' => $statusNotification])
+            @endif
+        @endif
+
         <script>
         document.addEventListener('DOMContentLoaded', function () {
             const appShell = document.querySelector('.app-shell');
