@@ -1188,19 +1188,34 @@
                                 <span>Berkas yang Harus Dilengkapi:</span>
                             </div>
                             <ul class="mob-req-list">
-                                <li>KTP asli</li>
+                                <li>KTP asli (bagi KTP rusak / perubahan data)</li>
                                 <li>Fotocopy Kartu Keluarga (KK)</li>
+                                <li>Surat kehilangan dari kepolisian (wajib jika KTP hilang)</li>
+                                <li>Dokumen pendukung lainnya</li>
                             </ul>
                         </div>
 
                         <div class="mob-field">
+                            <label class="mob-label">Nomor KK</label>
+                            <input class="mob-input" name="nomor_kk" type="text" placeholder="16 digit nomor KK" value="{{ old('nomor_kk') }}">
+                        </div>
+
+                        <div class="mob-field">
                             <label class="mob-label">Alasan Pembaharuan</label>
-                            <select class="mob-select" name="alasan_pembaruan">
+                            <select class="mob-select" name="alasan_pembaruan" id="ktp_alasan_pembaruan" onchange="checkKtpAlasan(this.value)">
                                 <option value="">Pilih alasan</option>
                                 <option value="Hilang" {{ old('alasan_pembaruan')=='Hilang'?'selected':'' }}>Hilang</option>
                                 <option value="Rusak" {{ old('alasan_pembaruan')=='Rusak'?'selected':'' }}>Rusak</option>
                                 <option value="Perubahan Data" {{ old('alasan_pembaruan')=='Perubahan Data'?'selected':'' }}>Perubahan Data</option>
                             </select>
+                        </div>
+
+                        <div id="ktp-hilang-info" style="{{ old('alasan_pembaruan') === 'Hilang' ? '' : 'display:none;' }}background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:10px;padding:10px 13px;margin-top:10px;font-size:0.8rem;color:#92400e;line-height:1.45;">
+                            <div style="font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                                <span>⚠️</span>
+                                <span>Catatan Pengajuan KTP Hilang:</span>
+                            </div>
+                            <p style="margin:0;">Silakan lampirkan <strong>Surat Keterangan Kehilangan dari Kepolisian</strong> serta <strong>dokumen pendukung</strong> (seperti Fotocopy KK) pada langkah upload dokumen.</p>
                         </div>
                     </div>
                 </div>
@@ -1222,27 +1237,19 @@
                             </ul>
                         </div>
 
+                        <div class="mob-field">
+                            <label class="mob-label">Tanggal Kedatangan</label>
+                            <input class="mob-input" id="prr_tanggal_kedatangan" name="tanggal_kedatangan" type="date" value="{{ old('tanggal_kedatangan') }}">
+                        </div>
                         <div class="mob-grid-2">
                             <div class="mob-field">
                                 <label class="mob-label">Bulan</label>
-                                <input class="mob-input" name="bulan" type="text" placeholder="Contoh: JAN" value="{{ old('bulan') }}">
+                                <input class="mob-input" id="prr_bulan" name="bulan" type="text" placeholder="Contoh: JAN" value="{{ old('bulan') }}">
                             </div>
                             <div class="mob-field">
                                 <label class="mob-label">Minggu Ke</label>
-                                <input class="mob-input" name="minggu_ke" type="text" placeholder="1" value="{{ old('minggu_ke') }}">
+                                <input class="mob-input" id="prr_minggu_ke" name="minggu_ke" type="text" placeholder="1" value="{{ old('minggu_ke') }}">
                             </div>
-                        </div>
-                        <div class="mob-field">
-                            <label class="mob-label">Tanggal Kedatangan</label>
-                            <input class="mob-input" name="tanggal_kedatangan" type="date" value="{{ old('tanggal_kedatangan') }}">
-                        </div>
-                        <div class="mob-field">
-                            <label class="mob-label">Alamat Asal</label>
-                            <input class="mob-input" name="alamat_asal" type="text" placeholder="Alamat asal" value="{{ old('alamat_asal') }}">
-                        </div>
-                        <div class="mob-field">
-                            <label class="mob-label">Alamat Tujuan</label>
-                            <input class="mob-input" name="alamat_tujuan" type="text" placeholder="Alamat tujuan" value="{{ old('alamat_tujuan') }}">
                         </div>
                     </div>
                 </div>
@@ -2051,8 +2058,10 @@ const serviceDocsData = {
     'KTP': {
         name: 'KTP Pembaharuan',
         docs: [
-            'KTP asli',
-            'Fotocopy Kartu Keluarga (KK)'
+            'KTP asli (bagi KTP rusak / perubahan data)',
+            'Fotocopy Kartu Keluarga (KK)',
+            'Surat kehilangan dari kepolisian (wajib jika KTP hilang)',
+            'Dokumen pendukung lainnya'
         ]
     },
     'Akta Kematian': {
@@ -2112,6 +2121,13 @@ function toggleMobSptjm(isChecked) {
     }
 }
 
+function checkKtpAlasan(val) {
+    const info = document.getElementById('ktp-hilang-info');
+    if (info) {
+        info.style.display = (val === 'Hilang') ? 'block' : 'none';
+    }
+}
+
 function renderServiceRequirements(value) {
     const data = serviceDocsData[value];
     if (!data) return;
@@ -2164,6 +2180,25 @@ function selectService(value) {
     if (document.getElementById('mob_sptjm_kematian')?.checked) {
         toggleMobSptjm(true);
     }
+
+    const prrTgl = document.getElementById('prr_tanggal_kedatangan');
+    if (prrTgl) {
+        prrTgl.addEventListener('change', function () {
+            if (!this.value) return;
+            const d = new Date(this.value);
+            if (isNaN(d.getTime())) return;
+            const bulanList = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
+            const bulanInput = document.getElementById('prr_bulan');
+            const mingguInput = document.getElementById('prr_minggu_ke');
+            if (bulanInput) {
+                bulanInput.value = bulanList[d.getMonth()];
+            }
+            if (mingguInput) {
+                mingguInput.value = Math.ceil(d.getDate() / 7);
+            }
+        });
+    }
+
     if ({{ $errors->any() ? 'true' : 'false' }}) {
         for (let i = 1; i <= totalSteps; i++) {
             document.getElementById('mob-step-' + i).style.display = 'none';

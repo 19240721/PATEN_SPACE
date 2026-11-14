@@ -99,6 +99,7 @@ class Pendaftaran extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
             'sptjm_kematian' => 'boolean',
             'documents' => 'array',
             'anggota_kk' => 'array',

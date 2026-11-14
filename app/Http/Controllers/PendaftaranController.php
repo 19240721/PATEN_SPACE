@@ -120,7 +120,8 @@ class PendaftaranController extends Controller
 
     public function citizenSuccess(Request $request, Pendaftaran $pendaftaran)
     {
-        abort_unless($pendaftaran->user_id === $request->user()->id, 404);
+        $isStaff = in_array($request->user()->role, ['petugas', 'operator', 'admin', 'camat'], true);
+        abort_unless((int) $pendaftaran->user_id === (int) $request->user()->id || $isStaff, 404);
 
         return view('masyarakat.success', compact('pendaftaran'));
     }
@@ -364,7 +365,7 @@ class PendaftaranController extends Controller
     public function document(Request $request, Pendaftaran $pendaftaran, int $index)
     {
         $isStaff = in_array($request->user()->role, ['petugas', 'operator', 'admin', 'camat'], true);
-        abort_unless($isStaff || $pendaftaran->user_id === $request->user()->id, 404);
+        abort_unless($isStaff || (int) $pendaftaran->user_id === (int) $request->user()->id, 404);
 
         $document = $pendaftaran->documents[$index] ?? null;
         abort_unless($document && Storage::disk('local')->exists($document['path']), 404);

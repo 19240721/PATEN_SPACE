@@ -188,9 +188,9 @@
 
                 <div class="service-section" data-service="PRR" {{ $selectedService == 'PRR' ? '' : 'hidden' }}>
                     <div class="form-grid compact-grid">
+                        <div class="field-group"><label>Tanggal Kedatangan</label><input type="date" name="tanggal_kedatangan" value="{{ old('tanggal_kedatangan', $pendaftaran->tanggal_kedatangan ?? '') }}"></div>
                         <div class="field-group"><label>Bulan</label><input type="text" name="bulan" value="{{ old('bulan', $pendaftaran->bulan ?? '') }}" placeholder="Contoh: JAN"></div>
                         <div class="field-group"><label>Minggu Ke</label><input type="text" name="minggu_ke" value="{{ old('minggu_ke', $pendaftaran->minggu_ke ?? '') }}" placeholder="Contoh: 1"></div>
-                        <div class="field-group"><label>Tanggal Kedatangan</label><input type="date" name="tanggal_kedatangan" value="{{ old('tanggal_kedatangan', $pendaftaran->tanggal_kedatangan ?? '') }}"></div>
                         <div class="field-group"><label>Nama</label><input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $pendaftaran->nama_lengkap ?? '') }}" placeholder="Nama lengkap"></div>
                         <div class="field-group"><label>NIK</label><input type="text" name="nik" value="{{ old('nik', $isCitizen ? $citizen->nik : ($pendaftaran->nik ?? '')) }}" placeholder="NIK" {{ $isCitizen ? 'readonly' : '' }}></div>
                         <div class="field-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $pendaftaran->tempat_lahir ?? '') }}" placeholder="Tempat lahir"></div>
@@ -226,19 +226,6 @@
                 <div class="service-section" data-service="KTP" {{ $selectedService == 'KTP' ? '' : 'hidden' }}>
                     <div class="form-grid compact-grid">
                         <div class="field-group"><label>Nomor KK</label><input type="text" name="nomor_kk" value="{{ old('nomor_kk', $pendaftaran->nomor_kk ?? '') }}" placeholder="Nomor KK"></div>
-                        <div class="field-group"><label>Jenis Kelamin</label>
-                            <select name="jenis_kelamin">
-                                <option value="">Pilih</option>
-                                <option value="L" {{ old('jenis_kelamin', $pendaftaran->jenis_kelamin ?? '') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="P" {{ old('jenis_kelamin', $pendaftaran->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                            </select>
-                        </div>
-                        <div class="field-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $pendaftaran->tempat_lahir ?? '') }}" placeholder="Tempat lahir"></div>
-                        <div class="field-group"><label>Tanggal Lahir</label><input type="text" name="tanggal_lahir" value="{{ old('tanggal_lahir', $pendaftaran->tanggal_lahir ? \Carbon\Carbon::parse($pendaftaran->tanggal_lahir)->format('d-m-Y') : '') }}" placeholder="Contoh: 10-05-1998"></div>
-                        <div class="field-group"><label>Jalan</label><input type="text" name="jalan" value="{{ old('jalan', $pendaftaran->jalan ?? '') }}" placeholder="Jalan"></div>
-                        <div class="field-group"><label>RT</label><input type="text" name="rt" value="{{ old('rt', $pendaftaran->rt ?? '') }}" placeholder="RT"></div>
-                        <div class="field-group"><label>RW</label><input type="text" name="rw" value="{{ old('rw', $pendaftaran->rw ?? '') }}" placeholder="RW"></div>
-                        <div class="field-group"><label>Desa</label><input type="text" name="desa" value="{{ old('desa', $pendaftaran->desa ?? '') }}" placeholder="Desa"></div>
                         <div class="field-group"><label>Alasan Pembaruan</label>
                             <select name="alasan_pembaruan">
                                 <option value="">Pilih alasan</option>
@@ -247,7 +234,6 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="field-group"><label>No HP</label><input type="text" name="no_telepon" value="{{ old('no_telepon', $pendaftaran->no_telepon ?? '') }}" placeholder="Nomor HP"></div>
                     </div>
                 </div>
 
@@ -468,9 +454,9 @@
 
                 <div class="service-section" data-service="Kedatangan" {{ $selectedService == 'Kedatangan' ? '' : 'hidden' }}>
                     <div class="form-grid compact-grid">
+                        <div class="field-group"><label>Tanggal Kedatangan</label><input type="date" name="tanggal_kedatangan" value="{{ old('tanggal_kedatangan', $pendaftaran->tanggal_kedatangan ?? '') }}"></div>
                         <div class="field-group"><label>Bulan</label><input type="text" name="bulan" value="{{ old('bulan', $pendaftaran->bulan ?? '') }}" placeholder="Contoh: JAN"></div>
                         <div class="field-group"><label>Minggu Ke</label><input type="text" name="minggu_ke" value="{{ old('minggu_ke', $pendaftaran->minggu_ke ?? '') }}" placeholder="Contoh: 1"></div>
-                        <div class="field-group"><label>Tanggal Kedatangan</label><input type="date" name="tanggal_kedatangan" value="{{ old('tanggal_kedatangan', $pendaftaran->tanggal_kedatangan ?? '') }}"></div>
                         <div class="field-group"><label>Nama</label><input type="text" name="nama_kedatangan" value="{{ old('nama_kedatangan', $pendaftaran->nama_kedatangan ?? '') }}" placeholder="Nama pendatang"></div>
                         <div class="field-group"><label>NIK</label><input type="text" name="nik_kedatangan" value="{{ old('nik_kedatangan', $pendaftaran->nik_kedatangan ?? '') }}" placeholder="NIK"></div>
                         <div class="field-group"><label>Alamat Asal</label><input type="text" name="alamat_asal_kedatangan" value="{{ old('alamat_asal_kedatangan', $pendaftaran->alamat_asal_kedatangan ?? '') }}" placeholder="Alamat asal"></div>
@@ -579,7 +565,7 @@
                         },
                         'KTP': {
                             name: 'KTP Pembaharuan',
-                            docs: ['KTP asli', 'Fotocopy Kartu Keluarga (KK)']
+                            docs: ['KTP asli (bagi KTP rusak / perubahan data)', 'Fotocopy Kartu Keluarga (KK)', 'Surat kehilangan dari kepolisian (wajib jika KTP hilang)', 'Dokumen pendukung lainnya']
                         },
                         'Akta Kematian': {
                             name: 'Akta Kematian',

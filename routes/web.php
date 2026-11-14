@@ -27,6 +27,26 @@ Route::get('/dashboard', function () {
     };
 })->middleware('auth')->name('dashboard');
 
+Route::get('/permohonan', function () {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+    return match (Auth::user()->role) {
+        'masyarakat' => redirect()->route('masyarakat.permohonan.create'),
+        default => redirect()->route('pendaftaran.create'),
+    };
+})->name('permohonan');
+
+Route::get('/pendaftaran', function () {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+    return match (Auth::user()->role) {
+        'masyarakat' => redirect()->route('masyarakat.permohonan.create'),
+        default => redirect()->route('pendaftaran.create'),
+    };
+});
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 Route::get('/login/masyarakat', [AuthController::class, 'showCitizenLogin'])->name('login.citizen');

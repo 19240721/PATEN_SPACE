@@ -819,7 +819,11 @@
         Dengan ini saya menyatakan bahwa data, keterangan, dan berkas yang saya berikan dalam formulir permohonan ini adalah benar, sah, dan dibuat dengan sesungguhnya tanpa paksaan dari pihak manapun. Apabila di kemudian hari terbukti keterangan yang saya sampaikan tidak benar/palsu, saya bersedia bertanggung jawab sepenuhnya dan dituntut sesuai dengan ketentuan peraturan perundang-undangan yang berlaku.
     </div>
 
-    {{-- IV. TANDA TANGAN & MATERAI (MANUAL) --}}
+    {{-- IV. TANDA TANGAN (DENGAN / TANPA MATERAI) --}}
+    @php
+        $layananTanpaMaterai = ['KTP', 'PRR', 'Pindah', 'Kedatangan'];
+        $pakaiMaterai = !in_array($pendaftaran->jenis_layanan, $layananTanpaMaterai, true);
+    @endphp
     <table class="signature-table">
         <tr>
             <td>
@@ -837,12 +841,17 @@
                 </div>
                 <div class="sig-instansi">Pemohon,</div>
 
-                {{-- Kotak Materai Tempel Fisik Manual --}}
-                <div class="materai-box">
-                    <div class="materai-title">MATERAI TEMPEL</div>
-                    <div class="materai-value">Rp 10.000,-</div>
-                    <div class="materai-hint">(Tanda tangan manual<br>di atas materai)</div>
-                </div>
+                @if($pakaiMaterai)
+                    {{-- Kotak Materai Tempel Fisik Manual (KK, Akta Lahir, Akta Kematian) --}}
+                    <div class="materai-box">
+                        <div class="materai-title">MATERAI TEMPEL</div>
+                        <div class="materai-value">Rp 10.000,-</div>
+                        <div class="materai-hint">(Tanda tangan manual<br>di atas materai)</div>
+                    </div>
+                @else
+                    {{-- Ruang Tanda Tangan Manual Tanpa Materai (KTP, PRR, Pindah, Kedatangan) --}}
+                    <div class="sig-space-petugas"></div>
+                @endif
 
                 <div class="sig-line">( ............................................................ )</div>
                 <div class="sig-name">{{ $pendaftaran->nama_lengkap }}</div>
