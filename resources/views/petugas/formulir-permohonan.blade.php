@@ -819,11 +819,7 @@
         Dengan ini saya menyatakan bahwa data, keterangan, dan berkas yang saya berikan dalam formulir permohonan ini adalah benar, sah, dan dibuat dengan sesungguhnya tanpa paksaan dari pihak manapun. Apabila di kemudian hari terbukti keterangan yang saya sampaikan tidak benar/palsu, saya bersedia bertanggung jawab sepenuhnya dan dituntut sesuai dengan ketentuan peraturan perundang-undangan yang berlaku.
     </div>
 
-    {{-- IV. TANDA TANGAN (DENGAN / TANPA MATERAI) --}}
-    @php
-        $layananTanpaMaterai = ['KTP', 'PRR', 'Pindah', 'Kedatangan'];
-        $pakaiMaterai = !in_array($pendaftaran->jenis_layanan, $layananTanpaMaterai, true);
-    @endphp
+    {{-- IV. TANDA TANGAN & MATERAI (MANUAL) --}}
     <table class="signature-table">
         <tr>
             <td>
@@ -841,15 +837,18 @@
                 </div>
                 <div class="sig-instansi">Pemohon,</div>
 
-                @if($pakaiMaterai)
-                    {{-- Kotak Materai Tempel Fisik Manual (KK, Akta Lahir, Akta Kematian) --}}
+                @php
+                    $needsMaterai = in_array($pendaftaran->jenis_layanan, ['KK', 'Akta Kematian', 'Akta Lahir'], true);
+                @endphp
+
+                @if($needsMaterai)
+                    {{-- Kotak Materai Tempel Fisik Manual (Hanya untuk KK, Akta Kematian, dan Akta Kelahiran) --}}
                     <div class="materai-box">
                         <div class="materai-title">MATERAI TEMPEL</div>
                         <div class="materai-value">Rp 10.000,-</div>
                         <div class="materai-hint">(Tanda tangan manual<br>di atas materai)</div>
                     </div>
                 @else
-                    {{-- Ruang Tanda Tangan Manual Tanpa Materai (KTP, PRR, Pindah, Kedatangan) --}}
                     <div class="sig-space-petugas"></div>
                 @endif
 

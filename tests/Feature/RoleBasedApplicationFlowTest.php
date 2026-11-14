@@ -382,7 +382,7 @@ class RoleBasedApplicationFlowTest extends TestCase
             'nama_lengkap' => 'Budi Santoso',
             'nik' => '3215000000000001',
             'alamat' => 'Desa Cirejag RT 01 RW 02',
-            'jenis_layanan' => 'KTP',
+            'jenis_layanan' => 'KK',
             'tanggal_daftar' => '2026-11-01',
             'status' => 'Baru',
             'intake_source' => 'masyarakat',
@@ -398,6 +398,18 @@ class RoleBasedApplicationFlowTest extends TestCase
             ->assertSee('Rp 10.000,-')
             ->assertSee('Pemohon,')
             ->assertSee('Petugas Pelayanan PATEN Jatisari');
+
+        // Pastikan layanan non-materai (seperti KTP atau PRR) tidak menampilkan kotak materai
+        $ktpApp = Pendaftaran::create([
+            'nama_lengkap' => 'Ahmad Fauzi',
+            'nik' => '3215000000000002',
+            'jenis_layanan' => 'KTP',
+            'tanggal_daftar' => '2026-11-01',
+            'status' => 'Baru',
+        ]);
+        $ktpResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.formulir', $ktpApp));
+        $ktpResponse->assertOk()
+            ->assertDontSee('MATERAI TEMPEL');
 
         // Test list shows verification link, detail page shows print link
         $listResponse = $this->actingAs($petugas)->get(route('petugas.permohonan.index'));
