@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CamatController extends Controller
 {
@@ -886,6 +887,20 @@ class CamatController extends Controller
     public function laporan(Request $request)
     {
         $data = $this->getLaporanReportData($request);
+        $services = collect($data['services']);
+        $perPage = 10;
+        $page = max(1, (int) $request->integer('page', 1));
+        $data['services'] = new LengthAwarePaginator(
+            $services->forPage($page, $perPage)->values(),
+            $services->count(),
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'pageName' => 'page',
+                'query' => $request->query(),
+            ]
+        );
 
         return view('camat.laporan', $data);
     }

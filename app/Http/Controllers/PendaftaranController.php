@@ -437,13 +437,14 @@ class PendaftaranController extends Controller
             $query->whereDate('tanggal_daftar', '<=', $request->input('tanggal_akhir'));
         }
 
-        $pendaftarans = $query->get();
+        $filteredPendaftarans = (clone $query)->get();
+        $pendaftarans = $query->paginate(10)->withQueryString();
 
         // Total seluruh pelayanan sesuai filter
-        $totalPelayanan = $pendaftarans->count();
+        $totalPelayanan = $filteredPendaftarans->count();
 
         // Rekap berdasarkan jenis layanan
-        $rekapLayanan = $pendaftarans
+        $rekapLayanan = $filteredPendaftarans
             ->groupBy('jenis_layanan')
             ->map(function ($items) {
                 return $items->count();
@@ -451,26 +452,26 @@ class PendaftaranController extends Controller
             ->sortDesc();
 
         // Statistik berdasarkan status
-        $proses = $pendaftarans
+        $proses = $filteredPendaftarans
             ->where('status', 'Proses')
             ->count();
 
-        $selesai = $pendaftarans
+        $selesai = $filteredPendaftarans
             ->where('status', 'Selesai')
             ->count();
 
         // Statistik jenis layanan
-        $total = $pendaftarans->count();
+        $total = $filteredPendaftarans->count();
 
-        $prr = $pendaftarans
+        $prr = $filteredPendaftarans
             ->where('jenis_layanan', 'PRR')
             ->count();
 
-        $ktp = $pendaftarans
+        $ktp = $filteredPendaftarans
             ->where('jenis_layanan', 'KTP')
             ->count();
 
-        $kk = $pendaftarans
+        $kk = $filteredPendaftarans
             ->where('jenis_layanan', 'KK')
             ->count();
 

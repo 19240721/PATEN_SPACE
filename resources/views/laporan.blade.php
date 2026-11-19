@@ -113,7 +113,7 @@
                 <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <div>
                         <h2>Daftar Pendaftaran</h2>
-                        <p>{{ $pendaftarans->count() }} data ditampilkan</p>
+                        <p>{{ $pendaftarans->total() }} data ditemukan</p>
                     </div>
                     @if(request()->hasAny(['q', 'jenis_layanan', 'status', 'tanggal_awal', 'tanggal_akhir']))
                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -168,7 +168,7 @@
                     <tbody>
                         @forelse ($pendaftarans as $index => $item)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $pendaftarans->firstItem() + $index }}</td>
                                 <td class="person-name">{{ $item->nama_lengkap }}</td>
                                 <td>{{ $item->jenis_layanan === 'KK' ? 'Kartu Keluarga' : $item->jenis_layanan }}</td>
                                 <td>{{ $item->petugas ?? '-' }}</td>
@@ -180,6 +180,33 @@
                         @endforelse
                     </tbody>
                 </table></div>
+
+                @if ($pendaftarans->hasPages())
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 20px; border-top: 1px solid #e2e8f0;">
+                        <span style="font-size: 0.82rem; color: #64748b;">
+                            Menampilkan {{ $pendaftarans->firstItem() }}-{{ $pendaftarans->lastItem() }} dari {{ $pendaftarans->total() }} data
+                        </span>
+                        <nav style="display: flex; gap: 6px; align-items: center;">
+                            @if ($pendaftarans->onFirstPage())
+                                <span style="padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 5px; color: #94a3b8;">&laquo;</span>
+                            @else
+                                <a href="{{ $pendaftarans->previousPageUrl() }}" style="padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; text-decoration: none;">&laquo;</a>
+                            @endif
+                            @foreach ($pendaftarans->getUrlRange(1, $pendaftarans->lastPage()) as $page => $url)
+                                @if ($page === $pendaftarans->currentPage())
+                                    <span style="padding: 7px 10px; border-radius: 5px; background: #796743; color: #fff; font-weight: 700;">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}" style="padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; text-decoration: none;">{{ $page }}</a>
+                                @endif
+                            @endforeach
+                            @if ($pendaftarans->hasMorePages())
+                                <a href="{{ $pendaftarans->nextPageUrl() }}" style="padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; text-decoration: none;">&raquo;</a>
+                            @else
+                                <span style="padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 5px; color: #94a3b8;">&raquo;</span>
+                            @endif
+                        </nav>
+                    </div>
+                @endif
             </section>
         </div>
     </main>

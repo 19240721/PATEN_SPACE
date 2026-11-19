@@ -365,7 +365,7 @@
                         $pct = $item['count'] > 0 ? round(($item['selesai'] / $item['count']) * 100, 1) : 0;
                     @endphp
                     <tr>
-                        <td><strong>0{{ $loop->iteration }}</strong></td>
+                        <td><strong>{{ str_pad((string) ($services->firstItem() + $index), 2, '0', STR_PAD_LEFT) }}</strong></td>
                         <td>
                             <strong style="color: #1e3a5f;">{{ $item['label'] }}</strong>
                             <div style="font-size: 0.72rem; color: #64748b;">Kecamatan Jatisari</div>
@@ -424,6 +424,33 @@
             </tfoot>
         </table>
     </div>
+
+    @if ($services->hasPages())
+        <div class="no-print" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 20px; border-top: 1px solid #e2e8f0;">
+            <span style="font-size: 0.82rem; color: #64748b;">
+                Menampilkan {{ $services->firstItem() }}-{{ $services->lastItem() }} dari {{ $services->total() }} jenis pelayanan
+            </span>
+            <nav style="display: flex; gap: 6px; align-items: center;">
+                @if ($services->onFirstPage())
+                    <span style="padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 5px; color: #94a3b8;">&laquo;</span>
+                @else
+                    <a href="{{ $services->previousPageUrl() }}" style="padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; text-decoration: none;">&laquo;</a>
+                @endif
+                @foreach ($services->getUrlRange(1, $services->lastPage()) as $page => $url)
+                    @if ($page === $services->currentPage())
+                        <span style="padding: 7px 10px; border-radius: 5px; background: #796743; color: #fff; font-weight: 700;">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" style="padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; text-decoration: none;">{{ $page }}</a>
+                    @endif
+                @endforeach
+                @if ($services->hasMorePages())
+                    <a href="{{ $services->nextPageUrl() }}" style="padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; color: #334155; text-decoration: none;">&raquo;</a>
+                @else
+                    <span style="padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 5px; color: #94a3b8;">&raquo;</span>
+                @endif
+            </nav>
+        </div>
+    @endif
 
 </section>
 
