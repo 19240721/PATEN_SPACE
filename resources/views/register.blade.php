@@ -32,10 +32,6 @@
             <span><strong>{{ auth()->user()->name }}</strong><small>{{ ucfirst(auth()->user()->role) }} PATEN</small></span>
         </a>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="logout-btn" type="submit">Keluar</button>
-        </form>
     </aside>
 
     <main class="main-panel form-page-main">
@@ -112,13 +108,13 @@
                             <option value="P" {{ old('jenis_kelamin', $pendaftaran->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                     </div>
-                    <div class="field-group">
+                    <div class="field-group reg-ttl-field" {{ in_array($selectedService, ['Kedatangan', 'Pindah'], true) ? 'hidden' : '' }}>
                         <label for="tempat_lahir">Tempat Lahir</label>
-                        <input id="tempat_lahir" name="tempat_lahir" type="text" placeholder="Masukkan tempat lahir" value="{{ old('tempat_lahir', $pendaftaran->tempat_lahir ?? '') }}">
+                        <input id="tempat_lahir" name="tempat_lahir" type="text" placeholder="Masukkan tempat lahir" value="{{ old('tempat_lahir', $pendaftaran->tempat_lahir ?? '') }}" {{ in_array($selectedService, ['Kedatangan', 'Pindah'], true) ? 'disabled' : '' }}>
                     </div>
-                    <div class="field-group">
+                    <div class="field-group reg-ttl-field" {{ in_array($selectedService, ['Kedatangan', 'Pindah'], true) ? 'hidden' : '' }}>
                         <label for="tanggal_lahir">Tanggal Lahir</label>
-                        <input id="tanggal_lahir" name="tanggal_lahir" type="text" placeholder="Contoh: 10-05-1998" value="{{ old('tanggal_lahir', $pendaftaran->tanggal_lahir ?? '') }}">
+                        <input id="tanggal_lahir" name="tanggal_lahir" type="text" placeholder="Contoh: 10-05-1998" value="{{ old('tanggal_lahir', $pendaftaran->tanggal_lahir ?? '') }}" {{ in_array($selectedService, ['Kedatangan', 'Pindah'], true) ? 'disabled' : '' }}>
                     </div>
                     <div class="field-group">
                         <label for="jalan">Jalan</label>
@@ -528,6 +524,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const serviceSelect = document.getElementById('jenis_layanan');
+                const serviceInput = document.querySelector('input[name="jenis_layanan"]');
                 const serviceSections = document.querySelectorAll('.service-section');
 
                 window.toggleRegSptjm = function(isChecked) {
@@ -537,7 +534,7 @@
                 };
 
                 function updateServiceSections() {
-                    const selected = serviceSelect.value || 'KTP';
+                    const selected = (serviceSelect ? serviceSelect.value : (serviceInput ? serviceInput.value : '')) || 'KTP';
                     const infoCard = document.querySelector('[data-role="informasi-pendaftar"]');
                     const sptjmChecked = document.getElementById('reg_sptjm_kematian') ? document.getElementById('reg_sptjm_kematian').checked : false;
 
@@ -555,6 +552,15 @@
                             field.disabled = selected === 'PRR'
                                 && field.name !== 'jenis_layanan'
                                 && field.name !== 'tanggal_daftar';
+                        });
+
+                        const noTtlServices = ['Kedatangan', 'Pindah'];
+                        const isNoTtl = noTtlServices.includes(selected);
+                        infoCard.querySelectorAll('.reg-ttl-field').forEach(function (ttlField) {
+                            ttlField.hidden = isNoTtl;
+                            ttlField.querySelectorAll('input').forEach(function (input) {
+                                input.disabled = isNoTtl || selected === 'PRR';
+                            });
                         });
                     }
 
@@ -604,8 +610,8 @@
 
                 if (serviceSelect) {
                     serviceSelect.addEventListener('change', updateServiceSections);
-                    updateServiceSections();
                 }
+                updateServiceSections();
             });
         </script>
     </main>

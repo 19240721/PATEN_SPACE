@@ -472,22 +472,28 @@
             <td class="col-val">{{ $pendaftaran->nomor_kk }}</td>
         </tr>
         @endif
+        @php
+            $showTtlInForm = !in_array($pendaftaran->jenis_layanan, ['KK', 'Kedatangan', 'Pindah'], true);
+            $fieldIndex = $pendaftaran->nomor_kk ? 4 : 3;
+        @endphp
         <tr>
-            <td class="col-num">{{ $pendaftaran->nomor_kk ? '4.' : '3.' }}</td>
+            <td class="col-num">{{ $fieldIndex++ }}.</td>
             <td class="col-label">Jenis Kelamin</td>
             <td class="col-sep">:</td>
             <td class="col-val">{{ $pendaftaran->jenis_kelamin ?? '-' }}</td>
         </tr>
+        @if($showTtlInForm)
         <tr>
-            <td class="col-num">{{ $pendaftaran->nomor_kk ? '5.' : '4.' }}</td>
+            <td class="col-num">{{ $fieldIndex++ }}.</td>
             <td class="col-label">Tempat / Tanggal Lahir</td>
             <td class="col-sep">:</td>
             <td class="col-val">
                 {{ $pendaftaran->tempat_lahir ?? '-' }}, {{ $pendaftaran->tanggal_lahir ? \Illuminate\Support\Carbon::parse($pendaftaran->tanggal_lahir)->translatedFormat('d F Y') : '-' }}
             </td>
         </tr>
+        @endif
         <tr>
-            <td class="col-num">{{ $pendaftaran->nomor_kk ? '6.' : '5.' }}</td>
+            <td class="col-num">{{ $fieldIndex++ }}.</td>
             <td class="col-label">Alamat Domisili</td>
             <td class="col-sep">:</td>
             <td class="col-val">
@@ -500,7 +506,7 @@
             </td>
         </tr>
         <tr>
-            <td class="col-num">{{ $pendaftaran->nomor_kk ? '7.' : '6.' }}</td>
+            <td class="col-num">{{ $fieldIndex++ }}.</td>
             <td class="col-label">Nomor Telepon / WhatsApp</td>
             <td class="col-sep">:</td>
             <td class="col-val">{{ $pendaftaran->no_telepon ?? '-' }}</td>

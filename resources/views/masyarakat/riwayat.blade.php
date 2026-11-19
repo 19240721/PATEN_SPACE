@@ -617,13 +617,10 @@
             <span class="mbn-icon">📋</span>
             <span>Riwayat</span>
         </a>
-        <form method="POST" action="{{ route('logout') }}" style="flex:1;display:flex;">
-            @csrf
-            <button type="submit" class="mbn-link" style="background:none;border:none;cursor:pointer;width:100%;font-family:inherit;">
-                <span class="mbn-icon">🚪</span>
-                <span>Keluar</span>
-            </button>
-        </form>
+        <a class="mbn-link" href="{{ route('profil') }}">
+            <span class="mbn-icon">👤</span>
+            <span>Profil</span>
+        </a>
     </nav>
 
     {{-- Virtual Android Navigation Bar --}}

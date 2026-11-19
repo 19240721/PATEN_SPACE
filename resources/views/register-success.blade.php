@@ -31,10 +31,6 @@
             <span><strong>{{ auth()->user()->name }}</strong><small>{{ ucfirst(auth()->user()->role) }} PATEN</small></span>
         </a>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="logout-btn" type="submit">Keluar</button>
-        </form>
         @endauth
     </aside>
 

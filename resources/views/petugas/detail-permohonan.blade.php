@@ -52,10 +52,6 @@
                     <span>Kabupaten Karawang</span>
                 </div>
             </div>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="report-filter-button">Keluar</button>
-            </form>
         </header>
 
         <div class="dashboard-content">
@@ -238,6 +234,7 @@
                         </div>
 
                         @php
+                            $hideTtl = in_array($pendaftaran->jenis_layanan, ['KK', 'Kedatangan', 'Pindah'], true);
                             $fields = [
                                 'Jenis Layanan'   => $pendaftaran->jenis_layanan,
                                 'Tanggal Daftar'  => $pendaftaran->tanggal_daftar ? \Illuminate\Support\Facades\Date::parse($pendaftaran->tanggal_daftar)->format('d-m-Y') : null,
@@ -245,8 +242,8 @@
                                 'Nama Lengkap'    => $pendaftaran->nama_lengkap,
                                 'NIK'             => $pendaftaran->nik,
                                 'Jenis Kelamin'   => $pendaftaran->jenis_kelamin,
-                                'Tempat Lahir'    => $pendaftaran->tempat_lahir,
-                                'Tanggal Lahir'   => $pendaftaran->tanggal_lahir ? \Illuminate\Support\Facades\Date::parse($pendaftaran->tanggal_lahir)->format('d-m-Y') : null,
+                                'Tempat Lahir'    => $hideTtl ? null : $pendaftaran->tempat_lahir,
+                                'Tanggal Lahir'   => $hideTtl ? null : ($pendaftaran->tanggal_lahir ? \Illuminate\Support\Facades\Date::parse($pendaftaran->tanggal_lahir)->format('d-m-Y') : null),
                                 'Alamat'          => $pendaftaran->alamat,
                                 'Jalan'           => $pendaftaran->jalan,
                                 'RT'              => $pendaftaran->rt,

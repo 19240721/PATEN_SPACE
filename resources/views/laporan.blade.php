@@ -50,10 +50,6 @@
                     <span>Kabupaten Karawang</span>
                 </div>
             </div>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="report-filter-button">Keluar</button>
-            </form>
         </header>
 
         <div class="dashboard-content">

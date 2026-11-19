@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+    // ---------- Login ----------
     public function showLogin()
     {
         if (Auth::check()) {
             return redirect()->route($this->dashboardRouteForAuthenticatedUser());
         }
-
         return view('auth.login', ['citizenLogin' => false]);
     }
 
@@ -22,7 +27,6 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route($this->dashboardRouteForAuthenticatedUser());
         }
-
         return view('auth.login', ['citizenLogin' => true]);
     }
 
@@ -30,27 +34,22 @@ class AuthController extends Controller
     {
         $alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
         $code = '';
-
         for ($index = 0; $index < 3; $index++) {
             $code .= $alphabet[random_int(0, strlen($alphabet) - 1)];
         }
-
         $request->session()->put('login_captcha', $code);
-
         $letters = [];
         foreach (str_split($code) as $index => $character) {
             $x = 47 + ($index * 38) + random_int(-3, 3);
             $y = 34 + random_int(-4, 4);
             $rotation = random_int(-14, 14);
-            $letters[] = '<text x="'.$x.'" y="'.$y.'" transform="rotate('.$rotation.' '.$x.' '.$y.')" text-anchor="middle" font-family="Georgia,serif" font-size="29" font-weight="700" fill="#302879">'.$character.'</text>';
+            $letters[] = '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $rotation . ' ' . $x . ' ' . $y . ')" text-anchor="middle" font-family="Georgia,serif" font-size="29" font-weight="700" fill="#302879">' . $character . '</text>';
         }
-
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 52" role="img" aria-label="Kode keamanan">'
-            .'<rect x="1" y="1" width="158" height="50" rx="8" fill="#f8fafc" stroke="#d9dded"/>'
-            .'<path d="M14 37 148 15M18 13l126 26M26 46l101-37" stroke="#c8c7dc" stroke-width="1" opacity=".7"/>'
-            .implode('', $letters)
-            .'</svg>';
-
+            . '<rect x="1" y="1" width="158" height="50" rx="8" fill="#f8fafc" stroke="#d9dded"/>'
+            . '<path d="M14 37 148 15M18 13l126 26M26 46l101-37" stroke="#c8c7dc" stroke-width="1" opacity=".7"/>'
+            . implode('', $letters)
+            . '</svg>';
         return response($svg, 200, [
             'Content-Type' => 'image/svg+xml',
             'Cache-Control' => 'no-store, no-cache, must-revalidate',
@@ -76,33 +75,31 @@ class AuthController extends Controller
         ]);
 
         $expectedCaptcha = (string) $request->session()->pull('login_captcha');
-        if ($expectedCaptcha === '' || ! hash_equals($expectedCaptcha, strtoupper(trim($credentials['captcha'])))) {
+        if ($expectedCaptcha === '' || !hash_equals($expectedCaptcha, strtoupper(trim($credentials['captcha'])))) {
             return back()
                 ->withErrors(['captcha' => 'Kode keamanan tidak sesuai.'])
                 ->withInput($request->only('email'));
         }
 
         unset($credentials['captcha']);
-
         $credentials['role'] = fn ($query) => $query->whereIn('role', $allowedRoles);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors(['email' => 'Email atau password salah.'])
                 ->onlyInput('email');
         }
 
         $request->session()->regenerate();
-
         return redirect()->route($this->dashboardRouteForAuthenticatedUser());
     }
 
+    // ---------- Registration ----------
     public function showRegister()
     {
         if (Auth::check()) {
             return redirect()->route($this->dashboardRouteForAuthenticatedUser());
         }
-
         return view('auth.register');
     }
 
@@ -116,27 +113,85 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'terms_accepted' => ['accepted'],
         ]);
-
         $validated['role'] = 'masyarakat';
         User::create($validated);
-
         return redirect()->route('login.citizen')->with('status', 'Akun berhasil dibuat. Silakan login.');
     }
 
+    // ---------- Logout ----------
     public function logout(Request $request)
     {
         $loginRoute = Auth::user()?->role === 'masyarakat' ? 'login.citizen' : 'login';
-
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route($loginRoute);
     }
 
     private function dashboardRouteForAuthenticatedUser(): string
     {
-        return Auth::user()->role === 'camat' ? 'camat.dashboard' : 'dashboard';
+        return Auth::user()?->role === 'camat' ? 'camat.dashboard' : 'dashboard';
+    }
+
+    // ---------- Forgot Password ----------
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+        $email = $request->input('email');
+        $user = User::where('email', $email)->first();
+        if (! $user) {
+            return back()->withErrors(['email' => 'Email tidak terdaftar.']);
+        }
+        $token = Str::random(64);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $email],
+            ['token' => $token, 'created_at' => now()]
+        );
+        $resetUrl = url(route('password.reset', ['token' => $token]));
+        Mail::raw("Klik link berikut untuk reset password: $resetUrl", function ($m) use ($email) {
+            $m->to($email)->subject('Reset Password');
+        });
+        return back()->with('status', 'Link reset password telah dikirim ke email Anda.');
+    }
+
+    public function showResetForm($token)
+    {
+        // Simple existence check
+        $record = DB::table('password_reset_tokens')->where('token', $token)->first();
+        if (! $record) {
+            return redirect()->route('password.request')->withErrors(['token' => 'Token tidak valid atau sudah kedaluwarsa.']);
+        }
+        return view('auth.reset-password', ['token' => $token]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'token' => ['required'],
+        ]);
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+        if (! $record) {
+            return back()->withErrors(['email' => 'Token tidak valid atau telah kedaluwarsa.']);
+        }
+        $user = User::where('email', $request->email)->first();
+        if (! $user) {
+            return back()->withErrors(['email' => 'User tidak ditemukan.']);
+        }
+        $user->password = Hash::make($request->password);
+        $user->save();
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        return redirect()->route('login')->with('status', 'Password berhasil diubah. Silakan login.');
     }
 }

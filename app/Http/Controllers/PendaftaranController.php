@@ -310,7 +310,7 @@ class PendaftaranController extends Controller
             $validated['alamat'] = !empty($parts) ? implode(', ', $parts) : '-';
         }
 
-        if (($validated['jenis_layanan'] ?? null) === 'KK') {
+        if (in_array($validated['jenis_layanan'] ?? null, ['KK', 'Kedatangan', 'Pindah'], true)) {
             $validated['tempat_lahir'] = null;
             $validated['tanggal_lahir'] = null;
         }
@@ -719,7 +719,7 @@ class PendaftaranController extends Controller
         ]);
 
         $newDocuments = $this->storeDocuments($request, $pendaftaran);
-        if (($validated['jenis_layanan'] ?? null) === 'KK') {
+        if (in_array($validated['jenis_layanan'] ?? null, ['KK', 'Kedatangan', 'Pindah'], true)) {
             $validated['tempat_lahir'] = null;
             $validated['tanggal_lahir'] = null;
         }

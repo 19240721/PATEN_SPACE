@@ -55,6 +55,12 @@ Route::get('/login/captcha', [AuthController::class, 'captchaImage'])->name('log
 Route::get('/daftar', [AuthController::class, 'showRegister'])->name('account.register');
 Route::post('/daftar', [AuthController::class, 'register'])->name('account.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+// Forgot Password routes
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 Route::middleware('auth')->group(function () {
     Route::get('/profil', [ProfileController::class, 'show'])->name('profil');
     Route::get('/profil-akun', [ProfileController::class, 'edit'])->name('account.profile');

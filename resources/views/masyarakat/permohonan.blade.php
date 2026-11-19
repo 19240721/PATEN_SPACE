@@ -1121,7 +1121,7 @@
                         </div>
                     </div>
 
-                    <div class="mob-grid-2" id="mob-ttl-group" style="{{ old('jenis_layanan', $selectedService) === 'KK' ? 'display:none;' : '' }}">
+                    <div class="mob-grid-2" id="mob-ttl-group" style="{{ in_array(old('jenis_layanan', $selectedService), ['KK', 'Kedatangan', 'Pindah'], true) ? 'display:none;' : '' }}">
                         <div class="mob-field">
                             <label class="mob-label">Tempat Lahir</label>
                             <input class="mob-input" name="tempat_lahir" type="text"
@@ -1966,13 +1966,10 @@
             <span class="mbn-icon">📋</span>
             <span>Riwayat</span>
         </a>
-        <form method="POST" action="{{ route('logout') }}" style="flex:1;display:flex;">
-            @csrf
-            <button type="submit" class="mbn-link" style="background:none;border:none;cursor:pointer;width:100%;font-family:inherit;">
-                <span class="mbn-icon">🚪</span>
-                <span>Keluar</span>
-            </button>
-        </form>
+        <a class="mbn-link" href="{{ route('profil') }}">
+            <span class="mbn-icon">👤</span>
+            <span>Profil</span>
+        </a>
     </nav>
 
     {{-- Tombol Navigasi Virtual Ponsel (Android 3-Button Navigation) --}}
@@ -2162,10 +2159,10 @@ function selectService(value) {
 
     renderServiceRequirements(value);
 
-    // Sembunyikan Tempat Lahir & Tanggal Lahir untuk permohonan KK
+    // Sembunyikan Tempat Lahir & Tanggal Lahir untuk permohonan KK, Kedatangan, dan Pindah
     const ttlGroup = document.getElementById('mob-ttl-group');
     if (ttlGroup) {
-        if (value === 'KK') {
+        if (['KK', 'Kedatangan', 'Pindah'].includes(value)) {
             ttlGroup.style.display = 'none';
             ttlGroup.querySelectorAll('input').forEach(inp => inp.value = '');
         } else {
